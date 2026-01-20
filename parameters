@@ -1,6 +1,6 @@
 #____________LAUNCH_____________
 
-outdir                  = "/tmp/"
+outdir                  = "./Data/baseline/"
 
 #___________PROFILE_____________
 
