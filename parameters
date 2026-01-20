@@ -1,0 +1,86 @@
+#____________LAUNCH_____________
+
+outdir                  = "/home/mrenzo/Runs/LMXRB/SNEC_expl/output/s30VdJNL_0.33/Thermal_bomb0.1e51/"
+
+#___________PROFILE_____________
+
+profile_name 		= "/home/mrenzo/Runs/LMXRB/SNEC_expl/input/s30VdJNL_0.33/s30VdJNL_0.33_onset_cc.short"
+
+comp_profile_name	= "/home/mrenzo/Runs/LMXRB/SNEC_expl/input/s30VdJNL_0.33/s30VdJNL_0.33_onset_cc.iso.dat"
+
+#__________EXPLOSION_________0;82;33M0;82;33m____
+
+initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
+
+#Options:
+#"Piston_Explosion"
+#"Thermal_Bomb"
+
+# piston_vel		= 5.0d8
+# piston_tstart		= 0.0d0
+# piston_tend		= 1.0d-2
+
+final_energy		= 0.1d51
+bomb_tstart		= 0.0d0
+bomb_tend		= 1.0d-2
+bomb_mass_spread	= 0.1d0 #(in solar mass)
+bomb_start_point	= 1
+
+#_____________GRID_______________
+
+imax			= 1146
+
+gridding		= "uniform_in_mass" #"from_file_by_mass"
+
+#Options:
+#"uniform_in_mass"
+#"from_file_by_mass"
+
+mass_excision		= 1
+mass_excised		= 1.4 #in solar mass, provided mass_excision = 1
+
+#___________EVOLUTION_____________
+
+radiation		= 1 # 1
+eoskey			= 2 # 1
+
+#Options:
+#1 - ideal eos
+#2 - Paczynski
+
+Ni_switch		= 1
+Ni_mass			= 0.0d0 # 0.028
+Ni_boundary_mass	= 2.9d0
+Ni_by_hand		= 0
+
+Ni_period		= 1.0d4
+
+saha_ncomps		= 3
+
+boxcar_smoothing	= 1
+
+opacity_floor_envelope	= 0.01d0
+opacity_floor_core	= 0.01d0
+
+#___________TIMING_______________
+
+ntmax			= 10000000000000
+
+tend			= 86400.0d0
+
+dtout			= 1800.0d0
+dtout_scalar		= 1800.0d0
+dtout_check		= 1800.0d0
+
+ntout			= -1
+ntout_scalar		= -1
+ntout_check		= -1
+
+ntinfo			= 1000
+
+dtmin			= 1.0d-10
+dtmax			= 1.0d2
+
+#____________TEST_________________
+
+sedov			= 0
