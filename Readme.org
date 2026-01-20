@@ -1,10 +1,6 @@
 #+title: Supernova Explosion Code (SNEC)
 
-#+begin_src html
-  <a href="https://ui.adsabs.harvard.edu/abs/2015ApJ...814...63M/abstract">
-      <img src="https://img.shields.io/badge/read-paper-blue.svg?style=flat" alt="Read the article"/>
-  </a>
-#+end_src
+[[https://ui.adsabs.harvard.edu/abs/2015ApJ...814...63M/abstract][https://img.shields.io/badge/read-paper-blue.svg?style=flat]] [[https://sntheory.org/SNEC.html][https://img.shields.io/website-up-down-green-red/http/shields.io.svg]]
 
 Copy of the SNEC code for further development. Original distribution
 source is at [[https://sntheory.org/SNEC.html]].
