@@ -1,0 +1,10 @@
+name: dev_SNEC
+channels:
+  - defaults
+dependencies:
+  - jupyter=1.0.0
+  - joblib=1.2.0
+  - matplotlib=3.10.0
+  - astropy=7.2.0
+  - pip:
+    - git+https://github.com/mathren/compare_workdir_MESA/
