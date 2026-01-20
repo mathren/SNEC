@@ -7,4 +7,4 @@ Data/*
 *.data
 *.xg
 profiles/*
-snec # executable
+./snec # executable
