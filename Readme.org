@@ -4,3 +4,12 @@
 
 Copy of the SNEC code for further development. Original distribution
 source is at [[https://sntheory.org/SNEC.html]].
+
+* TODO Objective:
+- [ ] implement inner boundary conditions allowing for infall with no
+  back reaction.
+
+The idea is to track an inner "ghost cell" which always has velocity
+and pressure of the cell above (first in the computational domain), so
+that no velocity or pressure gradient is created and no back reaction
+applies in the domain.
