@@ -50,4 +50,5 @@ if __name__ == "__main__":
                                          c=colors[i], label=f"{t.to(u.h):.1f}")
     ax.set_xlabel(r"Initial mass coordinate $[M_{\odot}]$")
     ax.set_ylabel(r"$v \ [\mathrm{km\ s^{-1}}]$")
-    plt.show()
+    # plt.show()
+    plt.savefig(root+'v_m_baseline.png')
