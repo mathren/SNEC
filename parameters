@@ -1,12 +1,12 @@
 #____________LAUNCH_____________
 
-outdir                  = "/home/mrenzo/Runs/LMXRB/SNEC_expl/output/s30VdJNL_0.33/Thermal_bomb0.1e51/"
+outdir                  = "/tmp/"
 
 #___________PROFILE_____________
 
-profile_name 		= "/home/mrenzo/Runs/LMXRB/SNEC_expl/input/s30VdJNL_0.33/s30VdJNL_0.33_onset_cc.short"
+profile_name 		= "./profiles/15Msol_RSG.short"
 
-comp_profile_name	= "/home/mrenzo/Runs/LMXRB/SNEC_expl/input/s30VdJNL_0.33/s30VdJNL_0.33_onset_cc.iso.dat"
+comp_profile_name	= "./profiles/15Msol_RSG.iso.dat"
 
 #__________EXPLOSION_________0;82;33M0;82;33m____
 

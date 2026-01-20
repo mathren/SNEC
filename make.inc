@@ -5,8 +5,8 @@ export F90FLAGS=-g -O3 -Warray-bounds  -fbounds-check
 export LDFLAGS=$(F90FLAGS)
 #use the following line when compiling on unix
 export LAPACKLIBS=-llapack  # -lg2c
-#use the following line when compiling on mac
-#export LAPACKLIBS=-framework Accelerate
+# use the following line when compiling on mac
+# export LAPACKLIBS=-framework Accelerate
 export LIBS+=$(LAPACKLIBS)
 
 #don't use lapack for the moment
