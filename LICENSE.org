@@ -1,0 +1,2 @@
+#+title: Creative Commons License
+SNEC by Morozova, Ott, Piro is licensed under a [[https://creativecommons.org/licenses/by-nc-sa/4.0/][Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License]].
