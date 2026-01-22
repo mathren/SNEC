@@ -32,11 +32,11 @@ def plot_vel_radius_at_time_t(t, vel_out, ax=None, fig_name=None, **kwargs):
 
 
 if __name__ == "__main__":
-    root = "/home/mrenzo/Documents/Research/codes/SNEC-1.01/Data/baseline/"
-    answer = input("Want to plot the files in "+root+" ?[Y/n]")
-    if answer.lower() != "y":
-        root = input("Input folder?")
-        print("Plotting files in "+root)
+    root = "/home/mrenzo/Documents/Research/codes/SNEC-1.01/Data/testing/"
+    # answer = input("Want to plot the files in "+root+" ?[Y/n]")
+    # if answer.lower() != "y":
+    #     root = input("Input folder?")
+    #     print("Plotting files in "+root)
     vfile = root+"vel.xg"
     data = SNEC_output_parser(vfile)
     keys = np.array(list(data.keys()))
