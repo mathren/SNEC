@@ -11,7 +11,7 @@ subroutine artificial_viscosity
 !------------------------------------------------------------------------------
 ! Richtmeyer-Von Neuman artificial viscosity
 
-  do i=1,imax-1          
+  do i=1,imax-1
       if(vel(i+1).lt.vel(i)) then
           Q(i) = cvisc*rho(i) &
            * (vel(i+1) - vel(i))**2

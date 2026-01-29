@@ -70,7 +70,7 @@ subroutine input_parser
   if (Ni_by_hand.eq.-666) Ni_by_hand = 1 ! set to default value
 
   call get_integer_parameter('saha_ncomps',saha_ncomps,opt)
-  
+
   call get_logical_parameter('boxcar_smoothing',boxcar_smoothing,opt)
 
   call get_double_parameter('opacity_floor_envelope',of_env,opt)
@@ -89,7 +89,7 @@ subroutine input_parser
   call get_integer_parameter('ntinfo',ntinfo,opt)
   call get_double_parameter('dtmin',dtmin,opt)
   call get_double_parameter('dtmax',dtmax,opt)
-  
+
 !********************************** TEST **************************************
 
   call get_logical_parameter('sedov',sedov,opt)
@@ -119,7 +119,7 @@ subroutine input_parser
      write(rmstring,*) "rm -rf ", trim(outdir), '/*'
      call system(rmstring)
   endif
-  
+
 ! copy parameter file
   cpstring="cp parameters "//trim(adjustl(outdir))
   call system(cpstring)
@@ -148,7 +148,7 @@ contains
 
         if (i.eq.0.or.j.eq.1) goto 10
         !   if the whole line is a comment or there is no
-        !   equal sign, then go on to the next line    
+        !   equal sign, then go on to the next line
 
         if(j.gt.0.and.j.lt.i) goto 10
         !   if there is an equal sign, but it is in a comment
@@ -192,7 +192,7 @@ contains
             write(6,*) "Fatal problem in input parser:"
             write(6,*) "Parameter ",parname
             write(6,*) "could not be read!"
-            write(6,*) 
+            write(6,*)
             call flush(6)
             stop
         else

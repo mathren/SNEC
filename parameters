@@ -16,7 +16,7 @@ initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
 #"Piston_Explosion"
 #"Thermal_Bomb"
 
-# piston_vel		= 1.0d1
+# piston_vel		= 5.0d8
 # piston_tstart		= 0.0d0
 # piston_tend		= 1.0d-2
 
@@ -66,11 +66,11 @@ opacity_floor_core	= 0.01d0
 
 ntmax			= 10000000000000
 
-tend			= 86400.0d0
+tend			= 864000.0d0
 
-dtout			= 1800.0d0
-dtout_scalar		= 1800.0d0
-dtout_check		= 1800.0d0
+dtout			= 900.0d0
+dtout_scalar		= 900.0d0
+dtout_check		= 900.0d0
 
 ntout			= -1
 ntout_scalar		= -1

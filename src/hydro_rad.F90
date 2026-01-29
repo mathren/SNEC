@@ -17,10 +17,10 @@ subroutine hydro_rad
   integer, parameter :: ldab=2*kl+ku+1
   real*8 :: ab(ldab,imax-1), b(imax-1)
   integer :: ipiv(imax-1)
-  
+
   real*8 :: delta_max
   integer :: location_max
-  
+
   real*8 :: Aarray(imax-1), Barray(imax-1), Carray(imax-1), Darray(imax-1)
   real*8 :: p_temp(imax), eps_temp(imax), lum_temp(imax), temp_temp(imax)
   real*8 :: lambda_temp(imax)
@@ -70,10 +70,19 @@ subroutine hydro_rad
     vel(1) = 0.0d0
   endif
 
+  ! hack inner boundary to be inflow no backreaction
+  ! TODO: make this a parameter-controllable option
+  if (vel_p(2)<=0) then
+     vel(1) = vel_p(2)  ! take last but one value of velocity and apply to last two cells
+     vel(2) = vel_p(2)
+  else
+     vel(1) = 0 ! normal reflective boundary
+  end if
+
 !----------------------- update the radial coordinates-------------------------
   do i=1,imax
    r(i) = r_p(i) + dtime * vel(i)
-   
+
    if(i.gt.1) then
        if (r(i).lt.r(i-1)) then
            write(*,*) 'radius of a gridpoint', i, 'is less than preceding'
@@ -87,7 +96,6 @@ subroutine hydro_rad
      rho(i) = delta_mass(i) / (4.0d0*pi * (r(i+1)**3 - r(i)**3)/3.0d0)
   enddo
   rho(imax) = 0.0d0 !passive boundary condition
-
 
 !------------------------- update zone center radius --------------------------
   do i=1,imax-1
@@ -140,12 +148,12 @@ subroutine hydro_rad
         eps_temp(:), p_temp(:), lum_temp(:), &
         Aarray(:), Barray(:), Carray(:), Darray(:))
 
-             
+
     !assemble the matrix in the form used by lapack
     ab(2,2:imax-1) = Aarray(1:imax-2)
     ab(3,1:imax-1) = Barray(1:imax-1)
     ab(4,1:imax-2) = Carray(2:imax-1)
- 
+
     b(1:imax-1) = Darray(1:imax-1)
 
     !invert the matrix
@@ -191,7 +199,7 @@ subroutine hydro_rad
 
   101 continue
 
-        
+
   eps(1:imax-1) = eps_temp(1:imax-1)
   p(1:imax-1)   = p_temp(1:imax-1)
   temp(1:imax-1)  = temp_temp(1:imax-1)
@@ -206,7 +214,7 @@ subroutine hydro_rad
 
 
   call opacity(rho(:),temp_temp(:),kappa(:),kappa_table(:),dkappadt(:))
-    
+
   call luminosity(r(:),temp(:),kappa(:),lambda(:),inv_kappa(:),lum(:))
 
 
