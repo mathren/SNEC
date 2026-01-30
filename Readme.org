@@ -6,10 +6,31 @@ Copy of the SNEC code for further development. Original distribution
 source is at [[https://sntheory.org/SNEC.html]].
 
 * TODO Objective:
-- [ ] implement inner boundary conditions allowing for infall with no
+- [?] implement inner boundary conditions allowing for infall with no
   back reaction.
 
 The idea is to track an inner "ghost cell" which always has velocity
 and pressure of the cell above (first in the computational domain), so
 that no velocity or pressure gradient is created and no back reaction
 applies in the domain.
+
+
+* Install =SNEC=
+
+Dependencies: =gfortran= and =Lapack= (I often use the ones coming with
+the [[http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk][MESA SDK]]), see [[./make.inc]]. You may need to comment/uncomment one
+line in this file to point to the correct location of =Lapack=.
+
+Then compile the code with
+#+BEGIN_SRC bash
+  ./make clean && ./make
+#+END_SRC
+
+* How to run =SNEC=
+
+After editing your =parameters= file according to your needs, and making
+sure the output directory exists,
+
+#+BEGIN_SRC bash
+ ./snec
+#+END_SRC
