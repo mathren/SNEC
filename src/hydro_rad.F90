@@ -70,15 +70,14 @@ subroutine hydro_rad
     vel(1) = 0.0d0
   endif
 
-  ! hack inner boundary to be inflow no backreaction
-  ! TODO: make this a parameter-controllable option
-  if (vel(2)<=0) then
-     vel(1) = vel_p(2)  ! take last but one value of velocity and apply to last two cells
-     vel(2) = vel_p(2)
-  else
-     vel(1) = 0 ! normal reflective boundary
+  if (innerBC == "inflow") then
+     ! hack inner boundary to be inflow no backreaction
+     if (vel(2)<=0) then
+        vel(1) = vel(2)  ! take last but one value of velocity and apply to last two cells
+     else
+        vel(1) = 0 ! normal reflective boundary
+     end if
   end if
-
 
 !----------------------- update the radial coordinates-------------------------
   do i=1,imax

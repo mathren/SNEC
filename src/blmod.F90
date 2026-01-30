@@ -5,7 +5,7 @@ module blmod
 ! some infrastructure stuff
  logical :: wipe_outdir = .true.    !used in input_parser.F90
  logical :: switch1,switch2,switch3 !for output control
- 
+
 ! physics controls
  logical :: scratch_step
  integer :: gravity_switch !gravity may be turned off (like for Sedov test)
@@ -21,14 +21,14 @@ module blmod
  real*8  :: bomb_total_energy
  integer :: bomb_spread
  real*8, allocatable :: bomb_heating(:)
- 
+
  ! Time centering term for radiative transfer
  real*8, parameter :: theta = 0.5d0
 
 !envelope metallicity is the nominal metallicity of the OPAL Type II tables
 !changing the tables, don't forget to change this number
  real*8, parameter :: envelope_metallicity = 0.02d0
- 
+
  !evolution vars
  real*8 :: time, dtime, dtime_p
 
@@ -82,7 +82,7 @@ real*8, allocatable :: p_rad(:)                        !radiation pressure
  real*8, allocatable :: delta_time(:)
 
  real*8, allocatable :: zav(:,:) !average charge of heavy particles
- real*8, allocatable :: ion_fractions(:,:,:) !ionization fractions 
+ real*8, allocatable :: ion_fractions(:,:,:) !ionization fractions
                                              !(ion:state:gridpoint)
  real*8, allocatable :: free_electron_frac(:)
 
@@ -148,7 +148,7 @@ real*8, allocatable :: p_rad(:)                        !radiation pressure
 end module blmod
 
 !############################# PARAMETERS MODULE ##############################
-       
+
 module parameters
 
    implicit none
@@ -226,6 +226,10 @@ module parameters
 !---------------------- test -------------------------------------
 
   logical :: sedov = .false.
+
+!---------------------- Inner boundary condition ----------------
+
+  character(len=256) :: innerBC = " "  ! default to empty string
 
 end module parameters
 
@@ -851,14 +855,14 @@ end module eosmodule
 module physical_constants
 
    implicit none
-   
+
    real*8, parameter :: msun = 1.98892d33              !solar mass
    real*8, parameter :: rsun = 6.96d10                 !solar radius
    real*8, parameter :: clite = 2.99792458d10          !speed of light
    real*8, parameter :: ggrav = 6.6742d-8              !gravitational constant
    real*8, parameter :: kboltz = 1.380662d-16
    real*8, parameter :: mev_to_erg = 1.6022d-6
-   real*8, parameter :: pi = 3.14159265358979d0 
+   real*8, parameter :: pi = 3.14159265358979d0
    real*8, parameter :: emev = 1.60219d-6
    real*8, parameter :: avo_real = 6.0221415d23
    real*8, parameter :: h_cgs = 6.626058d-27
@@ -873,11 +877,11 @@ module physical_constants
    real*8, parameter :: overtau_Ni = 1.0d0/760320.0d0
    real*8, parameter :: overtau_Co = 1.0d0/9616320.0d0
    !relative solar mass fraction of C (G&N'93)
-   real*8, parameter :: C_frac_sol = 0.173285d0 
+   real*8, parameter :: C_frac_sol = 0.173285d0
    !relative solar mass fraction of O (G&N'93)
-   real*8, parameter :: O_frac_sol = 0.482273d0 
+   real*8, parameter :: O_frac_sol = 0.482273d0
    !absolute bolometric magnitude of sun
-   real*8, parameter :: sun_mag = 4.75d0        
+   real*8, parameter :: sun_mag = 4.75d0
    !bolometric luminosity of sun in erg/s
    real*8, parameter :: sun_lum = 3.846d33
 

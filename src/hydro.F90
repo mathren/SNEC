@@ -59,6 +59,16 @@ subroutine hydro
       vel(1) = 0.0d0
   endif
 
+  if (innerBC == "inflow") then
+     ! hack inner boundary to be inflow no backreaction
+     if (vel(2)<=0) then
+        vel(1) = vel(2)  ! take last but one value of velocity and apply to last two cells
+     else
+        vel(1) = 0 ! normal reflective boundary
+     end if
+  end if
+
+
 !----------------------- update the radial coordinates-------------------------
   do i=1,imax
    r(i) = r_p(i) + dtime * vel(i)
@@ -116,16 +126,16 @@ subroutine hydro
   do while(delta_max > EPSTOL)
 
     keytemp = 1
-    call eos(rho(1:imax-1),temp_temp(1:imax-1),ye(1:imax-1), & 
+    call eos(rho(1:imax-1),temp_temp(1:imax-1),ye(1:imax-1), &
              abar(1:imax-1),p_temp(1:imax-1),eps_temp(1:imax-1), &
-             cs2(1:imax-1), dpdt(1:imax-1), dedt(1:imax-1), & 
+             cs2(1:imax-1), dpdt(1:imax-1), dedt(1:imax-1), &
              entropy(1:imax-1),p_rad(1:imax-1),keyerr,keytemp,eoskey)
-    
+
     delta_max = 0
 
     do i=1,imax-1
-        
-        function_star = eps_temp(i) - eps(i) + 0.5d0*(p_temp(i) + p(i)) & 
+
+        function_star = eps_temp(i) - eps(i) + 0.5d0*(p_temp(i) + p(i)) &
             * (1.0d0/rho(i)-1.0d0/rho_p(i)) - bomb_heating(i)*dtime &
             - Ni_heating(i)*dtime &
             - Qterm(i)
@@ -135,13 +145,13 @@ subroutine hydro
         temp_temp(i) = temp_temp(i) + delta_temp(i)
 
         temp(i) = temp_temp(i)
-        
+
         if(abs(delta_temp(i)/temp(i)).gt.delta_max) then
             delta_max = abs(delta_temp(i)/temp(i))
             location_max = i
         end if
 
-    enddo                 
+    enddo
 
     ie=ie+1
 
@@ -156,7 +166,7 @@ subroutine hydro
   keytemp = 1
   call eos(rho(1:imax-1),temp(1:imax-1),ye(1:imax-1), &
            abar(1:imax-1),p(1:imax-1),eps(1:imax-1), &
-           cs2(1:imax-1), dpdt(1:imax-1), dedt(1:imax-1), & 
+           cs2(1:imax-1), dpdt(1:imax-1), dedt(1:imax-1), &
            entropy(1:imax-1),p_rad(1:imax-1),keyerr,keytemp,eoskey)
 
   !passive boundary conditions, does not participate in the evolution
