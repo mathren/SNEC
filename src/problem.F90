@@ -24,6 +24,15 @@ subroutine problem
   ntstart       = 0
   tstart        = 0.0d0
 
+!****************************** Inner boundary condition *************************************
+
+  if (innerBC == "inflow") then
+     write(*,*) "Using inflow inner boundary condition!"
+  else
+     write(*,*) "Default inner boundary condition!"
+  endif
+
+
 !****************************** EOS setup *************************************
 
   if(eoskey.eq.1) then
@@ -176,6 +185,3 @@ subroutine problem
   close(666)
 
 end subroutine problem
-
-
-

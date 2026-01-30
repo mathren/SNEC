@@ -79,9 +79,7 @@ subroutine input_parser
 !********************** Inner boundary ****************************************
 
   call get_string_parameter('innerBC',innerBC,opt)
-  if (innerBC == "inflow") then
-     write(*,*) "Using inflow inner boundary condition!"
-  endif
+
 !********************** WHEN TO DO THINGS *************************************
 
   call get_integer_parameter('ntmax',ntmax,opt)
