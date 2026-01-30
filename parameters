@@ -20,7 +20,7 @@ initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
 # piston_tstart		= 0.0d0
 # piston_tend		= 1.0d-2
 
-final_energy		= 0.1d51
+final_energy		= 1.0d48 # 0.1d50
 bomb_tstart		= 0.0d0
 bomb_tend		= 1.0d-2
 bomb_mass_spread	= 0.1d0 #(in solar mass)
@@ -66,7 +66,7 @@ opacity_floor_core	= 0.01d0
 
 ntmax			= 10000000000000
 
-tend			= 864000.0d0
+tend			= 86400.0d0
 
 dtout			= 900.0d0
 dtout_scalar		= 900.0d0

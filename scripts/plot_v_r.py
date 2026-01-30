@@ -2,33 +2,8 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
-from plot_aux import SNEC_output_parser
+from plot_aux import SNEC_output_parser, plot_vel_radius_at_time_t
 import astropy.units as u
-
-
-def plot_vel_radius_at_time_t(t, vel_out, ax=None, fig_name=None, **kwargs):
-    data = SNEC_output_parser(vel_out)
-    keys = np.array(list(data.keys()))
-    times = keys * u.s
-    try:
-        units = t.unit
-    except AttributeError:
-        t *= u.s
-    index_time_of_interest = np.argmin(np.absolute(times-t))
-    key_of_interest = keys[index_time_of_interest]
-    mass = data[key_of_interest][:, 0] * u.g
-    vel = data[key_of_interest][:,1] * u.cm/u.s
-    if not ax:
-        fig = plt.figure()
-        gs = gridspec.GridSpec(150, 100)
-        ax = fig.add_subplot(gs[:, :])
-    ax.plot(mass.to(u.Msun), vel.to(u.km/u.s), **kwargs)
-    if fig_name:
-        ax.set_ylabel(r"$v \ [\mathrm{km\ s^{-1}}]$")
-        ax.set_xlabel(r"$M \ [M_{\odot}]$")
-        plt.savefig(fig_name)
-    return mass, vel
-
 
 
 if __name__ == "__main__":

@@ -3,11 +3,15 @@ import matplotlib as mpl
 from MESAreader import get_src_col, Lsun, Rsun_cm, Msun, G_cgs, clight
 import numpy as np
 import re
+import  astropy.units as u
+
+
 
 class MultiColorPatch:
     def __init__(self, colors, alpha=1.0):
         self.colors = colors
         self.alpha = alpha
+
 
 # Handler class that matplotlib will use
 class MultiColorHandler:
@@ -281,3 +285,85 @@ def SNEC_output_parser(outfile):
             data_dict[time_value] = np.array(data_lines)
 
     return data_dict
+
+
+
+
+def plot_vel_radius_at_time_t(t, vel_out, ax=None, fig_name=None, **kwargs):
+    data = SNEC_output_parser(vel_out)
+    keys = np.array(list(data.keys()))
+    times = keys * u.s
+    try:
+        units = t.unit
+    except AttributeError:
+        t *= u.s
+    index_time_of_interest = np.argmin(np.absolute(times-t))
+    key_of_interest = keys[index_time_of_interest]
+    mass = data[key_of_interest][:, 0] * u.g
+    vel = data[key_of_interest][:,1] * u.cm/u.s
+    if not ax:
+        fig = plt.figure()
+        gs = gridspec.GridSpec(150, 100)
+        ax = fig.add_subplot(gs[:, :])
+    ax.plot(mass.to(u.Msun), vel.to(u.km/u.s), **kwargs)
+    if fig_name:
+        ax.set_ylabel(r"$v \ [\mathrm{km\ s^{-1}}]$")
+        ax.set_xlabel(r"$M \ [M_{\odot}]$")
+        plt.savefig(fig_name)
+    return mass, vel
+
+
+
+def plot_mass_radius(t, mass_out, ax=None, **kwargs):
+    data = SNEC_output_parser(mass_out)
+    keys = np.array(list(data.keys()))
+    times = keys * u.s
+    try:
+        units = times.unit
+    except AttributeError:
+        times *= u.s
+    index_time_of_interest = np.argmin(np.absolute(times-t))
+    key_of_interest = keys[index_time_of_interest]
+    mass = data[key_of_interest][:, 1] * u.g
+    radius = data[key_of_interest][:, 0] * u.cm
+    if not ax:
+        fig = plt.figure()
+        gs = gridspec.GridSpec(150, 100)
+        ax = fig.add_subplot(gs[:, :])
+    ax.plot(radius.to(u.cm), mass.to(u.Msun), **kwargs)
+    return mass, radius
+
+
+
+def plot_v_radius_time(t, vel_out, mass_out, ax=None, annotate_inner_boundary=True, **kwargs):
+    vel_data = SNEC_output_parser(vel_out)
+    keys = np.array(list(vel_data.keys()))
+    vel_times = keys * u.s
+    try:
+        units = t.unit
+    except AttributeError:
+        vel_times *= u.s
+    mass_data = SNEC_output_parser(mass_out)
+    keys = np.array(list(mass_data.keys()))
+    mass_times = keys * u.s
+    try:
+        units = mass_times.unit
+    except AttributeError:
+        mass_times *= u.s
+    # sanity check
+    # print(vel_times == mass_times)
+    index_time_of_interest = np.argmin(np.absolute(vel_times-t))
+    key_of_interest = keys[index_time_of_interest]
+    mass = mass_data[key_of_interest][:, 1] * u.g
+    radius = mass_data[key_of_interest][:, 0] * u.cm
+    vel = vel_data[key_of_interest][:, 1] * u.cm/u.s
+    vel = vel.to(u.km/u.s)
+    if not ax:
+        fig = plt.figure()
+        gs = gridspec.GridSpec(150, 100)
+        ax = fig.add_subplot(gs[:, :])
+    if annotate_inner_boundary:
+        i_min_m = np.argmin(mass)
+        ax.axvline(np.log10(radius[i_min_m].value), 0, 1, zorder=0, ls='--', lw=1, c='k')
+    ax.plot(np.log10(radius.value), vel, **kwargs)
+    # ax.scatter(np.log10(radius.value), vel, **kwargs)
