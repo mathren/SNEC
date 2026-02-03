@@ -72,11 +72,7 @@ subroutine hydro_rad
 
   if (innerBC == "inflow") then
      ! hack inner boundary to be inflow no backreaction
-     if (vel(2)<=0) then
-        vel(1) = vel(2)  ! take last but one value of velocity and apply to last two cells
-     else
-        vel(1) = 0 ! normal reflective boundary
-     end if
+     vel(1) = min(0.0d0, vel(2))
   end if
 
 !----------------------- update the radial coordinates-------------------------

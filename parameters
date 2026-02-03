@@ -1,6 +1,6 @@
 #____________LAUNCH_____________
 
-outdir                  = "./Data/bomb1d48/"
+outdir                  = "./Data/bomb1d40/"
 
 #___________PROFILE_____________
 
@@ -20,7 +20,7 @@ initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
 # piston_tstart		= 0.0d0
 # piston_tend		= 1.0d-2
 
-final_energy		= 1.0d48 # 0.1d50
+final_energy		= 1.0d40 # 1.0d48 # 0.1d50
 bomb_tstart		= 0.0d0
 bomb_tend		= 1.0d-2
 bomb_mass_spread	= 0.1d0 #(in solar mass)
@@ -64,9 +64,9 @@ opacity_floor_core	= 0.01d0
 
 #___________TIMING_______________
 
-ntmax			= 1000000
+ntmax			= 100000000000
 
-tend			= 864000.0d0
+tend			= 8640000.0d0
 
 dtout			= 1800.0d0
 dtout_scalar		= 1800.0d0

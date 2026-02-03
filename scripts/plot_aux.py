@@ -294,9 +294,9 @@ def plot_vel_radius_at_time_t(t, vel_out, ax=None, fig_name=None, **kwargs):
     keys = np.array(list(data.keys()))
     times = keys * u.s
     try:
-        units = t.unit
+        units = times.unit
     except AttributeError:
-        t *= u.s
+        times *= u.s
     index_time_of_interest = np.argmin(np.absolute(times-t))
     key_of_interest = keys[index_time_of_interest]
     mass = data[key_of_interest][:, 0] * u.g
@@ -335,7 +335,10 @@ def plot_mass_radius(t, mass_out, ax=None, **kwargs):
 
 
 
-def plot_v_radius_time(t, vel_out, mass_out, ax=None, annotate_inner_boundary=True, **kwargs):
+def plot_v_radius_time(t, vel_out, mass_out, ax=None,
+                       annotate_inner_boundary=True,
+                       annotate_pre_expl_R=True,
+                       **kwargs):
     vel_data = SNEC_output_parser(vel_out)
     keys = np.array(list(vel_data.keys()))
     vel_times = keys * u.s
@@ -365,5 +368,7 @@ def plot_v_radius_time(t, vel_out, mass_out, ax=None, annotate_inner_boundary=Tr
     if annotate_inner_boundary:
         i_min_m = np.argmin(mass)
         ax.axvline(np.log10(radius[i_min_m].value), 0, 1, zorder=0, ls='--', lw=1, c='k')
+    if annotate_pre_expl_R:
+        ax.axvline(np.log10(max(radius.value)), 0, 1, zorder=0, ls='--', lw=1, c='r')
     ax.plot(np.log10(radius.value), vel, **kwargs)
     # ax.scatter(np.log10(radius.value), vel, **kwargs)
