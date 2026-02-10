@@ -61,8 +61,8 @@ def HRD(fname, ax, annotate_radii=None, interp=None, scatter=False,  **kwargs):
                 color = kwargs['color']
             except:
                 color='C0'
-        ax.plot(logT, logL, lw=1, c=color, alpha=0.8)
-        ax.scatter(logT_interp, logL_interp, **kwargs)
+                ax.plot(logT, logL, lw=1, c=color, alpha=0.8)
+                ax.scatter(logT_interp, logL_interp, **kwargs)
     else:  # not interpolating
         if not scatter:
             ax.plot(logT, logL, **kwargs)
@@ -95,7 +95,7 @@ def annotate_radii_hrd(ax, radii=np.logspace(0, 3, base=10)):
         # ax.text(x[5], y[5], f"{r:.0f}"+r"$\,R_\odot$", fontsize=20,
         # transform=ax.transData, zorder=0, c="#808080"),
         # rotation=np.((max(y)-min(y))/(max(x)-min(x))))
-    # reset ylim
+        # reset ylim
     ax.set_ylim(ymin, ymax)
 
 
@@ -191,9 +191,9 @@ def get_BE_from_pfile(pfile):
         dm = src[:, col.index("dm")]  # g
     except ValueError:
         dm = np.diff(m, append=0)
-    r = src[:, col.index("radius")] * Rsun_cm  # cm
-    psi = -1.0 * G_cgs * np.divide(m, r)  # erg
-    # change sign: BE is the energy (>0) to provide to unbind the star
+        r = src[:, col.index("radius")] * Rsun_cm  # cm
+        psi = -1.0 * G_cgs * np.divide(m, r)  # erg
+        # change sign: BE is the energy (>0) to provide to unbind the star
     BE = -1.0 * np.cumsum(np.multiply(psi, dm))
     return np.asarray(BE, dtype=float)
 
@@ -289,7 +289,7 @@ def SNEC_output_parser(outfile):
 
 
 
-def plot_vel_radius_at_time_t(t, vel_out, ax=None, fig_name=None, **kwargs):
+def plot_vel_radius_at_time_t(t, vel_out, ax=None, fig_name=None, skip=1, **kwargs):
     data = SNEC_output_parser(vel_out)
     keys = np.array(list(data.keys()))
     times = keys * u.s
@@ -297,15 +297,15 @@ def plot_vel_radius_at_time_t(t, vel_out, ax=None, fig_name=None, **kwargs):
         units = times.unit
     except AttributeError:
         times *= u.s
-    index_time_of_interest = np.argmin(np.absolute(times-t))
-    key_of_interest = keys[index_time_of_interest]
-    mass = data[key_of_interest][:, 0] * u.g
-    vel = data[key_of_interest][:,1] * u.cm/u.s
+        index_time_of_interest = np.argmin(np.absolute(times-t))
+        key_of_interest = keys[index_time_of_interest]
+        mass = data[key_of_interest][::skip, 0] * u.g
+        vel = data[key_of_interest][::skip, 1] * u.cm/u.s
     if not ax:
         fig = plt.figure()
         gs = gridspec.GridSpec(150, 100)
         ax = fig.add_subplot(gs[:, :])
-    ax.plot(mass.to(u.Msun), vel.to(u.km/u.s), **kwargs)
+        ax.plot(mass.to(u.Msun), vel.to(u.km/u.s), **kwargs)
     if fig_name:
         ax.set_ylabel(r"$v \ [\mathrm{km\ s^{-1}}]$")
         ax.set_xlabel(r"$M \ [M_{\odot}]$")
@@ -314,7 +314,7 @@ def plot_vel_radius_at_time_t(t, vel_out, ax=None, fig_name=None, **kwargs):
 
 
 
-def plot_mass_radius(t, mass_out, ax=None, **kwargs):
+def plot_mass_radius(t, mass_out, ax=None, skip=1, **kwargs):
     data = SNEC_output_parser(mass_out)
     keys = np.array(list(data.keys()))
     times = keys * u.s
@@ -322,15 +322,15 @@ def plot_mass_radius(t, mass_out, ax=None, **kwargs):
         units = times.unit
     except AttributeError:
         times *= u.s
-    index_time_of_interest = np.argmin(np.absolute(times-t))
-    key_of_interest = keys[index_time_of_interest]
-    mass = data[key_of_interest][:, 1] * u.g
-    radius = data[key_of_interest][:, 0] * u.cm
+        index_time_of_interest = np.argmin(np.absolute(times-t))
+        key_of_interest = keys[index_time_of_interest]
+        mass = data[key_of_interest][::skip, 1] * u.g
+        radius = data[key_of_interest][::skip, 0] * u.cm
     if not ax:
         fig = plt.figure()
         gs = gridspec.GridSpec(150, 100)
         ax = fig.add_subplot(gs[:, :])
-    ax.plot(radius.to(u.cm), mass.to(u.Msun), **kwargs)
+        ax.plot(radius.to(u.cm), mass.to(u.Msun), **kwargs)
     return mass, radius
 
 
@@ -346,15 +346,15 @@ def plot_v_radius_time(t, vel_out, mass_out, ax=None,
         units = t.unit
     except AttributeError:
         vel_times *= u.s
-    mass_data = SNEC_output_parser(mass_out)
-    keys = np.array(list(mass_data.keys()))
-    mass_times = keys * u.s
+        mass_data = SNEC_output_parser(mass_out)
+        keys = np.array(list(mass_data.keys()))
+        mass_times = keys * u.s
     try:
         units = mass_times.unit
     except AttributeError:
         mass_times *= u.s
-    # sanity check
-    # print(vel_times == mass_times)
+        # sanity check
+        # print(vel_times == mass_times)
     index_time_of_interest = np.argmin(np.absolute(vel_times-t))
     key_of_interest = keys[index_time_of_interest]
     mass = mass_data[key_of_interest][:, 1] * u.g
@@ -370,5 +370,5 @@ def plot_v_radius_time(t, vel_out, mass_out, ax=None,
         ax.axvline(np.log10(radius[i_min_m].value), 0, 1, zorder=0, ls='--', lw=1, c='k')
     if annotate_pre_expl_R:
         ax.axvline(np.log10(max(radius.value)), 0, 1, zorder=0, ls='--', lw=1, c='r')
-    ax.plot(np.log10(radius.value), vel, **kwargs)
-    # ax.scatter(np.log10(radius.value), vel, **kwargs)
+        ax.plot(np.log10(radius.value), vel, **kwargs)
+        # ax.scatter(np.log10(radius.value), vel, **kwargs)

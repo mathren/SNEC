@@ -159,6 +159,3 @@ subroutine initialize_vars
     outinfo_count = 0
 
 end subroutine initialize_vars
-
-
-        
