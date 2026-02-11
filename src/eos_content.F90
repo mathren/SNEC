@@ -76,13 +76,17 @@ subroutine paczynski_eos(rhox,tempx,yex,abarx,px,ex,cs2x,dpdtx,dedtx, &
 
 
 !------------------------------------------------------------------------------
-!variables ybar, N, y_r, chi_r, chi_T, chi_rho, c_V, nu_j, Gamma1 are named as 
+!variables ybar, N, y_r, chi_r, chi_T, chi_rho, c_V, nu_j, Gamma1 are named as
 !the analogous quantities in paragraph 9.18 of "Cox & Giuli's principles of
 !stellar structure" by Weiss et al. (2004). However, the quantities presented
 !here are obtained without assuming that only one element at a time changes
 !ionization state.
-!The degenerate electron gas is treated as 
+!The degenerate electron gas is treated as
 !in Paczynski B., ApJ, 267:315 (1983).
+
+  ! initialize indexes
+  l = 1
+  lmax = l
 
   do i = 1, np
 
@@ -131,6 +135,7 @@ subroutine paczynski_eos(rhox,tempx,yex,abarx,px,ex,cs2x,dpdtx,dedtx, &
         y_r = ion_fractions(j,lmax,k(i))
         chi_r = xxip(int(zion),lmax-1)
       else
+         print *, "index check: j", j, "lmax", lmax, "lmax+1", lmax+1, "i", i, "k(i)", k(i)
         if(ion_fractions(j,lmax+1,k(i)).gt.ion_fractions(j,lmax-1,k(i))) then
             y_r = ion_fractions(j,lmax + 1,k(i))
             chi_r = xxip(int(zion),lmax)
