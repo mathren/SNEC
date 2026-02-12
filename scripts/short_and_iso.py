@@ -34,3 +34,4 @@ def prepare_SNEC_input(MESA_core_collapse_pfile,
 
 if __name__ == "__main__":
     pfile, compfile = prepare_SNEC_input(sys.argv[1], sys.argv[2])
+    print("Done")
