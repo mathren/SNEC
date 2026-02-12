@@ -1,5 +1,4 @@
       subroutine instruct
-!
 ! The vast majority of the code in this file is from the OPAL opacity
 ! project: http://opalopacity.llnl.gov/
 !
@@ -33,9 +32,9 @@
 !     The interpolation variables are :
 !
 !     xh     The hydrogen mass fraction, X
-!     xxc    The enhanced carbon mass fraction, delta Xc.  
-!            The total C mass fraction, Xc, is the sum of the initial 
-!            amount included in the metal mass fraction, Z, and 
+!     xxc    The enhanced carbon mass fraction, delta Xc.
+!            The total C mass fraction, Xc, is the sum of the initial
+!            amount included in the metal mass fraction, Z, and
 !            delta Xc
 !     xxo    The enhanced oxygen mass fraction, delta Xo
 !     t6     The temperature in millions of degrees Kelvin, T6
@@ -50,8 +49,8 @@
 !in four different 3x3 sub-grids. Linear interpolation between quadratic
 !fits in these different  sub-grids gives smoothed results in both log T6
 !and Log R directions. This procedure produces results that are similar
-!to bicubic spline interpolation, but require storage of only local 
-!information.  
+!to bicubic spline interpolation, but require storage of only local
+!information.
 !    Each of the individual tables in a file Gx**x**z covers 70 temperatures
 !in the range logT=3.75[T6=0.0056341325]( referred to as temperature 1) to
 !logT=8.7[T6=501.187] and 19 values of log R in the range -8 (referred to as 1)
@@ -106,10 +105,10 @@
 !***CAUTION***
 !    As a result of the mixing procedure used to calculate the data a few
 !X=0.0, low T-small R, table values fell outside the range of T and R accessible
-!from the X=0.35 data directly calculated for this purpose.  These T-R 
+!from the X=0.35 data directly calculated for this purpose.  These T-R
 !locations are filled in with 9.99 (or for diagnostic purposes in some cases
 !larger values.  At the same locations the derivatives are set to 99.9.  When
-!T-R falls in this region a message is issued by the interpolation code to 
+!T-R falls in this region a message is issued by the interpolation code to
 !inform the user of this situation.  Presumable very few users will have
 !applications that take them into this region.
 !
@@ -119,8 +118,8 @@
 !    common/e/ opact,dopact,dopacr,dopactd
 !
 !    These variables have the following meanings:
-!   
-!    OPACT        Is the Log of the Rosseland mean opacity: Log(kappa)  
+!
+!    OPACT        Is the Log of the Rosseland mean opacity: Log(kappa)
 !    DOPACT      Is Dlog(kappa)/Dlog(T6)   !at constant R
 !    DOPACTD     Is Dlog(kappa)/Dlog(T6)   !at constant density
 !    DOPACR      Is Dlog(kappa)/Dlog(R),   !at constant T6
@@ -184,7 +183,7 @@
       xxi=xh
       t6i=t6
       ri=r
-      
+
 !
 !..... convert xxc and xxo to logarithmic shifted by Z
       cxx=log10(zzz+xxc)
@@ -192,7 +191,7 @@
       xxx=log10(0.005+xh)
       slt=log10(t6)
       slr=log10(r)
- 
+
 !..... set X indices
         ilo=2
         ihi=mx
@@ -225,10 +224,10 @@
           mf2=1
         endif
 
-      if (itime(1) .ne. 12345678) then 
-          alr(1)=-8.+(nrb-1)*0.5 
-          do i=2,nr  
-            alr(i)=alr(i-1)+0.5  
+      if (itime(1) .ne. 12345678) then
+          alr(1)=-8.+(nrb-1)*0.5
+          do i=2,nr
+            alr(i)=alr(i-1)+0.5
           enddo
 
         alt(1) = -3.3
@@ -255,8 +254,8 @@
           do i=1,nt
           t6list(i)=10.**alt(i)
           enddo
-      endif   
-      
+      endif
+
         ilo=2
         ihi=nr
    12     if(ihi-ilo .gt. 1) then
@@ -273,7 +272,7 @@
         l2=i-1
         l3=i
         l4=l3+1
-        
+
 !
         ilo=2
         ihi=nt
@@ -293,7 +292,7 @@
         k4=k3+1
         k3s=k3+ntb-1
         l3s=l3+nrb-1
-        
+
 
 !-----set-up indices to skip when low T&R data missing for X=0.
       kmin=0
@@ -301,7 +300,7 @@
       iadvance=0
       mfin=mf
       if ((mfin .eq. 1) .and. (co(1,1,1,k1,l1) .gt. 9.)) then! data missing
-      
+
           do i=1,6
             if (co(1,1,1,i,l1) .gt. 9.)  then
               if (xh .lt. .1) then
@@ -310,7 +309,7 @@
 
                 if (iadvance .eq. 0) then  ! sfift X index to avoid X=0.
                 iadvance=iadvance+1
-                mf=mf+1 
+                mf=mf+1
                 mg=mg+1
                 mh=mh+1
                 mi=mi+1
@@ -319,7 +318,7 @@
               endif
             endif
           enddo
-          
+
           if ((iadvance .eq. 0) .and. (k1 .le. kmin) .and. &
              (slt .le. alt(kmin))) then
           k1=kmin
@@ -334,7 +333,7 @@
               if ((kmin .ne. 0) .and. (k1in .lt. kmin)) k1=kmin
               endif
           endif
-      
+
           if ((slt+.001) .lt. alt(k1)) then
           write (*,'("OPAL data not available for X=", f7.5," logT6=", f7.3, &
                     " logR=",f7.3)') xh,slt,slr
@@ -342,9 +341,9 @@
           dopact=99.
           dopacr=99.
           dopactd=99.
-          return  
+          return
           endif
-          
+
       l2=l1+1
       l3=l2+1
       l4=l3+1
@@ -353,14 +352,14 @@
       k3=k2+1
       k4=k3+1
       k3s=k3+ntb-1
-      
+
       endif
 !-----end of check for missing data
 
       do 123 m=mf,mf2
        if(mx .ge. 4) then
 !.....  C and O  fractions determined by the ray through the origin that
-!       also passes through the point (Xc,Xo). Specific interpolation 
+!       also passes through the point (Xc,Xo). Specific interpolation
 !       values determined by tabulated X values;i.e. xa(m).  Inter-
 !       polation along the ray gives log (kappa(Xc,Xo)).  (Advantage
 !       of method: keeps indices within table boundaries)
@@ -391,7 +390,7 @@
            endif
          enddo
     3    continue
-    
+
 !
       if(itime(m) .ne. 12345678) then
       itime(m)=12345678
@@ -401,7 +400,7 @@
         if(xa(i) .eq. 0.0) mxzero=i
         enddo
 !..... this is the first time throught this m. Calculate the decadic
-!      log of the perimeter points shifted by Z+0.001(to avoid divergence 
+!      log of the perimeter points shifted by Z+0.001(to avoid divergence
 !      at origin); m refers to xa(m); the hydrogen table value.
 !
 !      note that the nc-th elements are sometimes needed!
@@ -426,7 +425,7 @@
 !
 !.....read the data files
         call readco
-      
+
       endif
 !
         do i=1,nc
@@ -478,7 +477,7 @@
           stop
         endif
       if(z .ne. zz(mf,1)) go to 66
-      xxc=xxci   ! restores input value; necessary if stop replaced 
+      xxc=xxci   ! restores input value; necessary if stop replaced
 !                  with return
       xxo=xxoi   ! restores input value
       is=0
@@ -515,18 +514,18 @@
 !      4x4 grid. (log(T6(i)),i=i1,i1+3),log(R(j)),j=j1,j1+3)).Procedure
 !      mixes overlapping quadratics to obtain smoothed derivatives.
 !
-        
+
       call t6rinterp(slr,slt)
       return
 !
    61 write(*,'(" Mass fractions exceed unity")')
-      xxc=xxci   ! restores input value; required if stop replaced 
+      xxc=xxci   ! restores input value; required if stop replaced
 !                  with a return
       xxo=xxoi   ! restores imput value
       stop
    62 write(*,'(" T6/LogR outside of table range")')
       xxc=xxci   ! restores input value; required if stop replaced
-!                  with a return 
+!                  with a return
       xxo=xxoi   ! restores input value
       stop
    64 write(*,'(" X not equal to zero: To run this case it &
@@ -878,7 +877,7 @@
           dopact=dkap1*dix+dkap2*(1.-dix)
           opact=opact*dix+opact2*(1.-dix)
         if(iq.eq.3) then
- 
+
 !.....    k and Dlog(k)/Dlog(T6) in upper-right 3x3.
           opactq2=quad(is,iw,slt,q(2),q(3),q(4),alt(k2),alt(k3),alt(k4))
           dkapq2=dkap
@@ -932,7 +931,7 @@
       dopactd=dopact-3.*dopacr
         if (opact .gt. 1.e+15) then
           write(*,'("Interpolation indices out of range", &
-                   ";please report conditions.")') 
+                   ";please report conditions.")')
           write(*,*) slt, slr, ip, iq, 10.0**cxx-zzz, 10.0**oxx-zzz, xxh
           write(*,*) xc(:)
           write(*,*) xo(:)
@@ -951,6 +950,7 @@
       subroutine readco
 !..... The purpose of this subroutine is to read the data tables
       save
+      character(len=256) :: snec_dir
       parameter (ismdata=1)   ! modified
       parameter (mx=5,mc=8,mo=8,nrm=19,nrb=1,nre=19,nr=nre+1-nrb &
           ,ntabs=60,ntm=134,ntb=1,nt=ntm+1-ntb)
@@ -963,16 +963,16 @@
           ,t6listf(ntm),opk2(nt,nr),dfsx(mx)
       common/b/ itab(mx,ntabs),nta(nrm),x(mx,ntabs),y(mx,ntabs), &
           zz(mx,ntabs),xca(mx,ntabs),xoa(mx,ntabs)
-      common/alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(200),coff(200,nr)  
+      common/alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(200),coff(200,nr)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
       common/e/ opact,dopact,dopacr,dopacrd
       character*1 dumarra(250)
       common/recoin/ itimeco,mxzero
-      
+
 !
         if (itimeco .ne. 12345678) then
         do i=1,mx
-          do j=1,mc 
+          do j=1,mc
             do k=1,mo
               do l=1,nt
                 do mq=1,nr
@@ -983,7 +983,7 @@
           enddo
         enddo
         do i=1,mx
-          do j=1,mc 
+          do j=1,mc
             do l=1,nt
               do mq=1,nr
                 diag(i,j,l,mq)=1.e+35
@@ -1005,16 +1005,19 @@
       n(m,nc)=0
 !
       close (2)
+
+      call get_environment_variable('SNEC_DIR', snec_dir)
+
 !..... read X=0.0 tables
-      if(m .eq. 1) open(2, FILE='tables/codataa')
+      if(m .eq. 1) open(2, FILE=trim(snec_dir) // 'tables/codataa')
 !..... read X=0.03 tables
-      if(m .eq. 2) open(2, FILE='tables/codatab')
+      if(m .eq. 2) open(2, FILE=trim(snec_dir) // 'tables/codatab')
 !..... read X=0.10 tables
-      if(m .eq. 3) open(2, FILE='tables/codatac')
+      if(m .eq. 3) open(2, FILE=trim(snec_dir) // 'tables/codatac')
 !..... read X=0.35 tables
-      if(m .eq. 4) open(2, FILE='tables/codatad')
+      if(m .eq. 4) open(2, FILE=trim(snec_dir) // 'tables/codatad')
 !.....read X=0.70 tables
-      if(m .eq. 5) open(2, FILE='tables/codatae')
+      if(m .eq. 5) open(2, FILE=trim(snec_dir) // 'tables/codatae')
 !
 !      read header
       read(2,'(a)') (dumarra(i),i=1,240)
@@ -1033,17 +1036,17 @@
         read(2,'(4x,f6.1,18f7.1)') (alrf(kk),kk=1,nrm)
         read(2,'(f10.5)') dum
           do k=1,ntm
-            read(2,'(f4.2,19f7.3)') altin,(cof(k,l), l=1,nrm) 
-            
+            read(2,'(f4.2,19f7.3)') altin,(cof(k,l), l=1,nrm)
+
             do ll=1,nrm   ! modified
               coff(k,ll)=cof(k,ll)
             enddo
           enddo
           if (isett6 .ne. 1234567) then
-          do k=1,ntm  
+          do k=1,ntm
             t6arr(k)=t6list(k)
-          enddo  
-          endif  
+          enddo
+          endif
           isett6=1234567
 
 
@@ -1110,7 +1113,7 @@
       endif
       return
       end
-      
+
 !
 !************************************************************************
       function quad(ic,i,x,y1,y2,y3,x1,x2,x3)

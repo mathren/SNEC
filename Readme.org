@@ -58,3 +58,20 @@ sure the output directory exists,
 #+BEGIN_SRC bash
  ./snec
 #+END_SRC
+
+The default SNEC creates an executable which can only be run from the
+SNEC folder, otherwise you get:
+
+#+BEGIN_SRC bas
+Fortran runtime error: Cannot open file 'tables/codataa': No such file or directory
+#+END_SRC
+
+To bypass this issue, define a global environment variable
+
+#+BEGIN_SRC bash
+   export SNEC_DIR=/path/to/SNEC
+#+END_SRC
+
+If this is /not/ defined, then the original behavior will happen, if it
+is defined, it will be pre-pended to the path of the EOS tables
+allowing to run the executable =snec= from anywhere.

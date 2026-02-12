@@ -135,7 +135,6 @@ subroutine paczynski_eos(rhox,tempx,yex,abarx,px,ex,cs2x,dpdtx,dedtx, &
         y_r = ion_fractions(j,lmax,k(i))
         chi_r = xxip(int(zion),lmax-1)
       else
-         print *, "index check: j", j, "lmax", lmax, "lmax+1", lmax+1, "i", i, "k(i)", k(i)
         if(ion_fractions(j,lmax+1,k(i)).gt.ion_fractions(j,lmax-1,k(i))) then
             y_r = ion_fractions(j,lmax + 1,k(i))
             chi_r = xxip(int(zion),lmax)
