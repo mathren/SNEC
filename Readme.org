@@ -69,8 +69,10 @@ Fortran runtime error: Cannot open file 'tables/codataa': No such file or direct
 To bypass this issue, define a global environment variable
 
 #+BEGIN_SRC bash
-   export SNEC_DIR=/path/to/SNEC
+   export SNEC_DIR=/path/to/SNEC/
 #+END_SRC
+
+*N.B.:* Do include the final =/= in =SNEC_DIR=.
 
 If this is /not/ defined, then the original behavior will happen, if it
 is defined, it will be pre-pended to the path of the EOS tables
