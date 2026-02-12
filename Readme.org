@@ -5,7 +5,7 @@
 Copy of the SNEC code for further development. Original distribution
 source is at [[https://sntheory.org/SNEC.html]].
 
-* TODO Objective:
+* TODO Objectives
 - [?] implement inner boundary conditions allowing for infall with no
   back reaction.
 - [ ] implement density smoothing self-consistent with boxcar
@@ -17,16 +17,38 @@ that no velocity or pressure gradient is created and no back reaction
 applies in the domain.
 
 
-* Install =SNEC=
+* How to install
 
-Dependencies: =gfortran= and =Lapack= (I often use the ones coming with
-the [[http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk][MESA SDK]]), see [[./make.inc]]. You may need to comment/uncomment one
-line in this file to point to the correct location of =Lapack=.
+First clone this repository, to create the folder =SNEC=. To compile,
+you will need =gfortran=, I use the one shipped with the [[http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk][MESA SDK]], which
+can be downloaded from the website, unpacked, and initialized with
 
-Then compile the code with
 #+BEGIN_SRC bash
-  ./make clean && ./make
+  export MESASDK_ROOT=/path/to/mesasdk
+  source $MESASDK_ROOT/bin/mesasdk_init.sh
 #+END_SRC
+
+At the time of writing, this provides
+
+#+BEGIN_SRC bash
+  gfortran --version
+  GNU Fortran (GCC) 13.3.0
+  Copyright (C) 2023 Free Software Foundation, Inc.
+  This is free software; see the source for copying conditions.  There is NO
+  warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#+END_SRC
+
+Once =gfortran= is loaded, =cd= into the =SNEC= directory and type:
+
+#+BEGIN_SRC bash
+make clean && make
+#+END_SRC
+
+You may need to comment/uncomment one line in [[./make.inc][make.inc]] file to point
+to the correct location of =Lapack=. The file shipped in this repo is
+for installation on linux machines, but there is a commented line for
+Mac OS.
+
 
 * How to run =SNEC=
 
