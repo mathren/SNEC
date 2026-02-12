@@ -1,5 +1,5 @@
 #____________LAUNCH_____________
-outdir                  = "OUTDIR"
+outdir                  = "OUTDIR/Data"
 
 #___________PROFILE_____________
 
