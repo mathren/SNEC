@@ -1,0 +1,9 @@
+#+title: Changelog compared to the original SNEC v1.01
+
+* Make optional inflow inner boundary
+
+If v(2)<0, set v(1)=v(2), else set v(1)=0
+
+* Introduce =SNEC_DIR= environment variable
+
+To run executable from anywhere

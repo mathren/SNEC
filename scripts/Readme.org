@@ -47,3 +47,6 @@ For each input =MESA= profile, one needs to hardcode in this file the
 number of mesh points in the input profile in the variable =imax= (same
 number as the input of =grid_setup.py= described above). Possibly opacity
 floors, and thermal bomb or piston properties need to be adjusted too.
+
+Alternative one can use a uniform in mass grid, 1000 points were
+enough in the original SNEC paper.

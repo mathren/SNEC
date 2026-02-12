@@ -5,18 +5,6 @@
 Copy of the SNEC code for further development. Original distribution
 source is at [[https://sntheory.org/SNEC.html]].
 
-* TODO Objectives
-- [?] implement inner boundary conditions allowing for infall with no
-  back reaction.
-- [ ] implement density smoothing self-consistent with boxcar
-  composition smoothing
-
-The idea is to track an inner "ghost cell" which always has velocity
-and pressure of the cell above (first in the computational domain), so
-that no velocity or pressure gradient is created and no back reaction
-applies in the domain.
-
-
 * How to install
 
 First clone this repository, to create the folder =SNEC=. To compile,
@@ -77,3 +65,10 @@ To bypass this issue, define a global environment variable
 If this is /not/ defined, then the original behavior will happen, if it
 is defined, it will be pre-pended to the path of the EOS tables
 allowing to run the executable =snec= from anywhere.
+
+
+* TODO Objectives
+- [x] implement inner boundary conditions allowing for infall with no
+  back reaction.
+- [ ] implement density smoothing self-consistent with boxcar
+  composition smoothing
