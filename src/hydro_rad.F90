@@ -62,6 +62,12 @@ subroutine hydro_rad
 
      ! artificial viscosity
      - dtv * 4.0d0*pi * (cr(i)**2 * Q(i) - cr(i-1)**2 * Q(i-1))/delta_cmass(i-1)
+
+    print *, i
+    print *, vel_p(i)
+    print *, - dtv * ggrav*mass(i) / r(i)**2 *gravity_switch
+    print *, - dtv * 4.0d0*pi*r(i)**2 * (p(i) - p(i-1)) / delta_cmass(i-1)
+    print *, - dtv * 4.0d0*pi * (cr(i)**2 * Q(i) - cr(i-1)**2 * Q(i-1))/delta_cmass(i-1)
   enddo
 
   if(do_piston.and.time.ge.piston_tend) then

@@ -7,6 +7,20 @@ import re
 import  astropy.units as u
 
 
+def sci_to_latex(value):
+    """Convert a float to a LaTeX-formatted scientific notation string."""
+    # Format in scientific notation
+    s = f"{value:.2e}"  # e.g. "3.50e+51"
+
+    # Split into coefficient and exponent
+    coeff, exp = s.split('e')
+    exp = int(exp)  # removes leading zeros and + sign
+
+    # Strip trailing zeros from coefficient
+    coeff = coeff.rstrip('0').rstrip('.')
+
+    return rf"${coeff}\times10^{{{exp}}}$"
+
 
 class MultiColorPatch:
     def __init__(self, colors, alpha=1.0):
@@ -331,7 +345,11 @@ def plot_mass_radius(t, mass_out, ax=None, **kwargs):
         fig = plt.figure()
         gs = gridspec.GridSpec(150, 100)
         ax = fig.add_subplot(gs[:, :])
-    p = ax.scatter(mass.to(u.Msun), radius.to(u.cm), c=[t.to(u.h).value]*len(mass), **kwargs)
+    if (('c' not in kwargs) and ('color' not in kwargs)):
+        c=[t.to(u.h).value]*len(mass)
+        p = ax.scatter(mass.to(u.Msun), radius.to(u.cm), c=c, **kwargs)
+    else:
+        p = ax.scatter(mass.to(u.Msun), radius.to(u.cm), **kwargs)
     return (mass, radius, p)
 
 
@@ -381,3 +399,17 @@ def get_times(data_file):
     keys = np.array(list(data.keys()))
     times = keys * u.s
     return times
+
+
+def plot_LC(obs_lum, ax=None, **kwargs):
+    # print(folder)
+    # obs_lum = folder+'Data/lum_observed.dat'
+    src = np.genfromtxt(obs_lum)
+    t = src[:, 0] * u.s
+    L = src[:,1] * u.erg/u.s
+    if not ax:
+        fig = plt.figure()
+        gs = gridspec.GridSpec(100, 100)
+        ax = fig.add_subplot(gs[:, :])
+    # ax.scatter(t.to(u.d), np.log10(L.value), **kwargs)
+    ax.plot(t.to(u.d), np.log10(L.value), **kwargs)

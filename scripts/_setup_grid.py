@@ -68,11 +68,14 @@ if __name__ == "__main__":
 
     # SNEC_ROOT="/home/u20/mrenzo/codes/SNEC/" # cluster_ua
     SNEC_ROOT = "/home/mrenzo/Documents/Research/codes/SNEC-1.01/" # ua_w
-    OUTDIR_ROOT='/home/mrenzo/Runs/SNEC_grid/15Msun_progenitor/'
-    INPUT_MESA_FILE = None # "/home/mrenzo/Documents/Research/codes/SNEC-1.01/profiles/"
-    # "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/s30VdJNL_0.33_onset_cc.data"
+    OUTDIR_ROOT='/home/mrenzo/Runs/SNEC_grid/15Msun_progenitor/test/'
+    # if below is None use SNEC provided model
+    INPUT_MESA_FILE = None # "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/s30VdJNL_0.33_onset_cc.data"
     # final_energies need to be strings including a decimal point and d for exponential notation, or SNEC will complain
-    final_energies = ["1.0d51", "1.0d50", "1.0d45", "0.0d0", "-1.0d45", "-1.0d50", "-1.0d51"]
+    final_energies = ["1.0d51", "0.75d51", "0.5d51", "0.25d51"]
+                      # #"1.0d50",  "1.0d49", "1.0d48", # "1.0d47",
+                      # "1.0d46", # "1.0d45",
+                      # "1.0d44", "1.0d42", "0.0d0"]
 
 
     # check if folder exists and user wants to erase it
@@ -94,6 +97,7 @@ if __name__ == "__main__":
         # make directory and SNEC output directory
         os.system("mkdir -p "+OUTDIR+"/Data/")
 
+
         if INPUT_MESA_FILE:
             INPUT_SHORT, INPUT_COMP_FILE = prepare_SNEC_input(INPUT_MESA_FILE, OUTDIR,
                                                               SNEC_ROOT+'/scripts/')
@@ -103,7 +107,7 @@ if __name__ == "__main__":
             INPUT_COMP_FILE = SNEC_ROOT+"/profiles/15Msol_RSG.iso.dat"
 
         setup_one_model(INPUT_SHORT, INPUT_COMP_FILE,
-                        parameters_template=SNEC_ROOT+"/parameters",
+                        parameters_template=SNEC_ROOT+"/parameters_template",
                         OUTDIR=OUTDIR,
                         FINAL_ENERGY=FINAL_ENERGY,
                         )
@@ -113,8 +117,7 @@ if __name__ == "__main__":
 
         # make submission script
         with open(OUTDIR_ROOT+"run_all.sh", "w") as f:
-            run_all_bash = """
-#!/bin/bash
+            run_all_bash = """#!/bin/bash
 
 for dir in */; do
     cd \"$dir\"
