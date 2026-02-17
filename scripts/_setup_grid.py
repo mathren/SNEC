@@ -118,7 +118,7 @@ if __name__ == "__main__":
 
 for dir in */; do
     cd \"$dir\"
-    ./snec > Data/output.txt &
+    ./snec > ./Data/output.txt 2>&1 &
     cd ..
 done
 pgrep -a snec
