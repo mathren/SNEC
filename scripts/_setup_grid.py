@@ -69,9 +69,11 @@ if __name__ == "__main__":
     # SNEC_ROOT="/home/u20/mrenzo/codes/SNEC/" # cluster_ua
     SNEC_ROOT = "/home/mrenzo/Documents/Research/codes/SNEC-1.01/" # ua_w
     OUTDIR_ROOT='/home/mrenzo/Runs/SNEC_grid/15Msun_progenitor/'
-    INPUT_MESA_FILE = "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/s30VdJNL_0.33_onset_cc.data"
+    INPUT_MESA_FILE = None # "/home/mrenzo/Documents/Research/codes/SNEC-1.01/profiles/"
+    # "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/s30VdJNL_0.33_onset_cc.data"
     # final_energies need to be strings including a decimal point and d for exponential notation, or SNEC will complain
-    final_energies = ["1.0d51", "1.0d50", "1.0d49", "1.0d48", "1.0d47", "1.0d46", "1.0d45", "0.0d0", "-1.0d45",  "-1.0d46",  "-1.0d44",  "-1.0d43"]
+    final_energies = ["1.0d51", "1.0d50", "1.0d45", "0.0d0", "-1.0d45", "-1.0d50", "-1.0d51"]
+
 
     # check if folder exists and user wants to erase it
     if os.path.isdir(OUTDIR_ROOT):
@@ -92,8 +94,13 @@ if __name__ == "__main__":
         # make directory and SNEC output directory
         os.system("mkdir -p "+OUTDIR+"/Data/")
 
-        INPUT_SHORT, INPUT_COMP_FILE = prepare_SNEC_input(INPUT_MESA_FILE, OUTDIR,
-                                                          SNEC_ROOT+'/scripts/')
+        if INPUT_MESA_FILE:
+            INPUT_SHORT, INPUT_COMP_FILE = prepare_SNEC_input(INPUT_MESA_FILE, OUTDIR,
+                                                              SNEC_ROOT+'/scripts/')
+        else:
+            # Use SNEC provided progenitor
+            INPUT_SHORT = SNEC_ROOT+"/profiles/15Msol_RSG.short"
+            INPUT_COMP_FILE = SNEC_ROOT+"/profiles/15Msol_RSG.iso.dat"
 
         setup_one_model(INPUT_SHORT, INPUT_COMP_FILE,
                         parameters_template=SNEC_ROOT+"/parameters",
@@ -104,6 +111,23 @@ if __name__ == "__main__":
         # copy SNEC executable -- assumes code is already compiled
         os.system("cp "+SNEC_ROOT+"snec "+OUTDIR)
 
+        # make submission script
+        with open(OUTDIR_ROOT+"run_all.sh", "w") as f:
+            run_all_bash = """
+#!/bin/bash
+
+for dir in */; do
+    cd \"$dir\"
+    ./snec > Data/output.txt &
+    cd ..
+done
+pgrep -a snec
+"""
+            # oneliner -- no terminal ouput
+            # "#!/bin/bash\n\nfor dir in */; do\n\tcd \"$dir\"\n\t./snec &\n\tcd ..\ndone"
+            f.write(run_all_bash)
+        # give -x permissions
+        os.chmod(OUTDIR_ROOT+"run_all.sh", 0o755)
 
         print ("Done grid setup in")
         print("")
