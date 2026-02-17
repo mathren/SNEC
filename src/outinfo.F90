@@ -6,17 +6,23 @@ module outinfomod
 end module outinfomod
 
 subroutine outinfo
-     
+
   use blmod, only: nt, time, dtime, rho, ye, cr, shockpos
   use outinfomod
   use parameters
   implicit none
-  
+
   real*8  :: shockr
 
 !------------------------------------------------------------------------------
-  
-  shockr = cr(shockpos)
+
+  if (shockpos < imax) then
+     ! shock is in domain
+     shockr = cr(shockpos)
+  else
+     shockr = 0.0
+  end if
+
 
   if( mod(outinfo_count,out_info_string_every).eq.0 ) then
     outinfo_count = 0
@@ -25,5 +31,5 @@ subroutine outinfo
   write(*,"(i8,1P10E15.6)") nt,time,dtime,maxval(rho),shockr
 
   outinfo_count = outinfo_count + 1
-  
+
 end subroutine outinfo
