@@ -65,11 +65,11 @@ opacity_floor_core	= 0.01d0
 
 ntmax			= 100000000000
 
-tend			= 86400.0d0
+tend			= 17280.0d0
 
-dtout			= 17280.0d0
-dtout_scalar		= 17280.0d0
-dtout_check		= 17280.0d0
+dtout			= 180.0d0
+dtout_scalar		= 180.0d0
+dtout_check		= 180.0d0
 
 ntout			= -1
 ntout_scalar		= -1

@@ -68,11 +68,11 @@ if __name__ == "__main__":
 
     # SNEC_ROOT="/home/u20/mrenzo/codes/SNEC/" # cluster_ua
     SNEC_ROOT = "/home/mrenzo/Documents/Research/codes/SNEC-1.01/" # ua_w
-    OUTDIR_ROOT='/home/mrenzo/Runs/SNEC_grid/15Msun_progenitor/test/'
+    OUTDIR_ROOT='/home/mrenzo/Runs/SNEC_grid/s30VdJNL_0.33/'
     # if below is None use SNEC provided model
-    INPUT_MESA_FILE = None # "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/s30VdJNL_0.33_onset_cc.data"
+    INPUT_MESA_FILE = "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/s30VdJNL_0.33_onset_cc.data" # None #
     # final_energies need to be strings including a decimal point and d for exponential notation, or SNEC will complain
-    final_energies = ["1.0d51", "0.75d51", "0.5d51", "0.25d51"]
+    final_energies = ["1.0d51", "0.75d51", "0.5d51", "0.25d51", "0.0d0"]
                       # #"1.0d50",  "1.0d49", "1.0d48", # "1.0d47",
                       # "1.0d46", # "1.0d45",
                       # "1.0d44", "1.0d42", "0.0d0"]
@@ -121,7 +121,7 @@ if __name__ == "__main__":
 
 for dir in */; do
     cd \"$dir\"
-    ./snec > ./Data/output.txt 2>&1 &
+    ./snec >> ./Data/output.txt 2>&1 &
     cd ..
 done
 pgrep -a snec
