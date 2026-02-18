@@ -413,3 +413,18 @@ def plot_LC(obs_lum, ax=None, **kwargs):
         ax = fig.add_subplot(gs[:, :])
     # ax.scatter(t.to(u.d), np.log10(L.value), **kwargs)
     ax.plot(t.to(u.d), np.log10(L.value), **kwargs)
+
+
+def plot_rho_pfile(t, rho_out, ax=None, **kwargs):
+    data = SNEC_output_parser(rho_out)
+    keys = np.array(list(data.keys()))
+    times = keys * u.s
+    try:
+        units = times.unit
+    except AttributeError:
+        times *= u.s
+    index_time_of_interest = np.argmin(np.absolute(times-t))
+    key_of_interest = keys[index_time_of_interest]
+    rho = data[key_of_interest][:, 1] * u.g/u.cm**3
+    mass = data[key_of_interest][:, 0] * u.g
+    ax.plot(mass.to(u.Msun), np.log10(rho.value), **kwargs)

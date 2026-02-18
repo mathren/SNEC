@@ -5,7 +5,7 @@ subroutine hydro_rad
   use physical_constants
   implicit none
 
-  integer :: i,k
+  integer :: i,k,ic
   integer :: keytemp,keyerr
   real*8 :: dtv
 
@@ -44,7 +44,6 @@ subroutine hydro_rad
   temp_p(:) = temp(:)
   kappa_p(:) = kappa(:)
 
-
 !---------------------------- update velocities -------------------------------
   if(do_piston .and. time.ge.piston_tstart .and. time.le.piston_tend) then
         vel(1) = piston_vel
@@ -62,12 +61,6 @@ subroutine hydro_rad
 
      ! artificial viscosity
      - dtv * 4.0d0*pi * (cr(i)**2 * Q(i) - cr(i-1)**2 * Q(i-1))/delta_cmass(i-1)
-
-    print *, i
-    print *, vel_p(i)
-    print *, - dtv * ggrav*mass(i) / r(i)**2 *gravity_switch
-    print *, - dtv * 4.0d0*pi*r(i)**2 * (p(i) - p(i-1)) / delta_cmass(i-1)
-    print *, - dtv * 4.0d0*pi * (cr(i)**2 * Q(i) - cr(i-1)**2 * Q(i-1))/delta_cmass(i-1)
   enddo
 
   if(do_piston.and.time.ge.piston_tend) then
@@ -82,9 +75,9 @@ subroutine hydro_rad
   end if
 
 !----------------------- update the radial coordinates-------------------------
+
   do i=1,imax
    r(i) = r_p(i) + dtime * vel(i)
-
    if(i.gt.1) then
        if (r(i).lt.r(i-1)) then
            write(*,*) 'radius of a gridpoint', i, 'is less than preceding'
@@ -107,10 +100,14 @@ subroutine hydro_rad
   !passive boundary condition, used in the expression for the velocity update,
   !but multiplied by the artificial viscosity, which is zero at the last point
 
+  if (innerBC == "inflow") then
+     ! reset center radius to prevent NaNs
+     r(1) = 1d6
+     cr(1) = r(1)/2.
+  end if
 
   ! update the artificial viscosity
   call artificial_viscosity
-
 
 !----------- update the temperature, pressure and internal energy -------------
 
@@ -176,7 +173,11 @@ subroutine hydro_rad
 
     !check if the iteration procedure converged
     delta_max = 0.0d0
-    do i=1,imax-1
+
+    ic = 1
+    if (innerBC == "inflow") ic = 2 ! avoid checking EOS in center
+
+    do i=ic,imax-1
         if(abs(b(i)/temp_temp(i)).gt.delta_max) then
             delta_max = abs(b(i)/temp_temp(i))
             location_max = i
