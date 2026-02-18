@@ -304,7 +304,8 @@ def SNEC_output_parser(outfile):
 
 
 
-def plot_vel_radius_at_time_t(t, vel_out, ax=None, fig_name=None, **kwargs):
+def plot_vel_radius_at_time_t(t, vel_out, ax=None, scatter=False,
+                              fig_name=None, **kwargs):
     data = SNEC_output_parser(vel_out)
     keys = np.array(list(data.keys()))
     times = keys * u.s
@@ -321,8 +322,22 @@ def plot_vel_radius_at_time_t(t, vel_out, ax=None, fig_name=None, **kwargs):
         gs = gridspec.GridSpec(150, 100)
         ax = fig.add_subplot(gs[:, :])
     i_non_zero = vel != 0
-    p = ax.scatter(mass[i_non_zero].to(u.Msun),
-                   vel[i_non_zero].to(u.km/u.s), **kwargs)
+    if scatter:
+        if (('c' not in kwargs) and ('color' not in kwargs)):
+            p = ax.scatter(mass[i_non_zero].to(u.Msun),
+                           vel[i_non_zero].to(u.km/u.s),
+                           c=[t.to(u.h).value]*len(vel[i_non_zero]),
+                           **kwargs)
+        else:
+            p = ax.scatter(mass[i_non_zero].to(u.Msun),
+                           vel[i_non_zero].to(u.km/u.s),
+                           **kwargs)
+    else:
+        p = None
+        p = ax.plot(mass[i_non_zero].to(u.Msun),
+                    vel[i_non_zero].to(u.km/u.s),
+                    **kwargs)
+
     if fig_name:
         ax.set_ylabel(r"$v \ [\mathrm{km\ s^{-1}}]$")
         ax.set_xlabel(r"$M \ [M_{\odot}]$")
@@ -330,8 +345,9 @@ def plot_vel_radius_at_time_t(t, vel_out, ax=None, fig_name=None, **kwargs):
     return (mass, vel, p)
 
 
-
-def plot_mass_radius(t, mass_out, ax=None, **kwargs):
+def plot_mass_radius(t, mass_out, ax=None, scatter=True, **kwargs):
+    p = None
+    color = 'b'
     data = SNEC_output_parser(mass_out)
     keys = np.array(list(data.keys()))
     times = keys * u.s
@@ -349,9 +365,15 @@ def plot_mass_radius(t, mass_out, ax=None, **kwargs):
         ax = fig.add_subplot(gs[:, :])
     if (('c' not in kwargs) and ('color' not in kwargs)):
         c=[t.to(u.h).value]*len(mass)
-        p = ax.scatter(mass.to(u.Msun), radius.to(u.cm), c=c, **kwargs)
+        if scatter:
+            p = ax.scatter(mass.to(u.Msun), radius.to(u.cm), c=c, **kwargs)
+            color = p.cmap(p.norm(c[0]))
+        ax.plot(mass.to(u.Msun), radius.to(u.cm), # c=plt.cm.viridis(c[0]),
+                c='k', zorder=10, ls=kwargs['ls'], lw=1)
     else:
-        p = ax.scatter(mass.to(u.Msun), radius.to(u.cm), **kwargs)
+        if scatter:
+            p = ax.scatter(mass.to(u.Msun), radius.to(u.cm), **kwargs)
+        ax.plot(mass.to(u.Msun), radius.to(u.cm), **kwargs)
     return (mass, radius, p)
 
 
@@ -416,7 +438,7 @@ def plot_LC(obs_lum, ax=None, **kwargs):
         ax = fig.add_subplot(gs[:, :])
     # ax.scatter(t.to(u.d), np.log10(L.value), **kwargs)
     ax.plot(t.to(u.d), np.log10(L.value), **kwargs)
-
+    return L, t
 
 def plot_rho_pfile(t, rho_out, ax=None, **kwargs):
     data = SNEC_output_parser(rho_out)

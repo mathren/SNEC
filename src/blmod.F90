@@ -223,6 +223,8 @@ module parameters
   real*8 :: dtmin
   real*8 :: dtmax
 
+  real*8 :: max_t_dense_out
+
   !---------------------- test -------------------------------------
 
   logical :: sedov = .false.

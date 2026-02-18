@@ -93,7 +93,7 @@ subroutine input_parser
   call get_integer_parameter('ntinfo',ntinfo,opt)
   call get_double_parameter('dtmin',dtmin,opt)
   call get_double_parameter('dtmax',dtmax,opt)
-
+  call get_double_parameter('max_t_dense_out',max_t_dense_out, opt)
 !********************************** TEST **************************************
 
   call get_logical_parameter('sedov',sedov,opt)

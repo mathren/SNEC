@@ -65,11 +65,13 @@ opacity_floor_core	= 0.01d0
 
 ntmax			= 100000000000
 
-tend			= 3.0d3
+tend			= 864000.0d0
 
-dtout			= 360.0d0
-dtout_scalar		= 360.0d0
-dtout_check		= 360.0d0
+max_t_dense_out         = 14400.0d0 # denser output until this
+
+dtout			= 36000.0d0
+dtout_scalar		= 36000.0d0
+dtout_check		= 36000.0d0
 
 ntout			= -1
 ntout_scalar		= -1
