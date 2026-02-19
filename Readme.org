@@ -68,7 +68,9 @@ allowing to run the executable =snec= from anywhere.
 
 
 * TODO Objectives
-- [x] implement inner boundary conditions allowing for infall with no
-  back reaction.
+- [X] implement inner boundary conditions allowing for infall with no
+  back reaction (testing)
+- [X] implement =OPEN_MP= parallelization? Not worth it
+  (in =hydro*.F90= most loops should be ready to, need changing compiler flags)
 - [ ] implement density smoothing self-consistent with boxcar
   composition smoothing
