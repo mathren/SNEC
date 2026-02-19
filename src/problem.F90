@@ -4,7 +4,7 @@ subroutine problem
        opacity_floor, metallicity, envelope_metallicity, do_piston, &
        do_bomb, total_initial_energy, bomb_total_energy, bomb_spread, &
        rho, kappa, kappa_table, dkappadt, tau, temp, p, delta_mass, &
-       lambda, inv_kappa, lum, eos_gamma1
+       lambda, inv_kappa, lum, eos_gamma1, rBC_initial, iBC
   use parameters
   use eosmodule
   use physical_constants
@@ -28,6 +28,7 @@ subroutine problem
 
   if (innerBC == "inflow") then
      write(*,*) "Using inflow inner boundary condition!"
+     iBC = 2
   else
      write(*,*) "Default inner boundary condition!"
   endif
@@ -64,6 +65,7 @@ subroutine problem
   call get_inner_outer_radius_from_profile(profile_name,mass(1),r(1),r(imax))
 
   Rstar=r(imax)
+  rBC_initial = r(1)  ! anything falling under this threshold is excised
 
   open(unit=666,file=trim(adjustl(trim(adjustl(outdir))//"/info.dat")), &
        status="unknown",form='formatted',position="append")

@@ -1,12 +1,12 @@
 subroutine timestep
   ! this routine sets the timestep
 
-  use blmod, only: cs2, r, vel, dtime, dtime_p, nt, delta_time
+  use blmod, only: cs2, r, vel, dtime, dtime_p, nt, delta_time, iBC
   use parameters
   use physical_constants
   implicit none
 
-  integer :: i, ic
+  integer :: i
 
   real*8 :: sound
   real*8 :: dttrans
@@ -24,18 +24,13 @@ subroutine timestep
   !copy old timestep
   dtime_p = dtime
 
-
   dtime = dtmax
 
-  ic=1
-  if (innerBC == "inflow") ic = 3 ! avoid checking CFL condition at inner boundary
-
-  do i=ic,imax-1
+  do i=iBC,imax-1
     sound = sqrt(cs2(i))
     delta_time(i) = (r(i+1) - r(i)) / &
          max(abs(vel(i)+sound),abs(vel(i)-sound))
-    dtime = min(dtime, (r(i+1) - r(i)) / &
-         max(abs(vel(i)+sound),abs(vel(i)-sound)))
+    dtime = min(dtime, delta_time(i))
   enddo
 
   dtime = dtfac * dtime

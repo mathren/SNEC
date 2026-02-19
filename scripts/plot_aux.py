@@ -369,7 +369,7 @@ def plot_mass_radius(t, mass_out, ax=None, scatter=True, **kwargs):
             p = ax.scatter(mass.to(u.Msun), radius.to(u.cm), c=c, **kwargs)
             color = p.cmap(p.norm(c[0]))
         ax.plot(mass.to(u.Msun), radius.to(u.cm), # c=plt.cm.viridis(c[0]),
-                c='k', zorder=10, ls=kwargs['ls'], lw=1)
+                c='orange', zorder=10, ls=kwargs['ls'], lw=1)
     else:
         if scatter:
             p = ax.scatter(mass.to(u.Msun), radius.to(u.cm), **kwargs)

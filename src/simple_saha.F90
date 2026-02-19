@@ -1,6 +1,6 @@
 subroutine simple_saha(ncomps_consider,k,tempx,rhox,ne)
 
-  use blmod, only: comp, comp_details, ncomps, zav, ion_fractions
+  use blmod, only: comp, comp_details, ncomps, zav, ion_fractions, iBC
   use parameters
   use physical_constants
   use eosmodule, only: xxip, stat_weight_p1_ratio
@@ -44,7 +44,7 @@ subroutine simple_saha(ncomps_consider,k,tempx,rhox,ne)
 
   !abort if the temperature is negative
   !(this should never happen)
-  if(tempx.lt.0.0d0) then
+  if((tempx.lt.0.0d0)) then
      write(*,*) 'temperature is negative', k
      stop
   end if
@@ -61,12 +61,12 @@ subroutine simple_saha(ncomps_consider,k,tempx,rhox,ne)
      izion = int(zion)
      number_states = izion + 1
      n_k = rhox*comp(k,j)/(comp_details(j,1)*mproton)
-     
+
      if(j.le.ncomps_consider.and.comp_details(j,2).gt.0.0d0) then
 
         !the initial guess for zav is the value from the previous timestep
         zav_star = zav(j,k)
-       
+
         !look for the lowest and highest ionization states to solve
         !(it doesn't make sense to solve for the states with the fraction
         !of atoms potentially less than the chosen tolerance level)
@@ -107,9 +107,9 @@ subroutine simple_saha(ncomps_consider,k,tempx,rhox,ne)
             ie = 0
 
             do while(abs(delta_zav/zav_star) > zavtol)
-            
+
                 ie = ie+1
-            
+
                 productx = 1.0d0
 
                 sum0 = 0.0d0
@@ -153,14 +153,14 @@ subroutine simple_saha(ncomps_consider,k,tempx,rhox,ne)
             end do
 
         end if
-        
-        
+
+
     else !if the element is not considered, it is assumed to be fully ionized
 
         y(1:number_states-1) = 0.0d0
         y(number_states) = 1.0d0
         zav_star = zion
-        
+
     end if
 
     ! save the ionization fractions

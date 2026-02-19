@@ -145,6 +145,10 @@ module blmod
   !other
   real*8 :: eos_gamma1
 
+  ! do not check CFL below this
+  integer :: iBC = 1
+  real*8:: rBC_initial
+
 end module blmod
 
 !############################# PARAMETERS MODULE ##############################

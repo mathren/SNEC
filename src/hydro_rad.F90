@@ -5,7 +5,7 @@ subroutine hydro_rad
   use physical_constants
   implicit none
 
-  integer :: i,k,ic
+  integer :: i,k
   integer :: keytemp,keyerr
   real*8 :: dtv
 
@@ -29,7 +29,7 @@ subroutine hydro_rad
   integer, parameter :: ITMAX = 300
 
 
-!------------------------------------------------------------------------------
+  !------------------------------------------------------------------------------
 
   ! follow dt convention of MB93:
   dtv = 0.5d0 * (dtime + dtime_p)
@@ -44,85 +44,103 @@ subroutine hydro_rad
   temp_p(:) = temp(:)
   kappa_p(:) = kappa(:)
 
-!---------------------------- update velocities -------------------------------
+  !---------------------------- update velocities -------------------------------
   if(do_piston .and. time.ge.piston_tstart .and. time.le.piston_tend) then
-        vel(1) = piston_vel
-        vel(2) = piston_vel
-  endif
-
-  do i=2,imax
-    vel(i) = vel_p(i) &
-
-     ! gravity
-     - dtv * ggrav*mass(i) / r(i)**2 *gravity_switch   &
-
-     ! pressure
-     - dtv * 4.0d0*pi*r(i)**2 * (p(i) - p(i-1)) / delta_cmass(i-1)   &
-
-     ! artificial viscosity
-     - dtv * 4.0d0*pi * (cr(i)**2 * Q(i) - cr(i-1)**2 * Q(i-1))/delta_cmass(i-1)
-  enddo
-
-  if(do_piston.and.time.ge.piston_tend) then
-    vel(1) = 0.0d0
-  else if(do_bomb) then
-    vel(1) = 0.0d0
-  endif
-
-  if (innerBC == "inflow") then
-     ! hack inner boundary to be inflow no backreaction
-     vel(1) = min(0.0d0, vel(2))
+     vel(1) = piston_vel
+     vel(2) = piston_vel
   end if
 
-!----------------------- update the radial coordinates-------------------------
+  do i=iBC+1,imax
+     vel(i) = vel_p(i) &
+          ! gravity
+          - dtv * ggrav*mass(i) / r(i)**2 *gravity_switch   &
+          ! pressure
+          - dtv * 4.0d0*pi*r(i)**2 * (p(i) - p(i-1)) / delta_cmass(i-1)   &
+          ! artificial viscosity
+          - dtv * 4.0d0*pi * (cr(i)**2 * Q(i) - cr(i-1)**2 * Q(i-1))/delta_cmass(i-1)
+     if (vel(i)/= vel(i)) then
+        print *, i, iBC
+        print *,"cri", cr(i),"qi", Q(i),"cri-1", cr(i-1)
+     end if
+  end do
 
-  do i=1,imax
-   r(i) = r_p(i) + dtime * vel(i)
-   if(i.gt.1) then
-       if (r(i).lt.r(i-1)) then
-           write(*,*) 'radius of a gridpoint', i, 'is less than preceding'
-           stop
-       end if
-   end if
-  enddo
+  if(do_piston.and.time.ge.piston_tend) then
+     vel(1) = 0.0d0
+  else if(do_bomb) then
+     vel(1) = 0.0d0
+  end if
 
-!------------------------- update the zone densities --------------------------
-  do i=1,imax-1
+  !----------------------- update the radial coordinates-------------------------
+
+  do i=2,imax
+     r(i) = r_p(i) + dtime * vel(i)
+     if((i>iBC) .and. &
+          (r(i).lt.r(i-1)) .and. &
+          innerBC /= "inflow") then
+        write(*,*) 'radius of a gridpoint', i, 'is less than preceding'
+        write(*,*) 'boundary at cell', iBC
+        stop
+     end if
+  end do
+
+  ! now we have updated radii: do we need to move iBC?
+  ! cut everything reaching r smaller than the initial smaller radius
+  if (innerBC == "inflow") then
+     i = imax
+     do while (i >= iBC+1)
+        if (r(i) <= rBC_initial) then
+           iBC = i
+           exit
+        end if
+        i = i - 1 ! loop inward
+     end do
+     ! hack inner boundary to be inflow no backreaction
+     vel(iBC) = min(0.0d0, vel(iBC+1))
+     if (iBC >1) then
+        ! wipe velocities below
+        vel(1:iBC-1) = 0.0d0
+        ! fix radii below
+        r(1:iBC-1) = r_p(1:iBC-1)
+     end if
+  end if
+
+  !------------------------- update the zone densities --------------------------
+
+  do i=iBC,imax-1
      rho(i) = delta_mass(i) / (4.0d0*pi * (r(i+1)**3 - r(i)**3)/3.0d0)
-  enddo
+  end do
   rho(imax) = 0.0d0 !passive boundary condition
 
-!------------------------- update zone center radius --------------------------
-  do i=1,imax-1
-    cr(i) = ( ( r(i)**3 + r(i+1)**3 ) / 2.0d0 )**(1.0d0/3.0d0)
-  enddo
+  !------------------------- update zone center radius --------------------------
+
+  do i=iBC+1,imax-1
+     cr(i) = ( ( r(i)**3 + r(i+1)**3 ) / 2.0d0 )**(1.0d0/3.0d0)
+     if (cr(i) /= cr(i)) then
+        print *, iBC, i, cr(i), r(i), r(i+1)
+        STOP
+     end if
+  end do
   cr(imax) = r(imax) + (r(imax) - cr(imax-1))
   !passive boundary condition, used in the expression for the velocity update,
   !but multiplied by the artificial viscosity, which is zero at the last point
 
-  if (innerBC == "inflow") then
-     ! reset center radius to prevent NaNs
-     r(1) = 1d6
-     cr(1) = r(1)/2.
-  end if
-
   ! update the artificial viscosity
   call artificial_viscosity
 
-!----------- update the temperature, pressure and internal energy -------------
+  !----------- update the temperature, pressure and internal energy -------------
 
   !calculate heating term due to Ni
   if(time.ge.time_Ni) then
-      time_Ni = time_Ni + Ni_period
-      call nickel_heating
-  endif
+     time_Ni = time_Ni + Ni_period
+     call nickel_heating
+  end if
 
   !calculate heating term due to bomb
   if(do_bomb .and. time.ge.bomb_tstart .and. time.le.bomb_tend) then
-      call bomb_pattern
+     call bomb_pattern
   else
-      bomb_heating(:) = 0.0d0
-  endif
+     bomb_heating(:) = 0.0d0
+  end if
 
   !Initial guess for the quantities at the next time step
   p_temp(1:imax) = p(1:imax)
@@ -131,82 +149,85 @@ subroutine hydro_rad
 
   do k=1, ITMAX
 
-    keytemp = 1
-    call eos(rho(1:imax-1),temp_temp(1:imax-1),ye(1:imax-1), &
-         abar(1:imax-1),p_temp(1:imax-1),eps_temp(1:imax-1), &
-         cs2(1:imax-1), dpdt(1:imax-1), dedt(1:imax-1), entropy(1:imax-1), &
-         p_rad(1:imax-1),keyerr,keytemp,eoskey)
+     keytemp = 1
+     call eos(rho(1:imax-1),temp_temp(1:imax-1),ye(1:imax-1), &
+          abar(1:imax-1),p_temp(1:imax-1),eps_temp(1:imax-1), &
+          cs2(1:imax-1), dpdt(1:imax-1), dedt(1:imax-1), entropy(1:imax-1), &
+          p_rad(1:imax-1),keyerr,keytemp,eoskey)
 
 
-    call luminosity(r(:), temp_temp(:), kappa_p(:), &
-                    lambda_temp(:), inv_kappa(:), lum_temp(:))
+     call luminosity(r(:), temp_temp(:), kappa_p(:), &
+          lambda_temp(:), inv_kappa(:), lum_temp(:))
 
-    !calculate the coefficients of the equation:
-    ! A(i)*\delta T(i+1) + B(i)*\delta T(i) + C(i)*\delta T(i-1) = D(i)
-    call matrix_arrays(temp_temp(:), lambda_temp(:), inv_kappa(:), &
-        eps_temp(:), p_temp(:), lum_temp(:), &
-        Aarray(:), Barray(:), Carray(:), Darray(:))
+     !calculate the coefficients of the equation:
+     ! A(i)*\delta T(i+1) + B(i)*\delta T(i) + C(i)*\delta T(i-1) = D(i)
+     call matrix_arrays(temp_temp(:), lambda_temp(:), inv_kappa(:), &
+          eps_temp(:), p_temp(:), lum_temp(:), &
+          Aarray(:), Barray(:), Carray(:), Darray(:))
 
 
-    !assemble the matrix in the form used by lapack
-    ab(2,2:imax-1) = Aarray(1:imax-2)
-    ab(3,1:imax-1) = Barray(1:imax-1)
-    ab(4,1:imax-2) = Carray(2:imax-1)
+     !assemble the matrix in the form used by lapack
+     ab(2,2:imax-1) = Aarray(1:imax-2)
+     ab(3,1:imax-1) = Barray(1:imax-1)
+     ab(4,1:imax-2) = Carray(2:imax-1)
 
-    b(1:imax-1) = Darray(1:imax-1)
+     b(1:imax-1) = Darray(1:imax-1)
 
-    !invert the matrix
-    !if the inversion fails, the whole matrix is written in 'failed_matrix.dat'
-    info = 0
-    call dgbsv(imax-1,kl,ku,1,ab,ldab,ipiv,b,imax-1,info)
+     !invert the matrix
+     !if the inversion fails, the whole matrix is written in 'failed_matrix.dat'
+     info = 0
+     call dgbsv(imax-1,kl,ku,1,ab,ldab,ipiv,b,imax-1,info)
 
-    if(info.ne.0) then
-       open(unit=666, &
-           file=trim(adjustl(trim(adjustl(outdir))//"/failed_matrix.dat")), &
-           status="unknown",form='formatted',position="append")
-       do i=1,imax-1
+     if(info.ne.0) then
+        open(unit=666, &
+             file=trim(adjustl(trim(adjustl(outdir))//"/failed_matrix.dat")), &
+             status="unknown",form='formatted',position="append")
+        do i=1,imax-1
            write(666,*) ab(2,i), ab(3,i), ab(4,i), Darray(i)
-       enddo
-       close(666)
-       stop "problem in the matrix inversion (see Data/failed_matrix.dat)"
-    endif
+        end do
+        close(666)
+        stop "problem in the matrix inversion (see Data/failed_matrix.dat)"
+     end if
 
-    !check if the iteration procedure converged
-    delta_max = 0.0d0
+     !check if the iteration procedure converged
+     delta_max = 0.0d0
 
-    ic = 1
-    if (innerBC == "inflow") ic = 2 ! avoid checking EOS in center
-
-    do i=ic,imax-1
+     do i=iBC+1,imax-1
         if(abs(b(i)/temp_temp(i)).gt.delta_max) then
-            delta_max = abs(b(i)/temp_temp(i))
-            location_max = i
-        endif
-    enddo
-    if(delta_max.le.EPSTOL) goto 101
+           delta_max = abs(b(i)/temp_temp(i))
+           location_max = i
+        end if
+     end do
+     if((delta_max.le.EPSTOL)) goto 101
 
-    !add the increment to the temperature
-    do i=1, imax-1
+     !add the increment to the temperature
+     do i=iBC+1, imax-1
         temp_temp(i) = temp_temp(i) + b(i)
         if(temp_temp(i).lt.0.0d0) then
-            goto 100
+           goto 100
         end if
-    end do
+     end do
 
-  enddo
+  end do
 
-  100 continue
+100 continue
 
   write(6,*) "EOS problem", delta_max, location_max
   scratch_step = .true.
 
-  101 continue
+101 continue
 
 
   eps(1:imax-1) = eps_temp(1:imax-1)
   p(1:imax-1)   = p_temp(1:imax-1)
   temp(1:imax-1)  = temp_temp(1:imax-1)
 
+  if (innerBC == "inflow") then
+     ! flatten everything inside inner boundary
+     eps(1:iBC) = eps(iBC+1)
+     p(1:iBC) = p(iBC+1)
+     temp(1:iBC) = temp(iBC+1)
+  end if
 
   !passive boundary conditions, do not participate in the evolution
   temp(imax) = 0.0d0
@@ -215,10 +236,14 @@ subroutine hydro_rad
   !active boundary condition, used in the velocity update
   p(imax) = 0.0d0
 
-
   call opacity(rho(:),temp_temp(:),kappa(:),kappa_table(:),dkappadt(:))
 
   call luminosity(r(:),temp(:),kappa(:),lambda(:),inv_kappa(:),lum(:))
+
+  ! Debug prints
+  ! print *, "end timestep", iBC, &
+  !      vel(iBC), vel(iBC+1), (vel(iBC) == vel(iBC+1)) .or. (vel(iBC+1)>0), &
+  !      p(iBC), p(iBC+1), p(iBC)== p(iBC+1)
 
 
 end subroutine hydro_rad
