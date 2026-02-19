@@ -6,7 +6,7 @@ subroutine timestep
   use physical_constants
   implicit none
 
-  integer :: i
+  integer :: i, ic
 
   real*8 :: sound
   real*8 :: dttrans
@@ -26,7 +26,11 @@ subroutine timestep
 
 
   dtime = dtmax
-  do i=1,imax-1
+
+  ic=1
+  if (innerBC == "inflow") ic = 3 ! avoid checking CFL condition at inner boundary
+
+  do i=ic,imax-1
     sound = sqrt(cs2(i))
     delta_time(i) = (r(i+1) - r(i)) / &
          max(abs(vel(i)+sound),abs(vel(i)-sound))
@@ -43,6 +47,5 @@ subroutine timestep
   endif
 
   dtime = min(max(dtime,dtmin),dtmax)
-
 
 end subroutine timestep
