@@ -58,10 +58,6 @@ subroutine hydro_rad
           - dtv * 4.0d0*pi*r(i)**2 * (p(i) - p(i-1)) / delta_cmass(i-1)   &
           ! artificial viscosity
           - dtv * 4.0d0*pi * (cr(i)**2 * Q(i) - cr(i-1)**2 * Q(i-1))/delta_cmass(i-1)
-     if (vel(i)/= vel(i)) then
-        print *, i, iBC
-        print *,"cri", cr(i),"qi", Q(i),"cri-1", cr(i-1)
-     end if
   end do
 
   if(do_piston.and.time.ge.piston_tend) then
@@ -83,8 +79,8 @@ subroutine hydro_rad
      end if
   end do
 
-  ! now we have updated radii: do we need to move iBC?
-  ! cut everything reaching r smaller than the initial smaller radius
+  ! now we have updated radii and velocities: do we need to move iBC?
+  ! cut everything reaching r smaller than the initial smaller radius, a fixed boundary
   if (innerBC == "inflow") then
      i = imax
      do while (i >= iBC+1)
@@ -94,8 +90,10 @@ subroutine hydro_rad
         end if
         i = i - 1 ! loop inward
      end do
+
      ! hack inner boundary to be inflow no backreaction
      vel(iBC) = min(0.0d0, vel(iBC+1))
+
      if (iBC >1) then
         ! wipe velocities below
         vel(1:iBC-1) = 0.0d0
@@ -115,10 +113,6 @@ subroutine hydro_rad
 
   do i=iBC+1,imax-1
      cr(i) = ( ( r(i)**3 + r(i+1)**3 ) / 2.0d0 )**(1.0d0/3.0d0)
-     if (cr(i) /= cr(i)) then
-        print *, iBC, i, cr(i), r(i), r(i+1)
-        STOP
-     end if
   end do
   cr(imax) = r(imax) + (r(imax) - cr(imax-1))
   !passive boundary condition, used in the expression for the velocity update,
