@@ -99,7 +99,6 @@ program snec
         else
            tdump_scalar =tdump_scalar+dtout
         end if
-        tdump_scalar=tdump_scalar+dtout_scalar
         OutputFlagScalar = .true.
      endif
 
@@ -109,7 +108,6 @@ program snec
         else
            tdump_check =tdump_check+dtout
         end if
-        tdump_check=tdump_check+dtout_check
         OutputFlagCheck = .true.
      endif
 

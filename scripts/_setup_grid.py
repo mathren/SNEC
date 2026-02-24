@@ -72,7 +72,7 @@ if __name__ == "__main__":
     # if below is None use SNEC provided model
     INPUT_MESA_FILE = None # "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/s30VdJNL_0.33_onset_cc.data" # None #
     # final_energies need to be strings including a decimal point and d for exponential notation, or SNEC will complain
-    final_energies = ["1.0d51", "0.0d0", "-1.0"]
+    final_energies = ["1.0d51", "0.0d0"]
 
 
     # check if folder exists and user wants to erase it

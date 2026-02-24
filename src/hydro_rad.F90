@@ -86,6 +86,7 @@ subroutine hydro_rad
      i = imax
      do while (i >= iBC+1)
         if (r(i) <= rBC_initial) then
+           ! print *, "updating inner boundary index", i, iBC
            iBC = i
            exit
         end if

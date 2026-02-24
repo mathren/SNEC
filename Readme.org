@@ -67,6 +67,10 @@ is defined, it will be pre-pended to the path of the EOS tables
 allowing to run the executable =snec= from anywhere.
 
 
+* Flowchart
+
+=snec= \rightarrow =timestep= \rightarrow =blstep= \rightarrow =hydro= or =hydro_rad= (where the calculation happens)
+
 * TODO Objectives
 - [X] implement inner boundary conditions allowing for infall with no
   back reaction (testing)

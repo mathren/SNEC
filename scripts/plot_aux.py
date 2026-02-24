@@ -90,12 +90,15 @@ def HRD(fname, ax, annotate_radii=None, interp=None, scatter=False,  **kwargs):
 
 def annotate_radii_hrd(ax, radii=np.logspace(0, 3, base=10)):
     """
-    give the axis object for an HRD plot (assumed to be in log10 Lsun and log10 Teff),
-    and a list of radii in Rsun units, plots radii.
+    give the axis object for an HRD plot (assumed to be in log10
+    Lsun and log10 Teff), and a list of radii in Rsun units, plots
+    radii.
+
     Parameters:
     ----------
     ax: `mpl.ax` matplotlib axis object
     radii: `np.array`, optional, radii to mark
+
     """
     xmin, xmax = ax.get_xlim()
     ymin, ymax = ax.get_ylim()
@@ -345,7 +348,7 @@ def plot_vel_radius_at_time_t(t, vel_out, ax=None, scatter=False,
     return (mass, vel, p)
 
 
-def plot_mass_radius(t, mass_out, ax=None, scatter=True, **kwargs):
+def plot_mass_radius(t, mass_out, ax=None, scatter=True, i_min=0, **kwargs):
     p = None
     color = 'b'
     data = SNEC_output_parser(mass_out)
@@ -357,8 +360,8 @@ def plot_mass_radius(t, mass_out, ax=None, scatter=True, **kwargs):
         times *= u.s
     index_time_of_interest = np.argmin(np.absolute(times-t))
     key_of_interest = keys[index_time_of_interest]
-    mass = data[key_of_interest][:, 1] * u.g
-    radius = data[key_of_interest][:, 0] * u.cm
+    mass = data[key_of_interest][i_min:, 1] * u.g
+    radius = data[key_of_interest][i_min:, 0] * u.cm
     if not ax:
         fig = plt.figure()
         gs = gridspec.GridSpec(150, 100)
@@ -439,6 +442,7 @@ def plot_LC(obs_lum, ax=None, **kwargs):
     # ax.scatter(t.to(u.d), np.log10(L.value), **kwargs)
     ax.plot(t.to(u.d), np.log10(L.value), **kwargs)
     return L, t
+
 
 def plot_rho_pfile(t, rho_out, ax=None, **kwargs):
     data = SNEC_output_parser(rho_out)
