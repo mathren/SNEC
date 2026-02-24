@@ -16,7 +16,7 @@ subroutine output_all(modeflag)
   ! meant for checkpoints; not used at the moment
 
   else if(modeflag.eq.1) then
-         
+
     filename = trim(adjustl(outdir))//"/vel.xg"
     call output_single_mass(vel,filename)
 
@@ -105,39 +105,44 @@ subroutine output_all(modeflag)
     call output_single_mass(photosphere_tracer,filename)
 
   else if(modeflag.eq.2) then
-     
+
      filename = trim(adjustl(outdir))//"/T_eff.dat"
      call output_scalar(T_eff,filename)
-     
+
      filename = trim(adjustl(outdir))//"/Ni_total_luminosity.dat"
      call output_scalar(Ni_total_luminosity,filename)
-     
+
      filename = trim(adjustl(outdir))//"/lum_observed.dat"
      call output_scalar(lum_observed,filename)
-         
+
      filename = trim(adjustl(outdir))//"/index_photo.dat"
      call output_integer(index_photo,filename)
-     
+
      filename = trim(adjustl(outdir))//"/lum_photo.dat"
      call output_scalar(lum_photo,filename)
- 
+
      filename = trim(adjustl(outdir))//"/mass_photo.dat"
      call output_scalar(mass_photo,filename)
- 
+
      filename = trim(adjustl(outdir))//"/vel_photo.dat"
      call output_scalar(vel_photo,filename)
- 
+
      filename = trim(adjustl(outdir))//"/rad_photo.dat"
      call output_scalar(rad_photo,filename)
-     
+
      filename = trim(adjustl(outdir))//"/opacity_corrupted.dat"
      call output_integer(opacity_corrupted,filename)
-     
+
      filename = trim(adjustl(outdir))//"/index_lumshell.dat"
      call output_integer(index_lumshell,filename)
- 
+
      filename = trim(adjustl(outdir))//"/mass_lumshell.dat"
      call output_scalar(mass_lumshell,filename)
+
+     if (innerBC == "inflow") then
+        filename = trim(adjustl(outdir))//"/inner_boundary.dat"
+        call output_integer(iBC, filename)
+     end if
 
   endif
 
@@ -147,7 +152,7 @@ end subroutine output_all
 ! *******************************************************************
 
 subroutine output_single_mass(var,filename)
-  
+
   use blmod, only: mass,time
   use parameters
 
@@ -177,7 +182,7 @@ end subroutine output_single_mass
 ! *******************************************************************
 
 subroutine output_single_radius(var,filename)
-  
+
   use blmod, only: r,time
   use parameters
 
@@ -202,7 +207,7 @@ subroutine output_single_radius(var,filename)
 
 
 end subroutine output_single_radius
-    
+
 ! *******************************************************************
 
 subroutine output_single_mass_integer(var,filename)
@@ -233,7 +238,7 @@ end subroutine output_single_mass_integer
 ! ******************************************************************
 
 subroutine output_central(var,filename)
-  
+
   use blmod, only: r,mass,time
   use parameters
 
@@ -247,16 +252,16 @@ subroutine output_central(var,filename)
                                             form='formatted',position="append")
 
   write(666,"(1P20E19.10E3)") time,var(1)
-  
+
   close(666)
 
 
 end subroutine output_central
-    
+
 ! ******************************************************************
 
 subroutine output_outer(var,filename)
-  
+
   use blmod, only: r,mass,time
   use parameters
 
@@ -291,11 +296,11 @@ subroutine output_scalar(var,filename)
                                             form='formatted',position="append")
 
   write(666,"(1P20E19.10E3)") time,var
-  
+
   close(666)
 
 end subroutine output_scalar
-    
+
 ! *******************************************************************
 subroutine output_integer(var,filename)
 
@@ -309,7 +314,7 @@ subroutine output_integer(var,filename)
 
   open(unit=666,file=trim(adjustl(filename)),status="unknown", &
                                             form='formatted',position="append")
-  
+
   write(666,"(E19.10E3, I5.4)") time,var
 
   close(666)
@@ -331,7 +336,7 @@ subroutine output_screenshot(var,filename,imaximum)
 
   open(unit=666,file=trim(adjustl(filename)),status="unknown", &
        form='formatted',position="append")
-  
+
   do i=1, imaximum
       write(666,"(I5.4, E25.16E3)") i,var(i)
   enddo
@@ -379,7 +384,3 @@ end subroutine output_screenshot
       fname = trim(adjustl(fname))//"_time_"//trim(adjustl(outtime))
 
     end subroutine generate_filename
-
-
-
-

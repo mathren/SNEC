@@ -79,8 +79,9 @@ subroutine hydro_rad
      end if
   end do
 
-  ! now we have updated radii and velocities: do we need to move iBC?
-  ! cut everything reaching r smaller than the initial smaller radius, a fixed boundary
+  ! now we have updated radii and velocities: do we need to move the
+  ! inner boundary index (iBC)? cut everything reaching r smaller than
+  ! the initial smaller radius, a fixed boundary
   if (innerBC == "inflow") then
      i = imax
      do while (i >= iBC+1)
@@ -233,11 +234,5 @@ subroutine hydro_rad
   call opacity(rho(:),temp_temp(:),kappa(:),kappa_table(:),dkappadt(:))
 
   call luminosity(r(:),temp(:),kappa(:),lambda(:),inv_kappa(:),lum(:))
-
-  ! Debug prints
-  ! print *, "end timestep", iBC, &
-  !      vel(iBC), vel(iBC+1), (vel(iBC) == vel(iBC+1)) .or. (vel(iBC+1)>0), &
-  !      p(iBC), p(iBC+1), p(iBC)== p(iBC+1)
-
 
 end subroutine hydro_rad
