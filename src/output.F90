@@ -166,7 +166,7 @@ subroutine output_single_mass(var,filename)
 
   open(unit=666,file=trim(adjustl(filename)),status="unknown", &
                                             form='formatted',position="append")
-  write(666,*) '"Time = ',time
+  write(666,"(A,1PE19.10E3)") '"Time = ',time
 
   do i=1,imax
      write(666,"(1P20E29.20E3)") mass(i),var(i)
@@ -195,7 +195,7 @@ subroutine output_single_radius(var,filename)
 
   open(unit=666,file=trim(adjustl(filename)),status="unknown", &
                                             form='formatted',position="append")
-  write(666,*) '"Time = ',time
+  write(666,"(A,1PE19.10E3)") '"Time = ',time
 
   do i=1,imax
      write(666,"(1P20E19.10E3)") r(i),var(i)
@@ -224,7 +224,7 @@ subroutine output_single_mass_integer(var,filename)
 
   open(unit=666,file=trim(adjustl(filename)),status="unknown", &
                                             form='formatted',position="append")
-  write(666,*) '"Time = ',time
+  write(666,"(A,1PE19.10E3)") '"Time = ',time
 
   do i=1,imax
      write(666,"(E19.10E3, I5.4)") mass(i), var(i)
@@ -315,7 +315,7 @@ subroutine output_integer(var,filename)
   open(unit=666,file=trim(adjustl(filename)),status="unknown", &
                                             form='formatted',position="append")
 
-  write(666,"(E19.10E3, I5.4)") time,var
+  write(666,"(1PE19.10E3, I5.4)") time,var
 
   close(666)
 
