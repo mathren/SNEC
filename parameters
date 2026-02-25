@@ -1,92 +1,91 @@
 #____________LAUNCH_____________
-outdir                  = "./Data"
+
+outdir              = "/home/mrenzo/Runs/SNEC_grid/long_runs/15Msun/default_run/Data/"
 
 #___________PROFILE_____________
 
-profile_name 		= "/home/mrenzo/Documents/Research/codes/SNEC-1.01//profiles/15Msol_RSG.short"
+profile_name 		= "profiles/15Msol_RSG.short"
 
-comp_profile_name	= "/home/mrenzo/Documents/Research/codes/SNEC-1.01//profiles/15Msol_RSG.iso.dat"
+comp_profile_name	= "profiles/15Msol_RSG.iso.dat"
 
 #__________EXPLOSION_____________
 
-initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
+initial_data 		= "Thermal_Bomb"
 
 #Options:
 #"Piston_Explosion"
 #"Thermal_Bomb"
 
-# piston_vel		= 5.0d8
-# piston_tstart		= 0.0d0
-# piston_tend		= 1.0d-2
+piston_vel          = 5.0d9
+piston_tstart       = 0.0d0
+piston_tend         = 1.0d-2
 
-final_energy		= -1.0d0 # 1.0d51 #
-bomb_tstart		= 0.0d0
-bomb_tend		= 1.0d-2
-bomb_mass_spread	= 0.1d0  # (in solar mass)
-bomb_start_point	= 1
+final_energy        = 1.0d51
+bomb_tstart         = 0.0d0
+bomb_tend           = 0.1d0
+bomb_mass_spread    = 0.1d0 #(in solar mass)
+bomb_start_point    = 1
 
 #_____________GRID_______________
 
-imax			= 1000
+imax         = 3208 #1000
 
-gridding		= "uniform_in_mass" #"from_file_by_mass"
+gridding = "from_file_by_mass"
 
 #Options:
 #"uniform_in_mass"
 #"from_file_by_mass"
 
-mass_excision		= 1
-mass_excised		= 1.4 #in solar mass, provided mass_excision = 1
+mass_excision = 1
+mass_excised = 1.4 #in solar mass, provided mass_excision = 1
 
 #___________EVOLUTION_____________
 
-radiation		= 1 # 1
-eoskey			= 2 # 1
+radiation = 1
+eoskey = 2
 
 #Options:
 #1 - ideal eos
 #2 - Paczynski
 
-Ni_switch		= 1
-Ni_mass			= 0.0d0 # 0.0d0 # 0.028
-Ni_boundary_mass	= 2.9d0
-Ni_by_hand		= 0
+Ni_switch = 1
+Ni_mass = 0.05 			#(in solar mass)
+Ni_boundary_mass = 3.0d0    #(in solar mass, should be larger than excised mass)
+			    #(attention - smoothing is going to change it, if applied)
+Ni_period = 1.0d4
 
-Ni_period		= 1.0d4
+saha_ncomps = 3
 
-saha_ncomps		= 3
+boxcar_smoothing = 1
 
-boxcar_smoothing	= 1
-
-opacity_floor_envelope	= 0.01d0
-opacity_floor_core	= 0.01d0
+opacity_floor_envelope = 0.01d0
+opacity_floor_core     = 0.24d0
 
 #___________TIMING_______________
 
-ntmax			= 10000000000
+ntmax               = 10000000000000
 
-tend			= 86400.0d0 # 8640000.0d0
+tend                = 17000000.0d0
 
-max_t_dense_out         = 144000.0d0 # denser output until this
+dtout               = 1.7d4
+dtout_scalar        = 1.7d3
+dtout_check         = 1.7d3
 
-dtout			= 36000.0d0
-dtout_scalar		= 36000.0d0
-dtout_check		= 36000.0d0
+ntout               = -1
+ntout_scalar        = -1
+ntout_check         = -1
 
-ntout			= -1
-ntout_scalar		= -1
-ntout_check		= 1000
+max_t_dense_out     = -1.0d0
 
-ntinfo			= 1000
+ntinfo              = 1000
 
-dtmin			= 1.0d-10
-dtmax			= 1.0d2
+dtmin               = 1.0d-10
+dtmax               = 1.0d2
 
 #____________TEST_________________
 
-sedov			= 0
+sedov 		    = 0
 
-#___________Inner boundary_________
-# Options: "inflow" or empty string
+#___________INNER BOUNDARY________
 
-innerBC                = "inflow"
+innerBC = " "

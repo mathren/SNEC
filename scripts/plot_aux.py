@@ -353,10 +353,6 @@ def plot_mass_radius(t, mass_out, ax=None, scatter=True, i_min=0, **kwargs):
     data = SNEC_output_parser(mass_out)
     keys = np.array(list(data.keys()))
     times = keys * u.s
-    try:
-        units = times.unit
-    except AttributeError:
-        times *= u.s
     index_time_of_interest = np.argmin(np.absolute(times-t))
     key_of_interest = keys[index_time_of_interest]
     mass = data[key_of_interest][i_min:, 1] * u.g
@@ -431,3 +427,17 @@ def get_innerBC_t(inner_boundary_file):
     t = src[:, 0]*u.s
     iBC = np.array(src[:, 1], dtype=int)
     return t, iBC
+
+
+def get_radius_at_time_for_m(mass_out, mcoord=2.0*u.Msun):
+    """ mass_out is Data/mass.xg """
+    data = SNEC_output_parser(mass_out)
+    keys = np.array(list(data.keys()))
+    times = keys * u.s
+    r = np.zeros(len(times)) * u.cm
+    for i, k in enumerate(keys):
+        m_tmp = (data[k][:, 1]*u.g).to(u.Msun)
+        r_tmp = data[k][:, 0] * u.cm
+        j = np.argmin(np.absolute(m_tmp-mcoord))
+        r[i] = r_tmp[j]
+    return times, r
