@@ -37,7 +37,6 @@ to the correct location of =Lapack=. The file shipped in this repo is
 for installation on linux machines, but there is a commented line for
 Mac OS.
 
-
 * How to run =SNEC=
 
 After editing your =parameters= file according to your needs, and making
