@@ -70,6 +70,8 @@ subroutine hydro_rad
 
   do i=2,imax
      r(i) = r_p(i) + dtime * vel(i)
+     ! floor to small
+     ! r(i) = min(r(i), rBC_initial)
      if((i>iBC) .and. &
           (r(i).lt.r(i-1)) .and. &
           innerBC /= "inflow") then
