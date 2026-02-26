@@ -70,8 +70,8 @@ subroutine hydro_rad
 
   do i=2,imax
      r(i) = r_p(i) + dtime * vel(i)
-     ! floor to small
-     ! r(i) = min(r(i), rBC_initial)
+     ! floor to small -- prevents negative if vel is large and <0
+     r(i) = min(r(i), rBC_initial)
      if((i>iBC) .and. &
           (r(i).lt.r(i-1)) .and. &
           innerBC /= "inflow") then
@@ -220,12 +220,12 @@ subroutine hydro_rad
   p(1:imax-1)   = p_temp(1:imax-1)
   temp(1:imax-1)  = temp_temp(1:imax-1)
 
-  ! if (innerBC == "inflow") then
-  !    ! flatten everything inside inner boundary
-  !    eps(1:iBC) = eps(iBC+1)
-  !    p(1:iBC) = p(iBC+1)
-  !    temp(1:iBC) = temp(iBC+1)
-  ! end if
+  if (innerBC == "inflow") then
+     ! flatten everything inside inner boundary
+     eps(1:iBC) = eps(iBC+1)
+     p(1:iBC) = p(iBC+1)
+     temp(1:iBC) = temp(iBC+1)
+  end if
 
   !passive boundary conditions, do not participate in the evolution
   temp(imax) = 0.0d0
