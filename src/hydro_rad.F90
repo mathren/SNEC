@@ -70,8 +70,6 @@ subroutine hydro_rad
 
   do i=2,imax
      r(i) = r_p(i) + dtime * vel(i)
-     ! floor to small -- prevents negative if vel is large and <0
-     r(i) = min(r(i), rBC_initial)
      if((i>iBC) .and. &
           (r(i).lt.r(i-1)) .and. &
           innerBC /= "inflow") then
@@ -86,10 +84,11 @@ subroutine hydro_rad
   ! the initial smaller radius, a fixed boundary
   if (innerBC == "inflow") then
      i = imax
-     do while (i >= iBC+1)
+     do while (i > iBC)
         if (r(i) <= rBC_initial) then
            ! print *, "updating inner boundary index", i, iBC
            iBC = i
+           if (iBC == imax) stop "inner boundary == outer cell"
            exit
         end if
         i = i - 1 ! loop inward
@@ -190,7 +189,8 @@ subroutine hydro_rad
      !check if the iteration procedure converged
      delta_max = 0.0d0
 
-     do i=iBC,imax-1
+     ! N.B.: do not check innermost cell at iBC
+     do i=iBC+1,imax-1
         if(abs(b(i)/temp_temp(i)).gt.delta_max) then
            delta_max = abs(b(i)/temp_temp(i))
            location_max = i
@@ -199,7 +199,7 @@ subroutine hydro_rad
      if((delta_max.le.EPSTOL)) goto 101
 
      !add the increment to the temperature
-     do i=iBC, imax-1
+     do i=iBC+1, imax-1
         temp_temp(i) = temp_temp(i) + b(i)
         if(temp_temp(i).lt.0.0d0) then
            goto 100
