@@ -190,7 +190,7 @@ subroutine hydro_rad
      !check if the iteration procedure converged
      delta_max = 0.0d0
 
-     do i=iBC+1,imax-1
+     do i=iBC,imax-1
         if(abs(b(i)/temp_temp(i)).gt.delta_max) then
            delta_max = abs(b(i)/temp_temp(i))
            location_max = i
@@ -199,7 +199,7 @@ subroutine hydro_rad
      if((delta_max.le.EPSTOL)) goto 101
 
      !add the increment to the temperature
-     do i=iBC+1, imax-1
+     do i=iBC, imax-1
         temp_temp(i) = temp_temp(i) + b(i)
         if(temp_temp(i).lt.0.0d0) then
            goto 100
@@ -220,12 +220,12 @@ subroutine hydro_rad
   p(1:imax-1)   = p_temp(1:imax-1)
   temp(1:imax-1)  = temp_temp(1:imax-1)
 
-  if (innerBC == "inflow") then
-     ! flatten everything inside inner boundary
-     eps(1:iBC) = eps(iBC+1)
-     p(1:iBC) = p(iBC+1)
-     temp(1:iBC) = temp(iBC+1)
-  end if
+  ! if (innerBC == "inflow") then
+  !    ! flatten everything inside inner boundary
+  !    eps(1:iBC) = eps(iBC+1)
+  !    p(1:iBC) = p(iBC+1)
+  !    temp(1:iBC) = temp(iBC+1)
+  ! end if
 
   !passive boundary conditions, do not participate in the evolution
   temp(imax) = 0.0d0

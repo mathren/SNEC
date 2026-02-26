@@ -20,7 +20,7 @@ piston_vel          = 5.0d9
 piston_tstart       = 0.0d0
 piston_tend         = 1.0d-2
 
-final_energy        = 1.0d51
+final_energy        = 0.1d51
 bomb_tstart         = 0.0d0
 bomb_tend           = 0.1d0
 bomb_mass_spread    = 0.1d0 #(in solar mass)
@@ -28,13 +28,13 @@ bomb_start_point    = 1
 
 #_____________GRID_______________
 
-imax         = 3208 #1000
+imax         = 3208 # 1000 #
 
-gridding = "from_file_by_mass"
+gridding = "from_file_by_mass" # "uniform_in_mass" #
 
-#Options:
-#"uniform_in_mass"
-#"from_file_by_mass"
+# Options:
+# "uniform_in_mass"
+# "from_file_by_mass"
 
 mass_excision = 1
 mass_excised = 1.4 #in solar mass, provided mass_excision = 1
@@ -88,4 +88,4 @@ sedov 		    = 0
 
 #___________INNER BOUNDARY________
 
-innerBC = " "
+innerBC = "inflow"

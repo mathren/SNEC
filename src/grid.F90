@@ -1,5 +1,5 @@
 subroutine grid
-    
+
   use blmod, only: mass, cmass, delta_mass, delta_cmass
   use parameters
   use physical_constants
@@ -11,10 +11,13 @@ subroutine grid
   integer :: i
   integer :: number_lines_GridPattern
 
+  character(len=256) :: snec_dir
+
+  call get_environment_variable('SNEC_DIR', snec_dir)
 !------------------------------------------------------------------------------
-    
+
   if(gridding.eq.'uniform_in_mass') then
-      
+
       dmass = (mass(imax) - mass(1))/(imax-1)
       do i=2,imax-1
          mass(i) = mass(i-1) + dmass
@@ -22,7 +25,7 @@ subroutine grid
 
   else if(gridding.eq.'from_file_by_mass') then
 
-      open(666,file=trim("tables/GridPattern.dat"),status='unknown', &
+      open(666,file=trim(snec_dir)//trim("tables/GridPattern.dat"),status='unknown', &
             form='formatted',action='read')
       number_lines_GridPattern = 0
       do
@@ -38,23 +41,23 @@ subroutine grid
         stop
       end if
 
-      open(666,file=trim("tables/GridPattern.dat"),status='unknown', &
+      open(666,file=trim(snec_dir)//trim("tables/GridPattern.dat"),status='unknown', &
            form='formatted',action='read')
       do i=1,imax
          read(666,*) grid_pattern(i)
       enddo
       close(666)
-      
+
       do i = 2, imax
           mass(i) = mass(i-1) &
               + (grid_pattern(i)-grid_pattern(i-1))*(mass(imax) - mass(1))
       enddo
-      
+
   else
-      
+
       write(*,*) "the chosen type of gridding is not implemented"
       stop
-      
+
   end if
 
   do i=1,imax-1
@@ -68,5 +71,5 @@ subroutine grid
   enddo
   delta_mass(imax) = delta_mass(imax-1)
   delta_cmass(imax) = delta_cmass(imax-1)
-    
+
 end subroutine grid

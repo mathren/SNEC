@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     # SNEC_ROOT="/home/u20/mrenzo/codes/SNEC/" # cluster_ua
     SNEC_ROOT = "/home/mrenzo/Documents/Research/codes/SNEC-1.01/" # ua_w
-    OUTDIR_ROOT='/home/mrenzo/Runs/SNEC_grid/long_runs/15Msun/' # s30VdJNL_0.33/'
+    OUTDIR_ROOT='/home/mrenzo/Runs/SNEC_grid/long_runs3/15Msun/' # s30VdJNL_0.33/'
     # if below is None use SNEC provided model
     INPUT_MESA_FILE = None # "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/s30VdJNL_0.33_onset_cc.data" # None #
     # final_energies need to be strings including a decimal point and d for exponential notation, or SNEC will complain
