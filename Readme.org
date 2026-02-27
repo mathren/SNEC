@@ -70,6 +70,20 @@ allowing to run the executable =snec= from anywhere.
 
 =snec= \rightarrow =timestep= \rightarrow =blstep= \rightarrow =hydro= or =hydro_rad= (where the calculation happens)
 
+* Intermediate results
+
+=commit c0442068eefd2e591bc56f23555ba5a65eee1f74=
+
+large_grid3 M(r) evolution in time
+#+DOWNLOADED: screenshot @ 2026-02-26 20:13:41
+[[file:.org_notes_figures/Intermediate_results/2026-02-26_20-13-41_screenshot.png]]
+
+
+
+#+DOWNLOADED: screenshot @ 2026-02-26 20:14:38
+[[file:.org_notes_figures/Intermediate_results/2026-02-26_20-14-38_screenshot.png]]
+
+
 * TODO Objectives
 - [X] implement inner boundary conditions allowing for infall with no
   back reaction (testing)
