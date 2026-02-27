@@ -84,8 +84,9 @@ large_grid3 M(r) evolution in time
 [[file:.org_notes_figures/Intermediate_results/2026-02-26_20-14-38_screenshot.png]]
 
 
-* TODO Objectives
+* TODO =SNECfb= Objectives
 - [X] implement inner boundary conditions allowing for infall with no
   back reaction (testing)
 - [ ] implement density smoothing self-consistent with boxcar
   composition smoothing
+- [ ] changes between =large_grid2= and =large_grid3=?
