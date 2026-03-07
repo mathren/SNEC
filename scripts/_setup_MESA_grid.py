@@ -37,8 +37,9 @@ def get_num_cells(INPUT_PROFILE):
 def setup_one_model(INPUT_SHORT, INPUT_COMP_FILE,
                     parameters_template,
                     OUTDIR="/tmp/Data",
-                    FINAL_ENERGY="0.0d0",
-                    NI_MASS="0.0d0",
+                    FINAL_ENERGY="0.0d0",  # erg
+                    BOMB_MASS_SPREAD="0.1d0",  # Msun
+                    NI_MASS="0.0d0",  # Msun
                     ):
     """ Assumes OUTDIR exists"""
     # IMAX = get_num_cells(INPUT_PROFILE)
@@ -50,6 +51,7 @@ def setup_one_model(INPUT_SHORT, INPUT_COMP_FILE,
     parameters_file = parameters_file.replace("INPUT_COMP_FILE", INPUT_COMP_FILE)
     parameters_file = parameters_file.replace("OUTDIR", OUTDIR)
     parameters_file = parameters_file.replace("FINAL_ENERGY", FINAL_ENERGY)
+    parameters_file = parameters_file.replace("BOMB_MASS_SPREAD", BOMB_MASS_SPREAD)
     parameters_file = parameters_file.replace("IMAX", f"{1000:d}")
     parameters_file = parameters_file.replace("NI_MASS", NI_MASS)
 
@@ -68,12 +70,14 @@ if __name__ == "__main__":
 
     # SNEC_ROOT="/home/u20/mrenzo/codes/SNEC/" # cluster_ua
     SNEC_ROOT = "/home/mrenzo/Documents/Research/codes/SNEC-1.01/" # ua_w
-    OUTDIR_ROOT='/home/mrenzo/Runs/SNEC_grid/long_runs3/15Msun/' # s30VdJNL_0.33/'
+    OUTDIR_ROOT='/home/mrenzo/Runs/SNEC_grid/bomb_spread/15Msun/' # s30VdJNL_0.33/'
     # if below is None use SNEC provided model
     INPUT_MESA_FILE = None # "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/s30VdJNL_0.33_onset_cc.data" # None #
     # final_energies need to be strings including a decimal point and d for exponential notation, or SNEC will complain
-    final_energies = ["1.0d51", "0.0d0"]
-
+    BOMB_MASS_SPREAD = "0.0d0"
+    bomb_spreads = ["0.1d0", "0.25d0", "0.35d0", "1.0d0", "2.0d0",
+                    "2.5d0", "3.0d0", "4.0d0", "5.0d0", "6.0d0", "8.0d0", "10.0d0",
+                    "11.0d0", "12.9d0"]
 
     # check if folder exists and user wants to erase it
     if os.path.isdir(OUTDIR_ROOT):
@@ -86,10 +90,10 @@ if __name__ == "__main__":
             os.system("rm -rf "+OUTDIR_ROOT)
             print("...removed pre-existing "+OUTDIR_ROOT)
 
-    for FINAL_ENERGY in final_energies:
-        print("working on "+f"{FINAL_ENERGY}")
+    for BOMB_MASS_SPREAD in bomb_spreads:
+        print("working on "+f"{BOMB_MASS_SPREAD}")
 
-        OUTDIR = OUTDIR_ROOT+"/bomb_final_e_"+str(FINAL_ENERGY)+"/"
+        OUTDIR = OUTDIR_ROOT+"/bomb_mass_spread_"+str(BOMB_MASS_SPREAD)+"/"
 
         # make directory and SNEC output directory
         os.system("mkdir -p "+OUTDIR+"/Data/")
@@ -106,7 +110,7 @@ if __name__ == "__main__":
         setup_one_model(INPUT_SHORT, INPUT_COMP_FILE,
                         parameters_template=SNEC_ROOT+"/parameters_template",
                         OUTDIR=OUTDIR,
-                        FINAL_ENERGY=FINAL_ENERGY,
+                        BOMB_MASS_SPREAD=BOMB_MASS_SPREAD,
                         )
 
         # copy SNEC executable -- assumes code is already compiled

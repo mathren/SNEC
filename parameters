@@ -27,9 +27,9 @@ bomb_start_point	= 1
 
 #_____________GRID_______________
 
-imax			= 1000 #3208 # 1000
+imax			= 3208 # 1000 1000 #
 
-gridding		= "uniform_in_mass" # "from_file_by_mass"
+gridding		= "from_file_by_mass" #"uniform_in_mass"
 
 #Options:
 #"uniform_in_mass"

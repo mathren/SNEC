@@ -22,7 +22,7 @@ initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
 final_energy		= FINAL_ENERGY
 bomb_tstart		= 0.0d0
 bomb_tend		= 1.0d-2
-bomb_mass_spread	= 0.1d0  # (in solar mass)
+bomb_mass_spread	= BOMB_MASS_SPREAD  # (in solar mass)
 bomb_start_point	= 1
 
 #_____________GRID_______________
