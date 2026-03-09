@@ -307,15 +307,11 @@ def SNEC_output_parser(outfile):
 
 
 
-def plot_vel_radius_at_time_t(t, vel_out, ax=None, scatter=False,
+def plot_vel_mass_at_time_t(t, vel_out, ax=None, scatter=False,
                               fig_name=None, **kwargs):
     data = SNEC_output_parser(vel_out)
     keys = np.array(list(data.keys()))
     times = keys * u.s
-    try:
-        units = times.unit
-    except AttributeError:
-        times *= u.s
     index_time_of_interest = np.argmin(np.absolute(times-t))
     key_of_interest = keys[index_time_of_interest]
     mass = data[key_of_interest][:, 0] * u.g
@@ -372,17 +368,10 @@ def plot_mass_radius(t, mass_out, ax=None, scatter=True, i_min=0, **kwargs):
         if scatter:
             p = ax.scatter(mass.to(u.Msun), radius.to(u.cm), **kwargs)
         ax.plot(mass.to(u.Msun), radius.to(u.cm), **kwargs)
-    if i_min >2:
-        ax.axvline(mass[i_min].to(u.Msun).value, 0, 1, c=color, ls="-.", lw=1, zorder=1)
+    if (i_min > 2):
+        ax.axvline(mass[i_min].to(u.Msun).value,
+                   0, 1, c=color, ls="-.", lw=1, zorder=1)
     return (mass, radius, p, color)
-
-
-
-def plot_v_radius_time(t, vel_out, mass_out, ax=None,
-                       annotate_inner_boundary=True,
-                       annotate_pre_expl_R=True,
-                       **kwargs):
-    print("use plot_vel_radius_at_time_t")
 
 
 def get_times(data_file):
@@ -441,3 +430,42 @@ def get_radius_at_time_for_m(mass_out, mcoord=2.0*u.Msun):
         j = np.argmin(np.absolute(m_tmp-mcoord))
         r[i] = r_tmp[j]
     return times, r
+
+
+def plot_vel_radius_at_time_t(t, vel_out, mass_out, ax=None, scatter=False,
+                              fig_name=None, **kwargs):
+    data = SNEC_output_parser(vel_out)
+    keys = np.array(list(data.keys()))
+    times = keys * u.s
+    index_time_of_interest = np.argmin(np.absolute(times-t))
+    key_of_interest = keys[index_time_of_interest]
+    mass = data[key_of_interest][:, 0] * u.g
+    vel = data[key_of_interest][:,1] * u.cm/u.s
+    mr_data = SNEC_output_parser(mass_out)
+    mr_mass = mr_data[key_of_interest][:, 1] * u.g
+    mr_radius = mr_data[key_of_interest][:, 0] * u.cm
+    if not ax:
+        fig = plt.figure()
+        gs = gridspec.GridSpec(150, 100)
+        ax = fig.add_subplot(gs[:, :])
+    # i_non_zero = vel != 0
+    if scatter:
+        if (('c' not in kwargs) and ('color' not in kwargs)):
+            p = ax.scatter(np.log10(mr_radius.to(u.cm).value),
+                           vel.to(u.km/u.s),
+                           c=[t.to(u.h).value]*len(vel[i_non_zero]),
+                           **kwargs)
+        else:
+            p = ax.scatter(np.log10(mr_radius.to(u.cm).value),
+                           vel.to(u.km/u.s),
+                           **kwargs)
+    else:
+        p = None
+        p = ax.plot(np.log10(mr_radius.to(u.cm).value),
+                    vel.to(u.km/u.s),
+                    **kwargs)
+    if fig_name:
+        ax.set_ylabel(r"$v \ [\mathrm{km\ s^{-1}}]$")
+        ax.set_xlabel(r"$\log_{10}(r/\mathrm{[cm]})$")
+        plt.savefig(fig_name)
+    return (mr_radius, vel, p)
