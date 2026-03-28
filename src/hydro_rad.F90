@@ -135,7 +135,7 @@ subroutine hydro_rad
   !calculate heating term due to bomb
   if(do_bomb .and. time.ge.bomb_tstart .and. time.le.bomb_tend) then
      call bomb_pattern
-  else if (inject_be .and. nt .lt. 1) then
+  else if (inject_be .and. nt == 0) then
      call inject_progenitor_binding_energy
   else
      bomb_heating(:) = 0.0d0
