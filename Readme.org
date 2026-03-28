@@ -90,5 +90,5 @@ large_grid3 M(r) evolution in time
 
 * Original =SNEC= resources
 
-- https://img.shields.io/badge/read-paper-blue.svg?style=flat]]
+- https://img.shields.io/badge/read-paper-blue.svg?style=flat
 - [[https://sntheory.org/SNEC.html][https://img.shields.io/website-up-down-green-red/http/shields.io.svg]]
