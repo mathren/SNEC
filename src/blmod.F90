@@ -18,6 +18,7 @@ module blmod
   !explosion parameters
   logical :: do_piston
   logical :: do_bomb
+  logical :: inject_BE
   real*8  :: bomb_total_energy
   integer :: bomb_spread
   real*8, allocatable :: bomb_heating(:)

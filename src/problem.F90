@@ -2,7 +2,7 @@ subroutine problem
 
   use blmod, only: ntstart, tstart, ncomps, mass, r, Rstar, &
        opacity_floor, metallicity, envelope_metallicity, do_piston, &
-       do_bomb, total_initial_energy, bomb_total_energy, bomb_spread, &
+       do_bomb, inject_BE, total_initial_energy, bomb_total_energy, bomb_spread, &
        rho, kappa, kappa_table, dkappadt, tau, temp, p, delta_mass, &
        lambda, inv_kappa, lum, eos_gamma1, rBC_initial, iBC
   use parameters
@@ -99,7 +99,11 @@ subroutine problem
 
   call conservation_compute_energies
 
-  if(initial_data.eq."Piston_Explosion") then
+  if (initial_data.eq."Progenitor_binding_energy") then
+
+     inject_BE = .true.
+
+  else if(initial_data.eq."Piston_Explosion") then
 
      do_piston = .true.
 

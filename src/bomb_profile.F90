@@ -73,26 +73,21 @@ end subroutine bomb_pattern
 
 subroutine inject_progenitor_binding_energy
 
-  use blmod, only: bomb_heating, bomb_total_energy, time, mass, delta_mass, &
-                    bomb_spread
+  use blmod, only: mass, delta_mass, r, bomb_heating
+
   use parameters
   use physical_constants
+
   implicit none
 
-  real*8 :: exponent_array(bomb_spread)
-  real*8 :: coef_A
-  real*8 :: coef_B
-  real*8 :: coef_C
-  real*8 :: coef_D
-  real*8 :: current_luminosity
-
-  integer :: bomb_end_point
   integer :: i
 
-  real*8, parameter :: ratio_time = 100.0d0
-  real*8, parameter :: ratio_mass = 100.0d0
-
-
-
+  bomb_heating(:) = 0.0d0
+  print *, "Injecting progenitor gravitational BE"
+  bomb_heating(1) = 3.0*ggrav*mass(1)*mass(1)/(5.*r(1)) ! uniform sphere of mass mass(1) and radius r(1)
+  do i=2, imax, 1
+     ! integrate
+     bomb_heating(i) = bomb_heating(i-1) + ggrav*mass(i-1)*delta_mass(i)/r(i)
+  end do
 
 end subroutine inject_progenitor_binding_energy

@@ -14,6 +14,7 @@ initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
 #Options:
 #"Piston_Explosion"
 #"Thermal_Bomb"
+#"Progenitor_binding_energy"
 
 # piston_vel		= 5.0d8
 # piston_tstart		= 0.0d0
