@@ -1,9 +1,10 @@
-#+title: Supernova Explosion Code (SNEC)
+#+title: =SNEC-fb=: SNEC with fallback
 
-[[https://ui.adsabs.harvard.edu/abs/2015ApJ...814...63M/abstract][https://img.shields.io/badge/read-paper-blue.svg?style=flat]] [[https://sntheory.org/SNEC.html][https://img.shields.io/website-up-down-green-red/http/shields.io.svg]]
+Based on =SNEC= version =1.01= available at [[https://sntheory.org/SNEC.html]].
 
-Copy of the SNEC code for further development. Original distribution
-source is at [[https://sntheory.org/SNEC.html]].
+This version allows inflow without gradients at the inner boundary to
+allow the central compact object to grow in mass without applying any
+radiative or mechanical feedback on outflows (if present).
 
 * How to install
 
@@ -85,8 +86,9 @@ large_grid3 M(r) evolution in time
 
 
 * TODO =SNECfb= Objectives
-- [X] implement inner boundary conditions allowing for infall with no
-  back reaction (testing)
-- [ ] implement density smoothing self-consistent with boxcar
-  composition smoothing
-- [ ] changes between =large_grid2= and =large_grid3=?
+- [ ] implement density smoothing self-consistent with boxcar composition smoothing
+
+* Original =SNEC= resources
+
+- https://img.shields.io/badge/read-paper-blue.svg?style=flat]]
+- [[https://sntheory.org/SNEC.html][https://img.shields.io/website-up-down-green-red/http/shields.io.svg]]
