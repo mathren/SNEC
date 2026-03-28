@@ -1,5 +1,5 @@
 #____________LAUNCH_____________
-outdir                  = "./Data/test/"
+outdir                  = "/home/mrenzo/Runs/SNEC_grid/bomb_spread/15Msun/bomb_mass_spread_-1/"
 
 #___________PROFILE_____________
 
@@ -64,9 +64,9 @@ opacity_floor_core	= 0.01d0
 
 #___________TIMING_______________
 
-ntmax			= 10000
+ntmax			= 10000000000
 
-tend			= 8640.0d0
+tend			= 8640000.0d0
 
 max_t_dense_out         = 14400.0d0 # denser output until this
 
