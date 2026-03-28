@@ -5,7 +5,7 @@ from MESAreader import get_src_col, Lsun, Rsun_cm, Msun, G_cgs, clight
 import numpy as np
 import re
 import  astropy.units as u
-
+import os
 
 def sci_to_latex(value):
     """Convert a float to a LaTeX-formatted scientific notation string."""
@@ -255,7 +255,7 @@ def find_He_core_from_pfile(pfile,
 
 
 
-def SNEC_output_parser(outfile):
+def SNEC_output_parser(outfile, cache=True):
     """
     Parse the file and return a dictionary with time values as keys
     and numpy arrays with two columns as values.
@@ -269,6 +269,13 @@ def SNEC_output_parser(outfile):
     --------
     data: np.array [time, mass, radius]
     """
+        # Check for cached binary version
+    cache_file = outfile + ".npz"
+    if os.path.exists(cache_file):
+        print("Reading from cached:", cache_file)
+        cached = np.load(cache_file)
+        return {float(k): cached[k] for k in cached.files}
+
     data_dict = {}
 
     with open(outfile, "r") as f:
@@ -302,6 +309,10 @@ def SNEC_output_parser(outfile):
         if data_lines:
             data_dict[time_value] = np.array(data_lines)
 
+    if cache:
+        # Save to binary cache
+        np.savez(cache_file, **{str(k): v for k, v in data_dict.items()})
+
     return data_dict
 
 
@@ -334,10 +345,10 @@ def plot_vel_mass_at_time_t(t, vel_out, ax=None, scatter=False,
     else:
         p = None
         p = ax.plot(mass.to(u.Msun),
-                    vel.to(u.km/u.s),
+                    vel.to(1000* u.km/u.s),
                     **kwargs)
     if fig_name:
-        ax.set_ylabel(r"$v \ [\mathrm{km\ s^{-1}}]$")
+        ax.set_ylabel(r"$v \ [\mathrm{10^{3} km\ s^{-1}}]$")
         ax.set_xlabel(r"$M \ [M_{\odot}]$")
         plt.savefig(fig_name)
     return (mass, vel, p)
@@ -452,20 +463,20 @@ def plot_vel_radius_at_time_t(t, vel_out, mass_out, ax=None, scatter=False,
     if scatter:
         if (('c' not in kwargs) and ('color' not in kwargs)):
             p = ax.scatter(np.log10(mr_radius.to(u.cm).value),
-                           vel.to(u.km/u.s),
+                           vel.to(1000*u.km/u.s),
                            c=[t.to(u.h).value]*len(vel[i_non_zero]),
                            **kwargs)
         else:
             p = ax.scatter(np.log10(mr_radius.to(u.cm).value),
-                           vel.to(u.km/u.s),
+                           vel.to(1000*u.km/u.s),
                            **kwargs)
     else:
         p = None
         p = ax.plot(np.log10(mr_radius.to(u.cm).value),
-                    vel.to(u.km/u.s),
+                    vel.to(1000*u.km/u.s),
                     **kwargs)
     if fig_name:
-        ax.set_ylabel(r"$v \ [\mathrm{km\ s^{-1}}]$")
+        ax.set_ylabel(r"$v \ [10^{3}\mathrm{km\ s^{-1}}]$")
         ax.set_xlabel(r"$\log_{10}(r/\mathrm{[cm]})$")
         plt.savefig(fig_name)
     return (mr_radius, vel, p)
