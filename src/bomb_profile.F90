@@ -1,5 +1,5 @@
 subroutine bomb_pattern
-  
+
   use blmod, only: bomb_heating, bomb_total_energy, time, mass, delta_mass, &
                     bomb_spread
   use parameters
@@ -24,7 +24,7 @@ subroutine bomb_pattern
 
 !energy of the bomb is injected into the model exponentially in time:
 !          energy per unit time = coef_D * EXP(- coef_C * time)
-!where               bomb_tstart < time < bomb_tend 
+!where               bomb_tstart < time < bomb_tend
 
 !and exponentially in mass coordinate:
 !      energy per unit time per unit mass = coef_B * EXP(- coef_A * mass(i))
@@ -33,7 +33,7 @@ subroutine bomb_pattern
 !ratio_time gives the ratio between the bomb luminosity at time = bomb_tstart
 !and the bomb luminosity at time = bomb_tend
 
-!ratio_mass gives the ratio between the bomb heating at 
+!ratio_mass gives the ratio between the bomb heating at
 !mass = mass(bomb_start_point) and the bomb heating at mass(bomb_end_point)
 
   bomb_heating(:) = 0.0d0
@@ -69,3 +69,30 @@ subroutine bomb_pattern
   end if
 
 end subroutine bomb_pattern
+
+
+subroutine inject_progenitor_binding_energy
+
+  use blmod, only: bomb_heating, bomb_total_energy, time, mass, delta_mass, &
+                    bomb_spread
+  use parameters
+  use physical_constants
+  implicit none
+
+  real*8 :: exponent_array(bomb_spread)
+  real*8 :: coef_A
+  real*8 :: coef_B
+  real*8 :: coef_C
+  real*8 :: coef_D
+  real*8 :: current_luminosity
+
+  integer :: bomb_end_point
+  integer :: i
+
+  real*8, parameter :: ratio_time = 100.0d0
+  real*8, parameter :: ratio_mass = 100.0d0
+
+
+
+
+end subroutine inject_progenitor_binding_energy

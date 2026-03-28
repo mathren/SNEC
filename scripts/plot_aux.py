@@ -269,10 +269,9 @@ def SNEC_output_parser(outfile, cache=True):
     --------
     data: np.array [time, mass, radius]
     """
-        # Check for cached binary version
+    # Check for cached binary version
     cache_file = outfile + ".npz"
     if os.path.exists(cache_file):
-        print("Reading from cached:", cache_file)
         cached = np.load(cache_file)
         return {float(k): cached[k] for k in cached.files}
 
