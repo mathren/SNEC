@@ -28,7 +28,7 @@ subroutine problem
 
   if (innerBC == "inflow") then
      write(*,*) "Using inflow inner boundary condition!"
-     iBC = 2
+     ! iBC = 2
   else
      write(*,*) "Default inner boundary condition!"
   endif

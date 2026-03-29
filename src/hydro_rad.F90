@@ -5,7 +5,7 @@ subroutine hydro_rad
   use physical_constants
   implicit none
 
-  integer :: i,k
+  integer :: i,k,j
   integer :: keytemp,keyerr
   real*8 :: dtv
 
@@ -117,7 +117,7 @@ subroutine hydro_rad
 
   !------------------------- update zone center radius --------------------------
 
-  do i=iBC+1,imax-1
+  do i=iBC,imax-1
      cr(i) = ( ( r(i)**3 + r(i+1)**3 ) / 2.0d0 )**(1.0d0/3.0d0)
   end do
   cr(imax) = r(imax) + (r(imax) - cr(imax-1))
@@ -194,8 +194,14 @@ subroutine hydro_rad
      !check if the iteration procedure converged
      delta_max = 0.0d0
 
-     ! N.B.: do not check innermost cell at iBC
-     do i=iBC+1,imax-1
+     if (innerBC == "inflow") then
+        ! do not check change in T at inner boundary
+        j = iBC+1
+     else
+        j = iBC
+     end if
+
+     do i=j,imax-1
         if(abs(b(i)/temp_temp(i)).gt.delta_max) then
            delta_max = abs(b(i)/temp_temp(i))
            location_max = i
@@ -204,7 +210,7 @@ subroutine hydro_rad
      if((delta_max.le.EPSTOL)) goto 101
 
      !add the increment to the temperature
-     do i=iBC+1, imax-1
+     do i=j, imax-1
         temp_temp(i) = temp_temp(i) + b(i)
         if(temp_temp(i).lt.0.0d0) then
            goto 100
