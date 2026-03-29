@@ -4,11 +4,11 @@ subroutine opacity(rho_x,temp_x,kappa_x,kappa_table_x,dkappadt_x)
   use parameters
   use physical_constants
   implicit none
-  
+
   !input:
   real*8 rho_x(imax)
   real*8 temp_x(imax)
-  
+
   !output:
   real*8 kappa_x(imax)
   real*8 kappa_table_x(imax)
@@ -27,14 +27,14 @@ subroutine opacity(rho_x,temp_x,kappa_x,kappa_table_x,dkappadt_x)
   ! of the OPAL Type II tables; see blmod.F90
 
   do i=1, imax - 1
-     
+
      !definitions of R_op and t6 are given in the codata files (opacity tables)
      t6 = temp_x(i)*1.0d-6
 
      logT(i) = log10(temp_x(i))
 
      R_op = rho_x(i)/(t6**3)
-     
+
      logR_op(i) = log10(R_op)
 
      call bicubic_interpolation(i,logR_op(i),logT(i),log_kappa,no_tabular_value)
@@ -93,6 +93,72 @@ subroutine compose_opacity_tables_OPAL
   !for OPAL interpolation routine
   real*4 opact,dopact,dopacr,dopactd
   common/e/ opact,dopact,dopacr,dopactd
+
+  ! --- Cache ---
+  character(len=256) :: cache_dir
+  integer :: mkdir_stat
+  character(len=256) :: cache_file
+  logical :: cache_exists
+  integer :: io_unit = 99, io_stat
+  ! --- Cache fingerprint ---
+  integer :: cached_imax
+  real*8  :: cached_metallicity
+  real*8, allocatable :: cached_comp(:,:)
+
+  !---------------------------------------------------------------------------
+
+  cache_dir = trim(adjustl(outdir))//'/cache'
+  cache_file = trim(adjustl(cache_dir))//'/opacity_cache.bin'
+
+  inquire(file=cache_file, exist=cache_exists)
+
+  if (cache_exists) then
+    write(*,*) "Loading opacity tables from cache..."
+    open(unit=io_unit, file=cache_file, form='unformatted', status='old', &
+         action='read', iostat=io_stat)
+    if (io_stat /= 0) goto 10  ! fall through to recompute if read fails
+
+    ! --- read and validate fingerprint before loading tables ---
+    allocate(cached_comp(imax, size(comp, 2)))
+    read(io_unit, iostat=io_stat) cached_imax, cached_metallicity, cached_comp
+    if (io_stat /= 0 .or. &
+        cached_imax /= imax .or. &
+        abs(cached_metallicity - envelope_metallicity) > 1.0d-12 .or. &
+        any(abs(cached_comp - comp) > 1.0d-12)) then
+      write(*,*) "Cache fingerprint mismatch or unreadable — recomputing."
+      close(io_unit)
+      deallocate(cached_comp)
+      goto 10
+    end if
+    deallocate(cached_comp)
+
+    read(io_unit, iostat=io_stat) tpoints, rpoints
+    if (io_stat /= 0) then
+       close(io_unit)
+       goto 10
+    end if
+
+    allocate(logT_array(tpoints))
+    allocate(logR_array(rpoints))
+    allocate(opacity_tables(imax, tpoints, rpoints))
+    allocate(op_rows(tpoints, 2))
+    allocate(op_cols(rpoints, 2))
+
+    read(io_unit, iostat=io_stat) logT_array, logR_array, &
+                                   op_rows, op_cols, opacity_tables
+    close(io_unit)
+
+    if (io_stat /= 0) then
+      write(*,*) "Cache read error — recomputing..."
+      deallocate(logT_array, logR_array, opacity_tables, op_rows, op_cols)
+      goto 10
+    end if
+
+    write(*,*) "Opacity tables loaded from cache."
+    return
+  end if
+
+10 continue  ! <-- recompute label
 
 !------------------------------------------------------------------------------
 
@@ -228,5 +294,22 @@ subroutine compose_opacity_tables_OPAL
 
   write(*,*) "finished composing opacity tables"
 
-end subroutine compose_opacity_tables_OPAL
+   ! --- Write cache ---
+  write(*,*) "Saving opacity tables to cache..."
+  call execute_command_line('mkdir -p '//trim(cache_dir), exitstat=mkdir_stat)
+  if (mkdir_stat /= 0) write(*,*) "Warning: could not create cache directory: ", trim(cache_dir)
 
+  open(unit=io_unit, file=cache_file, form='unformatted', status='replace', &
+       action='write', iostat=io_stat)
+  if (io_stat == 0) then
+     ! --- write fingerprint first ---
+    write(io_unit) imax, envelope_metallicity, comp
+    write(io_unit) tpoints, rpoints
+    write(io_unit) logT_array, logR_array, op_rows, op_cols, opacity_tables
+    close(io_unit)
+    write(*,*) "Cache saved to: ", cache_file
+  else
+    write(*,*) "Warning: could not write opacity cache."
+  end if
+
+end subroutine compose_opacity_tables_OPAL
