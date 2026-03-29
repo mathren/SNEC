@@ -45,9 +45,17 @@ subroutine hydro_rad
   kappa_p(:) = kappa(:)
 
   !---------------------------- update velocities -------------------------------
-  if(do_piston .and. time.ge.piston_tstart .and. time.le.piston_tend) then
-     vel(1) = piston_vel
-     vel(2) = piston_vel
+  if(do_piston) then
+     if (time.ge.piston_tstart .and. time.le.piston_tend) then
+        vel(1) = piston_vel
+        vel(2) = piston_vel
+     else
+        vel(1) = 0.0d0
+     end if
+  else if(do_bomb) then
+     vel(1) = 0.0d0
+  else if(inject_BE) then
+     vel(1) = 0.0d0
   end if
 
   do i=iBC+1,imax
@@ -60,11 +68,6 @@ subroutine hydro_rad
           - dtv * 4.0d0*pi * (cr(i)**2 * Q(i) - cr(i-1)**2 * Q(i-1))/delta_cmass(i-1)
   end do
 
-  if(do_piston.and.time.ge.piston_tend) then
-     vel(1) = 0.0d0
-  else if(do_bomb) then
-     vel(1) = 0.0d0
-  end if
 
   !----------------------- update the radial coordinates-------------------------
 
@@ -239,5 +242,7 @@ subroutine hydro_rad
   call opacity(rho(:),temp_temp(:),kappa(:),kappa_table(:),dkappadt(:))
 
   call luminosity(r(:),temp(:),kappa(:),lambda(:),inv_kappa(:),lum(:))
+
+  ! print *, "End step:", iBC, vel(iBC), vel(1), vel(2)
 
 end subroutine hydro_rad
