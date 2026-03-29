@@ -194,7 +194,7 @@ subroutine hydro_rad
      !check if the iteration procedure converged
      delta_max = 0.0d0
 
-     if (innerBC == "inflow") then
+     if ((innerBC == "inflow") .and. (vel(iBC)<0)) then
         ! do not check change in T at inner boundary
         j = iBC+1
      else

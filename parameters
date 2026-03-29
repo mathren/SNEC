@@ -90,4 +90,4 @@ sedov			= 0
 #___________Inner boundary_________
 # Options: "inflow" or empty string
 
-innerBC                = "" # inflow"
+innerBC                = "inflow" # ""
