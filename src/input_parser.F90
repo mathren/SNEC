@@ -120,7 +120,7 @@ subroutine input_parser
 ! wipe output dir if requested:
   if(wipe_outdir) then
      write(*,*) "Removing output directory contents: ", trim(outdir)
-     write(rmstring,*) "rm -rf ", trim(outdir), '/*'
+     write(rmstring,*) "rm -f ", trim(outdir), '/*'
      call system(rmstring)
   endif
 
