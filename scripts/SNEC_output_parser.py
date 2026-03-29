@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import re
 
 def SNEC_output_parser(outfile, cache=True):
     """

@@ -25,8 +25,8 @@ def sci_to_latex(value):
         return rf"$10^{{{exp}}}$"
     elif float(coeff)==0:
         return rf"0"
-
-    return rf"${coeff}\times10^{{{exp}}}$"
+    else:
+        return rf"${coeff}\times10^{{{exp}}}$"
 
 
 class MultiColorPatch:
