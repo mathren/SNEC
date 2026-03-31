@@ -23,10 +23,10 @@ subroutine luminosity(r_x,temp_x,kappa_x,lambda_x,inv_kappa_x,lum_x)
 
 !------------------------------------------------------------------------------
 
-  inv_kappa_x(1) = 1.0d0
-  bigr_x(1) = 0.0d0
-  lambda_x(1) = 1.0d0
-  lum_x(1) = 0.0d0 !inner boundary condition
+  inv_kappa_x(1:iBC) = 1.0d0
+  bigr_x(1:iBC) = 0.0d0
+  lambda_x(1:iBC) = 1.0d0
+  lum_x(1:iBC) = 0.0d0 !inner boundary condition
 
   do i=iBC+1, imax
 
@@ -50,7 +50,6 @@ subroutine luminosity(r_x,temp_x,kappa_x,lambda_x,inv_kappa_x,lum_x)
   end do
 
   lum_x(imax) = lum_x(imax-1)
-
 
 end subroutine luminosity
 

@@ -84,13 +84,13 @@ subroutine analysis
   mass_lumshell = mass(index_lumshell)
 
   !characteristic diffusion and expansion times for different shells
-  do i=1, imax-1
+  do i=iBC, imax-1
      time_diff(i) = kappa(i)*rho(i)*(r(imax)-r(i))**2.0/clite
      time_exp(i) = (r(imax)-r(i))/(vel(imax)-vel(i))
   end do
 
   !internal energies of shells from the given radius out to the surface
-  do i=1, imax
+  do i=iBC, imax
      E_shell(i) = sum(eps(i:imax)*delta_mass(i:imax))
   end do
 

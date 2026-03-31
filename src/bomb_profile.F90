@@ -73,7 +73,7 @@ end subroutine bomb_pattern
 
 subroutine inject_progenitor_binding_energy
 
-  use blmod, only: mass, delta_mass, r, bomb_heating
+  use blmod, only: mass, delta_mass, r, eps, bomb_heating
 
   use parameters
   use physical_constants
@@ -86,8 +86,7 @@ subroutine inject_progenitor_binding_energy
   print *, "Injecting progenitor gravitational BE"
   bomb_heating(1) = 3.0*ggrav*mass(1)*mass(1)/(5.*r(1)) ! uniform sphere of mass mass(1) and radius r(1)
   do i=2, imax, 1
-     ! integrate
-     bomb_heating(i) = bomb_heating(i-1) + ggrav*mass(i-1)*delta_mass(i)/r(i)
+     bomb_heating(i) = ggrav*mass(i-1)*delta_mass(i)/r(i) - eps(i)
   end do
 
 end subroutine inject_progenitor_binding_energy

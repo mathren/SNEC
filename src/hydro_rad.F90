@@ -93,9 +93,10 @@ subroutine hydro_rad
            ! update inner boundary !
            ! update iBC            !
            ! ----------------------!
+           ! print *, "update iBC: i, i+1, iBC_old", i, i+1, iBC
            iBC = i+1
+           if (iBC > imax) stop "inner boundary == outer cell"
            r(iBC) = max(rBC_initial, r(iBC))
-           if (iBC == imax) stop "inner boundary == outer cell"
            exit
         end if
         i = i - 1 ! loop inward
@@ -260,4 +261,5 @@ subroutine hydro_rad
 
   call luminosity(r(iBC:imax),temp(iBC:imax),kappa(iBC:imax),lambda(iBC:imax),inv_kappa(iBC:imax),lum(iBC:imax))
 
+  print *, maxval(lum(iBC:imax)), minval(lum(iBC:imax))
 end subroutine hydro_rad
