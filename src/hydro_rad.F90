@@ -89,26 +89,31 @@ subroutine hydro_rad
      i = imax
      do while (i > iBC)
         if (r(i) <= max(rBC_initial, r(iBC))) then
+           ! ----------------------!
+           ! update inner boundary !
+           ! update iBC            !
+           ! ----------------------!
            iBC = i+1
-           r(iBC) = max(r(iBC), rBC_initial)
+           r(iBC) = max(rBC_initial, r(iBC))
            if (iBC == imax) stop "inner boundary == outer cell"
            exit
         end if
         i = i - 1 ! loop inward
      end do
 
-     ! hack inner boundary to be inflow no backreaction
-     vel(iBC) = min(0.0d0, vel(iBC+1))
-
      if (iBC>1) then
         ! wipe velocities below
         vel(1:iBC-1) = 0.0d0
         ! fix radii below
-        ! linearly spaced grid between 0 and 95% of r(BC)
+        ! linearly spaced grid between 0 and 95% of r(iBC)
         do i=1,iBC-1,1
            r(i) = (r(iBC)*0.95d0)*real(i-1)/real(iBC-1)
         end do
      end if
+
+     ! hack inner boundary to be inflow no backreaction
+     vel(iBC) = min(0.0d0, vel(iBC+1))
+
   end if
 
   !------------------------- update the zone densities --------------------------
@@ -199,8 +204,10 @@ subroutine hydro_rad
 
      j = iBC
 
-     if ((innerBC == "inflow") .and. (iBC>1)) then
+     if (iBC>1) then
         ! flatten everything inside inner boundary
+        ! prevent pressure, temperature and internal
+        ! energy gradients which could cause backreaction
         eps(1:iBC) = eps(iBC+1)
         p(1:iBC) = p(iBC+1)
         temp(1:iBC) = temp(iBC+1)
@@ -238,9 +245,9 @@ subroutine hydro_rad
 101 continue
 
 
-  eps(1:imax-1) = eps_temp(1:imax-1)
-  p(1:imax-1)   = p_temp(1:imax-1)
-  temp(1:imax-1)  = temp_temp(1:imax-1)
+  eps(iBC:imax-1) = eps_temp(iBC:imax-1)
+  p(iBC:imax-1)   = p_temp(iBC:imax-1)
+  temp(iBC:imax-1)  = temp_temp(iBC:imax-1)
 
   !passive boundary conditions, do not participate in the evolution
   temp(imax) = 0.0d0
