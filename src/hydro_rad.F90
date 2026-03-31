@@ -197,19 +197,27 @@ subroutine hydro_rad
      !check if the iteration procedure converged
      delta_max = 0.0d0
 
-     if ((innerBC == "inflow") .and. (vel(iBC)<0)) then
-        ! do not check change in T at inner boundary
-        j = iBC+1
-     else
-        j = iBC
+     j = iBC
+
+     if ((innerBC == "inflow") .and. (iBC>1)) then
+        ! flatten everything inside inner boundary
+        eps(1:iBC) = eps(iBC+1)
+        p(1:iBC) = p(iBC+1)
+        temp(1:iBC) = temp(iBC+1)
+        temp_temp(1:iBC) = temp_temp(iBC+1)
+        if (vel(iBC)<0) then
+           ! do not check change in T at inner boundary
+           j = iBC+1
+        end if
      end if
 
-     do i=j,imax-1
+     do i=j,imax-1 ! loop from j set above
         if(abs(b(i)/temp_temp(i)).gt.delta_max) then
            delta_max = abs(b(i)/temp_temp(i))
            location_max = i
         end if
      end do
+
      if((delta_max.le.EPSTOL)) goto 101
 
      !add the increment to the temperature
@@ -224,7 +232,7 @@ subroutine hydro_rad
 
 100 continue
 
-  write(6,*) "EOS problem", delta_max, location_max
+  write(6,*) "EOS problem", delta_max, location_max, iBC
   scratch_step = .true.
 
 101 continue
@@ -233,13 +241,6 @@ subroutine hydro_rad
   eps(1:imax-1) = eps_temp(1:imax-1)
   p(1:imax-1)   = p_temp(1:imax-1)
   temp(1:imax-1)  = temp_temp(1:imax-1)
-
-  if (innerBC == "inflow") then
-     ! flatten everything inside inner boundary
-     eps(1:iBC) = eps(iBC+1)
-     p(1:iBC) = p(iBC+1)
-     temp(1:iBC) = temp(iBC+1)
-  end if
 
   !passive boundary conditions, do not participate in the evolution
   temp(imax) = 0.0d0

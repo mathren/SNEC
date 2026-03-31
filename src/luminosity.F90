@@ -81,8 +81,4 @@ subroutine optical_depth(rho, r, kappa, tau)
       tau(i) = tau(i+1) + (r(i+1) - r(i))*rho(i)*(kappa(i+1) + kappa(i))/2.0d0
   enddo
 
-  ! set infinite opacity inside inner boundary
-  if (iBC>1) then
-     tau(1:iBC-1) = 1d99
-  end if
 end subroutine optical_depth
