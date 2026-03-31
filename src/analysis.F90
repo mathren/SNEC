@@ -20,7 +20,7 @@ subroutine analysis
   call optical_depth(rho(:), r(:), kappa_table(:), tau(:))
 
   !find the grid point, where the photosphere is located
-  do i=imax-1, 1, -1
+  do i=imax-1, iBC, -1
      if(tau(i).gt.0.66d0) then
         index_photo = i + 1
         exit
@@ -28,7 +28,8 @@ subroutine analysis
   enddo
 
   !fix the moment, when the photosphere reaches the inner boundary, if it does
-  if(tau(1).lt.0.66d0) then
+  ! print *, "tau(iBC)=", tau(iBC), tau(iBC)==tau(1), iBC, tau(iBC).lt.0.66d0, r(iBC)
+  if(tau(iBC).lt.0.66d0) then
      index_photo = 1
      if(photosphere_fell_on_the_center.eq.0) then
         photosphere_fell_on_the_center = 1
@@ -47,10 +48,10 @@ subroutine analysis
      call map_map(vel_photo,  0.66d0, vel(imax:1:-1),  tau(imax:1:-1),imax)
      call map_map(rad_photo,  0.66d0, r(imax:1:-1),    tau(imax:1:-1),imax)
   else
-     lum_photo   = lum(1)
-     mass_photo  = mass(1)
-     vel_photo   = vel(1)
-     rad_photo   = r(1)
+     lum_photo   = lum(iBC)
+     mass_photo  = mass(iBC)
+     vel_photo   = vel(iBC)
+     rad_photo   = r(iBC)
   end if
 
   !photosphere tracer is equal to 1 at the photosphere, and 0 everywhere else
@@ -71,7 +72,7 @@ subroutine analysis
 
 !------------------------ Tracing the luminosity shell ------------------------
   index_lumshell = imax
-  do i=1, imax - 1
+  do i=iBC, imax - 1
      if(tau(imax-i).gt.(clite/vel(imax-i))) then
         index_lumshell = imax - i + 1
         exit
@@ -81,7 +82,7 @@ subroutine analysis
      index_lumshell = 1
   end if
   mass_lumshell = mass(index_lumshell)
-  
+
   !characteristic diffusion and expansion times for different shells
   do i=1, imax-1
      time_diff(i) = kappa(i)*rho(i)*(r(imax)-r(i))**2.0/clite
@@ -100,8 +101,8 @@ subroutine analysis
      lum_observed = lum_photo + sum(Ni_energy_rate* &
           Ni_deposit_function(index_photo:imax)*delta_mass(index_photo:imax))
   else
-     lum_observed = lum(1) + &
-          sum(Ni_energy_rate*Ni_deposit_function(1:imax)*delta_mass(1:imax))
+     lum_observed = lum(iBC) + &
+          sum(Ni_energy_rate*Ni_deposit_function(iBC:imax)*delta_mass(iBC:imax))
   end if
 
   !write down the time when the contribution of the Ni above the
@@ -109,7 +110,7 @@ subroutine analysis
   if(shockpos_stop.eq.1 .and. &
        abs((lum_observed - lum_photo)/lum_photo).gt.0.05 .and. &
        Ni_contributes_five_percents.eq.0) then
-     
+
      Ni_contributes_five_percents = 1
      open(unit=666,file=trim(adjustl(trim(adjustl(outdir))//"/info.dat")), &
           status="unknown",form='formatted',position="append")

@@ -22,7 +22,7 @@ subroutine get_inner_outer_mass_from_profile(prof_name,inner_mass,outer_mass)
 
   read(666,*) profile_zones
   allocate(pmass(profile_zones))
-  
+
   do i=1,profile_zones
      read(666,*) ibuffer,pmass(i)
   enddo
@@ -30,7 +30,7 @@ subroutine get_inner_outer_mass_from_profile(prof_name,inner_mass,outer_mass)
 
   outer_mass = pmass(profile_zones)
   inner_mass = pmass(1)
-  
+
   deallocate(pmass)
 
 end subroutine get_inner_outer_mass_from_profile
@@ -70,13 +70,13 @@ subroutine get_inner_outer_radius_from_profile(prof_name,inner_mass, &
      read(666,*) ibuffer, pmass(i), pradius(i)
   enddo
   close(666)
-  
+
   !inner mass takes into account the excised mass, and does not necessarily
   !coincide with the inner mass of the profile
   call map_map(inner_radius,inner_mass,pradius,pmass,profile_zones)
 
   outer_radius = pradius(profile_zones)
-  
+
   deallocate(pradius)
   deallocate(pmass)
 
@@ -107,7 +107,7 @@ subroutine get_ncomps_from_profile(prof_name,xncomps)
 end subroutine get_ncomps_from_profile
 
 !****************************** READ PROFILE **********************************
-      
+
 subroutine read_profile(prof_name)
 
   use blmod, only: mass, cmass, vel, rho, temp, ncomps, ye, abar, comp_details,&
@@ -186,7 +186,7 @@ subroutine read_profile(prof_name)
   keytemp = 1
   call eos(rho(1:imax-1),temp(1:imax-1),ye(1:imax-1), &
          abar(1:imax-1),p(1:imax-1),eps(1:imax-1), &
-         cs2(1:imax-1), dpdt(1:imax-1), dedt(1:imax-1), & 
+         cs2(1:imax-1), dpdt(1:imax-1), dedt(1:imax-1), &
          entropy(1:imax-1),p_rad(1:imax-1),keyerr,keytemp,eoskey)
 
   eps(imax) = 0.0d0 !passive boundary condition
@@ -198,7 +198,7 @@ end subroutine read_profile
 !******************************************************************************
 subroutine map_linterp(x1,x2,y1,y2,x,y)
 
-! perform linear interpolation      
+! perform linear interpolation
   implicit none
 
   real*8 :: slope,x1,x2,y1,y2,x,y
@@ -266,17 +266,17 @@ subroutine map_map(point_value,point_radius,parray,pradius,zones)
           upper_index,lower_index)
 
      call map_linterp( pradius(lower_index),pradius(upper_index), &
-          parray(lower_index), parray(upper_index),  & 
+          parray(lower_index), parray(upper_index),  &
           point_radius, point_value )
 
     else if (point_radius .lt. pradius(1)) then
      ! linear extrapolation
-     call map_linterp(pradius(1),pradius(2), & 
+     call map_linterp(pradius(1),pradius(2), &
           parray(1),parray(2),point_radius,point_value)
 
     else if (point_radius .gt. pradius(zones)) then
      ! linear extrapolation
-     call map_linterp(pradius(zones-1),pradius(zones), & 
+     call map_linterp(pradius(zones-1),pradius(zones), &
           parray(zones-1),parray(zones),point_radius,point_value)
     endif
 
@@ -294,7 +294,7 @@ subroutine integrate_radius_initial
   integer :: i
 
 !------------------------------------------------------------------------------
-  
+
   do i=1,imax-1
    r(i+1) = ( 3.0d0/(4.0d0*pi) * delta_mass(i)/rho(i) + r(i)**3 )**(1.0d0/3.0d0)
 

@@ -71,7 +71,7 @@ subroutine hydro_rad
 
   !----------------------- update the radial coordinates-------------------------
 
-  do i=2,imax
+  do i=iBC+1,imax
      r(i) = r_p(i) + dtime * vel(i)
      if((i>iBC) .and. &
           (r(i).lt.r(i-1)) .and. &
@@ -83,14 +83,14 @@ subroutine hydro_rad
   end do
 
   ! now we have updated radii and velocities: do we need to move the
-  ! inner boundary index (iBC)? cut everything reaching r smaller than
+  ! inner boundary index (iBC)? cut everything reaching r smaller thana
   ! the initial smaller radius, a fixed boundary
   if (innerBC == "inflow") then
      i = imax
      do while (i > iBC)
-        if (r(i) <= rBC_initial) then
-           ! print *, "updating inner boundary index", i, iBC
-           iBC = i
+        if (r(i) <= max(rBC_initial, r(iBC))) then
+           iBC = i+1
+           r(iBC) = max(r(iBC), rBC_initial)
            if (iBC == imax) stop "inner boundary == outer cell"
            exit
         end if
@@ -100,11 +100,14 @@ subroutine hydro_rad
      ! hack inner boundary to be inflow no backreaction
      vel(iBC) = min(0.0d0, vel(iBC+1))
 
-     if (iBC >1) then
+     if (iBC>1) then
         ! wipe velocities below
         vel(1:iBC-1) = 0.0d0
         ! fix radii below
-        r(1:iBC-1) = r_p(1:iBC-1)
+        ! linearly spaced grid between 0 and 95% of r(BC)
+        do i=1,iBC-1,1
+           r(i) = (r(iBC)*0.95d0)*real(i-1)/real(iBC-1)
+        end do
      end if
   end if
 
@@ -245,10 +248,8 @@ subroutine hydro_rad
   !active boundary condition, used in the velocity update
   p(imax) = 0.0d0
 
-  call opacity(rho(:),temp_temp(:),kappa(:),kappa_table(:),dkappadt(:))
+  call opacity(rho(iBC:imax),temp_temp(iBC:imax),kappa(iBC:imax),kappa_table(iBC:imax),dkappadt(iBC:imax))
 
-  call luminosity(r(:),temp(:),kappa(:),lambda(:),inv_kappa(:),lum(:))
-
-  ! print *, "End step:", iBC, vel(iBC), vel(1), vel(2)
+  call luminosity(r(iBC:imax),temp(iBC:imax),kappa(iBC:imax),lambda(iBC:imax),inv_kappa(iBC:imax),lum(iBC:imax))
 
 end subroutine hydro_rad
