@@ -20,7 +20,7 @@ initial_data 		=  "Thermal_Bomb" #  # "Piston_Explosion"  # "Progenitor_binding_
 # piston_tstart		= 0.0d0
 # piston_tend		= 1.0d-2
 
-final_energy		= 1.0d51 # 0.0d0 #1.0d51
+final_energy		= 0.0d0 # 51 # 0.0d0 #1.0d51
 bomb_tstart		= 0.0d0
 bomb_tend		= 1.0d-2
 bomb_mass_spread	= 0.1d0  # (in solar mass)
@@ -90,4 +90,4 @@ sedov			= 0
 #___________Inner boundary_________
 # Options: "inflow" or empty string
 
-innerBC                =    "inflow" # #"" #
+innerBC                =   "inflow" ##  "" #
