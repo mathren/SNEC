@@ -73,7 +73,7 @@ end subroutine bomb_pattern
 
 subroutine inject_progenitor_binding_energy
 
-  use blmod, only: mass, delta_mass, r, eps, bomb_heating
+  use blmod, only: mass, delta_mass, r, eps, bomb_heating, tau
 
   use parameters
   use physical_constants
@@ -83,10 +83,12 @@ subroutine inject_progenitor_binding_energy
   integer :: i
 
   bomb_heating(:) = 0.0d0
-  print *, "Injecting progenitor gravitational BE"
+  write(*,*) "Injecting progenitor gravitational BE"
+
   bomb_heating(1) = 3.0*ggrav*mass(1)*mass(1)/(5.*r(1)) ! uniform sphere of mass mass(1) and radius r(1)
   do i=2, imax, 1
-     bomb_heating(i) = ggrav*mass(i-1)*delta_mass(i)/r(i) - eps(i)
+     if (tau(i)<1) exit ! do not deposit any energy in optically thin region
+     bomb_heating(i) = ggrav*mass(i-1)*delta_mass(i)/r(i) ! gravitational local binding energy
   end do
 
 end subroutine inject_progenitor_binding_energy

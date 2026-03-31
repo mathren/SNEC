@@ -261,5 +261,4 @@ subroutine hydro_rad
 
   call luminosity(r(iBC:imax),temp(iBC:imax),kappa(iBC:imax),lambda(iBC:imax),inv_kappa(iBC:imax),lum(iBC:imax))
 
-  print *, maxval(lum(iBC:imax)), minval(lum(iBC:imax))
 end subroutine hydro_rad

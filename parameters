@@ -9,7 +9,7 @@ comp_profile_name	= "./profiles/15Msol_RSG.iso.dat"
 
 #__________EXPLOSION_____________
 
-initial_data 		=  "Progenitor_binding_energy" # "Thermal_Bomb" #  # "Piston_Explosion"  #
+initial_data 		=  "Thermal_Bomb" #  # "Piston_Explosion"  # "Progenitor_binding_energy" #
 
 #Options:
 #"Piston_Explosion"
@@ -20,11 +20,11 @@ initial_data 		=  "Progenitor_binding_energy" # "Thermal_Bomb" #  # "Piston_Expl
 # piston_tstart		= 0.0d0
 # piston_tend		= 1.0d-2
 
-# final_energy		= 0.0d0 # 0.0d0 #1.0d51
-# bomb_tstart		= 0.0d0
-# bomb_tend		= 1.0d-2
-# bomb_mass_spread	= 0.1d0  # (in solar mass)
-# bomb_start_point	= 1
+final_energy		= 1.0d51 # 0.0d0 #1.0d51
+bomb_tstart		= 0.0d0
+bomb_tend		= 1.0d-2
+bomb_mass_spread	= 0.1d0  # (in solar mass)
+bomb_start_point	= 1
 
 #_____________GRID_______________
 
@@ -71,7 +71,7 @@ tend			= 864000.0d0
 max_t_dense_out         = 14400.0d0 # denser output until this
 
 dtout			= 3.600d0
-dtout_scalar		= 3.600.0d0
+dtout_scalar		= 3.600d0
 dtout_check		= 3600.0d0
 
 ntout			= -1
