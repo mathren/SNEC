@@ -34,11 +34,17 @@ columnNames = profile[5].split()
 # get some more indexes
 imixing = columnNames.index("mixing_type")
 imass = columnNames.index("mass")  # mass is in M_\odot units
-iradius = columnNames.index("radius")  # outer radius of the cell in R_\odot units
+
 iprot = columnNames.index("h1")  # index for column containing protons
 ineut = columnNames.index("neut")  # index for column containing free neutrons
 
 arr = np.loadtxt(path, skiprows=6)
+try:
+    iradius = columnNames.index("radius")  # outer radius of the cell in R_\odot units
+    radius = arr[:, iradius] * rsun
+except ValueError:
+    iradius = columnNames.index("logR")
+    radius = (10.0**arr[:, iradius]) * rsun
 
 for i in range(0, len(arr[:, imixing]), 1):  # start reading the the data
     if arr[i, imixing] == -1:
@@ -315,10 +321,11 @@ outfile.write(
     "0.0d0 1.0d0 2.0d0 6.0d0 8.0d0 10.0d0 12.0d0 14.0d0 16.0d0 18.0d0 20.0d0 22.0d0 24.0d0 26.0d0 28.0d0 \n"
 )  # values of Z for each isotope
 
+
 # MESA stores the output in reverse order with respect to KEPLER
 for i in range(zones, 0, -1):
     writeNewLine = "%15.6E" % (arr[i - 1, imass] * msun)  # mass in grams
-    writeNewLine += "%15.6E" % (arr[i - 1, iradius] * rsun)  # radius in cm
+    writeNewLine += "%15.6E" % (radius[i-1])  # radius in cm
     writeNewLine += (
         "%15.6E" % (arr[i - 1, ineut])
     )  # abundance of neutrons as MESA gives it

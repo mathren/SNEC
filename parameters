@@ -1,15 +1,15 @@
 #____________LAUNCH_____________
-outdir                  = "./Data/"
+outdir                  = "./Data"
 
 #___________PROFILE_____________
 
-profile_name 		= "./profiles/15Msol_RSG.short"
+profile_name 		= "/home/mrenzo/Documents/Research/codes/SNEC-1.01//profiles/15Msol_RSG.short"
 
-comp_profile_name	= "./profiles/15Msol_RSG.iso.dat"
+comp_profile_name	= "/home/mrenzo/Documents/Research/codes/SNEC-1.01//profiles/15Msol_RSG.iso.dat"
 
 #__________EXPLOSION_____________
 
-initial_data 		=  "Thermal_Bomb" #  # "Piston_Explosion"  # "Progenitor_binding_energy" #
+initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
 
 #Options:
 #"Piston_Explosion"
@@ -20,7 +20,7 @@ initial_data 		=  "Thermal_Bomb" #  # "Piston_Explosion"  # "Progenitor_binding_
 # piston_tstart		= 0.0d0
 # piston_tend		= 1.0d-2
 
-final_energy		= 0.0d0 # 51 # 0.0d0 #1.0d51
+final_energy		= 0.0d0
 bomb_tstart		= 0.0d0
 bomb_tend		= 1.0d-2
 bomb_mass_spread	= 0.1d0  # (in solar mass)
@@ -28,12 +28,12 @@ bomb_start_point	= 1
 
 #_____________GRID_______________
 
-imax			= 3208 # 1000 1000 #
+imax			= 1000 # 3208 #
 
-gridding		= "from_file_by_mass" #"uniform_in_mass"
+gridding		= "uniform_in_mass"  # "from_file_by_mass"
 
 #Options:
-#"uniform_in_mass"
+#
 #"from_file_by_mass"
 
 mass_excision		= 1
@@ -66,19 +66,19 @@ opacity_floor_core	= 0.01d0
 
 ntmax			= 10000000000
 
-tend			= 864000.0d0
+tend			= 8640000.0d0
 
 max_t_dense_out         = 14400.0d0 # denser output until this
 
-dtout			= 3.600d0
-dtout_scalar		= 3.600d0
-dtout_check		= 3600.0d0
+dtout			= 36000.0d0
+dtout_scalar		= 36000.0d0
+dtout_check		= 36000.0d0
 
 ntout			= -1
 ntout_scalar		= -1
 ntout_check		= 1000
 
-ntinfo			= 100
+ntinfo			= 1000
 
 dtmin			= 1.0d-10
 dtmax			= 1.0d2
@@ -90,4 +90,4 @@ sedov			= 0
 #___________Inner boundary_________
 # Options: "inflow" or empty string
 
-innerBC                =   "inflow" ##  "" #
+innerBC                = "inflow"

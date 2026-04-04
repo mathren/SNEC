@@ -33,12 +33,16 @@ irho = colnames.index("logRho")
 itemp = colnames.index("logT")
 ivel = colnames.index("velocity")
 iye = colnames.index("ye")
+imass = colnames.index("mass")
 try:
     iomega = colnames.index("omega")
-except:
+except ValueError:
     pass
-irad = colnames.index("radius")
-imass = colnames.index("mass")
+try:
+    irad = colnames.index("radius")
+except ValueError:
+    irad = None
+    ilograd = colnames.index("logR")
 
 # data starts at profile[6]
 arr = np.zeros((8, nzones))
@@ -48,7 +52,10 @@ for i in range(nzones):
     # print i, sline[imass]
     arr[0, i] = float(sline[imass]) * msun
     # radius
-    arr[1, i] = float(sline[irad]) * rsun
+    if irad:
+        arr[1, i] = float(sline[irad]) * rsun
+    else:
+        arr[1, i] = 10.0**float(sline[ilograd]) * rsun
     # temp
     arr[2, i] = 10.0 ** float(sline[itemp])
     # rho
