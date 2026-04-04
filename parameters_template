@@ -7,7 +7,7 @@ profile_name 		= "INPUT_PROFILE"
 
 comp_profile_name	= "INPUT_COMP_FILE"
 
-grid_pattern_name       = ""
+grid_pattern_name       = /home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/Grid_Pattern.dat"
 
 #__________EXPLOSION_____________
 
@@ -30,12 +30,12 @@ bomb_start_point	= 1
 
 #_____________GRID_______________
 
-imax			= IMAX # 3208 #
+imax			= 2442 # 3208 # IMAX
 
-gridding		= "uniform_in_mass"
+gridding		= "from_file_by_mass" # "uniform_in_mass"
 
 #Options:
-#"from_file_by_mass"
+#
 #"from_file_by_mass"
 
 mass_excision		= 1
