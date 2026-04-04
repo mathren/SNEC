@@ -3,10 +3,12 @@ outdir                  = "./Data"
 
 #___________PROFILE_____________
 
-profile_name 		= "/home/mrenzo/Documents/Research/codes/SNEC-1.01//profiles/15Msol_RSG.short"
+profile_name 		= "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/profile_end.short"
 
-comp_profile_name	= "/home/mrenzo/Documents/Research/codes/SNEC-1.01//profiles/15Msol_RSG.iso.dat"
+comp_profile_name	= "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/profile_end.iso.dat"
 
+
+grid_pattern_name       = "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/Grid_Pattern.dat"
 #__________EXPLOSION_____________
 
 initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
@@ -28,9 +30,9 @@ bomb_start_point	= 1
 
 #_____________GRID_______________
 
-imax			= 1000 # 3208 #
+imax			= 2442 # 1000 # 3208 #
 
-gridding		= "uniform_in_mass"  # "from_file_by_mass"
+gridding		= "from_file_by_mass" "uniform_in_mass"  #
 
 #Options:
 #

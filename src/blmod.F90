@@ -166,6 +166,7 @@ module parameters
 
   character(len=256) :: profile_name
   character(len=256) :: composition_profile_name
+  character(len=256) :: grid_pattern_name
 
   !------------------- explosion ------------------------------
 

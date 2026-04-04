@@ -7,6 +7,8 @@ profile_name 		= "INPUT_PROFILE"
 
 comp_profile_name	= "INPUT_COMP_FILE"
 
+grid_pattern_name       = ""
+
 #__________EXPLOSION_____________
 
 initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
@@ -28,12 +30,12 @@ bomb_start_point	= 1
 
 #_____________GRID_______________
 
-imax			= 3208 # IMAX
+imax			= IMAX # 3208 #
 
-gridding		= "from_file_by_mass"
+gridding		= "uniform_in_mass"
 
 #Options:
-#"uniform_in_mass"
+#"from_file_by_mass"
 #"from_file_by_mass"
 
 mass_excision		= 1
@@ -66,7 +68,7 @@ opacity_floor_core	= 0.01d0
 
 ntmax			= 10000000000
 
-tend			= 8640000.0d0
+tend			= 864000.0d0
 
 max_t_dense_out         = 14400.0d0 # denser output until this
 

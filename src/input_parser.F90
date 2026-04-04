@@ -25,6 +25,7 @@ subroutine input_parser
 
   call get_string_parameter('profile_name',profile_name,opt)
   call get_string_parameter('comp_profile_name',composition_profile_name,opt)
+  call get_string_parameter('grid_pattern_name',grid_pattern_name,opt)
 
 
 !***************************** EXPLOSION **************************************

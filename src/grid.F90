@@ -12,6 +12,7 @@ subroutine grid
   integer :: number_lines_GridPattern
 
   character(len=256) :: snec_dir
+  character(len=256) :: tmp
 
   call get_environment_variable('SNEC_DIR', snec_dir)
 !------------------------------------------------------------------------------
@@ -25,14 +26,20 @@ subroutine grid
 
   else if(gridding.eq.'from_file_by_mass') then
 
-      open(666,file=trim(snec_dir)//trim("tables/GridPattern.dat"),status='unknown', &
-            form='formatted',action='read')
-      number_lines_GridPattern = 0
-      do
-        read(666,*,end=15)
-        number_lines_GridPattern = number_lines_GridPattern + 1
-      end do
-      15 close(666)
+     if (trim(grid_pattern_name)=="") then
+        tmp = trim(snec_dir)//trim("tables/GridPattern.dat")
+     else
+        tmp = trim(grid_pattern_name)
+     end if
+
+        open(666,file=trim(tmp),status='unknown', &
+             form='formatted',action='read')
+        number_lines_GridPattern = 0
+        do
+           read(666,*,end=15)
+           number_lines_GridPattern = number_lines_GridPattern + 1
+        end do
+15      close(666)
 
       if(number_lines_GridPattern.ne.imax) then
         write(*,*) '******* Number of lines in the file GridPattern.dat'
