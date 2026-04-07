@@ -71,8 +71,11 @@ subroutine output_all(modeflag)
     filename = trim(adjustl(outdir))//"/p_rad.xg"
     call output_single_mass(p_rad,filename)
 
-    filename = trim(adjustl(outdir))//"/Ni_deposit_function.xg"
-    call output_single_mass(Ni_deposit_function,filename)
+    ! prevent this output if no Ni56 was input
+    if (Ni_mass > 0) then
+       filename = trim(adjustl(outdir))//"/Ni_deposit_function.xg"
+       call output_single_mass(Ni_deposit_function,filename)
+    end if
 
     filename = trim(adjustl(outdir))//"/He_1.xg"
     call output_single_mass(ion_fractions(He_number,1,:),filename)
