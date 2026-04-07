@@ -36,10 +36,10 @@ program snec
 
   call timestep
 
-  ! initialize so that 180sec later there is output
-  tdump_check = tstart+min(180.0d0, dtout_check/100.0) !dtout_check
-  tdump_scalar = tstart+min(180.0d0, dtout_scalar/100.0) !dtout_scalar
-  tdump = tstart+min(180.0d0, dtout/100.0) ! dtout
+  ! initialize for dense output
+  tdump_check = tstart+dtout_check/200.0 !dtout_check
+  tdump_scalar = tstart+dtout_scalar/200.0 !dtout_scalar
+  tdump = tstart+dtout/200.0 ! dtout
   time = tstart
   nt = ntstart
 
@@ -86,7 +86,7 @@ program snec
 
      if ( time.ge.tdump) then
         if (time.le.max_t_dense_out) then ! more output early
-           tdump=tdump+min(180.0d0, dtout/200.0)
+           tdump=tdump+dtout/200.0
         else
            tdump =tdump+dtout
         end if
@@ -95,7 +95,7 @@ program snec
 
      if ( time.ge.tdump_scalar) then
         if (time.le.max_t_dense_out) then ! more output in the first 4h
-           tdump_scalar=tdump_scalar+min(180.0d0, dtout_scalar/200.0)
+           tdump_scalar=tdump_scalar+dtout_scalar/200.0
         else
            tdump_scalar =tdump_scalar+dtout
         end if
@@ -104,7 +104,7 @@ program snec
 
      if ( time.ge.tdump_check) then
         if (time.le.max_t_dense_out) then ! more output in the first 4h
-           tdump_check=tdump_check+min(180.0d0, dtout_check/200.0)
+           tdump_check=tdump_check+dtout_check/200.0
         else
            tdump_check =tdump_check+dtout
         end if
