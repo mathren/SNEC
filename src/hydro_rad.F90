@@ -93,7 +93,6 @@ subroutine hydro_rad
            ! update inner boundary !
            ! update iBC            !
            ! ----------------------!
-           ! print *, "update iBC: i, i+1, iBC_old", i, i+1, iBC
            iBC = i+1
            if (iBC > imax) stop "inner boundary == outer cell"
            r(iBC) = max(rBC_initial, r(iBC))
@@ -113,8 +112,7 @@ subroutine hydro_rad
      end if
 
      ! hack inner boundary to be inflow no backreaction
-     vel(iBC) = min(0.0d0, vel(iBC+1))
-
+     vel(iBC) = min(0.0d0, vel(iBC+1)) !vel(iBC+1) !
   end if
 
   !------------------------- update the zone densities --------------------------
