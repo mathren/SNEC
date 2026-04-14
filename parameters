@@ -3,12 +3,11 @@ outdir                  = "./Data_no_min_500x"
 
 #___________PROFILE_____________
 
-profile_name 		= "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/profile_end.short"
+profile_name 		= "./profiles/15Msol_RSG.short"   # "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/profile_end.short"
 
-comp_profile_name	= "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/profile_end.iso.dat"
+comp_profile_name	= "./profiles/15Msol_RSG.iso.dat" # "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/profile_end.iso.dat"
 
-
-grid_pattern_name       = "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/Grid_Pattern.dat"
+grid_pattern_name       = "./profiles/Grid_pattern_15RSG.dat" # "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/Grid_Pattern.dat"
 #__________EXPLOSION_____________
 
 initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
@@ -30,7 +29,7 @@ bomb_start_point	= 1
 
 #_____________GRID_______________
 
-imax			= 2442 # 1000 # 3208 #
+imax			= 3208 #2442 # 1000 #
 
 gridding		= "from_file_by_mass" "uniform_in_mass"  #
 
@@ -73,9 +72,9 @@ tend			= 1.01e5
 
 max_t_dense_out         = 100.0d0 # denser output until this
 
-dtout			= 100.0d0
-dtout_scalar		= 100.0d0
-dtout_check		= 100.0d0
+dtout			= 360.0d0
+dtout_scalar		= 360.0d0
+dtout_check		= 360.0d0
 
 ntout			= -1
 ntout_scalar		= -1

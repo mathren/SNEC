@@ -3,326 +3,281 @@ subroutine output_all(modeflag)
   use blmod
   use parameters
   use physical_constants
+  use hdf5
   implicit none
 
   character(len=1024) :: filename
-  character(len=256) :: basename
-  integer :: modeflag
+  integer             :: modeflag
+  integer(HID_T)      :: file_id
+  integer             :: hdferr
+  logical             :: file_exists
 
-!------------------------------------------------------------------------------
+  !---------------------------------------------------------------------------
+  filename = trim(adjustl(outdir))//"/output.h5"
 
-  if(modeflag.eq.0) then
+  call h5open_f(hdferr)
 
-  ! meant for checkpoints; not used at the moment
+  inquire(file=trim(filename), exist=file_exists)
+  if (file_exists) then
+    call h5fopen_f(trim(filename), H5F_ACC_RDWR_F, file_id, hdferr)
+  else
+    call h5fcreate_f(trim(filename), H5F_ACC_TRUNC_F, file_id, hdferr)
+  end if
 
-  else if(modeflag.eq.1) then
+  ! create groups
+  call hdf5_ensure_group(file_id, "fields")
+  call hdf5_ensure_group(file_id, "scalars")
 
-    filename = trim(adjustl(outdir))//"/vel.xg"
-    call output_single_mass(vel,filename)
+  ! Always stamp the current time at the root
+  call hdf5_write_scalar_r8(file_id, "time", time)
 
-    filename = trim(adjustl(outdir))//"/rho.xg"
-    call output_single_mass(rho,filename)
+  !---------------------------------------------------------------------------
+  if (modeflag == 1) then
 
-    filename = trim(adjustl(outdir))//"/ye.xg"
-    call output_single_mass(ye,filename)
+    ! ---- mass-coordinate fields -------------------------------------------
+    call hdf5_write_1d(file_id, "fields/mass",     mass(1:imax), imax)
+    call hdf5_write_1d(file_id, "fields/vel",      vel(1:imax),  imax)
+    call hdf5_write_1d(file_id, "fields/rho",      rho(1:imax),  imax)
+    call hdf5_write_1d(file_id, "fields/ye",       ye(1:imax),   imax)
+    call hdf5_write_1d(file_id, "fields/press",    p(1:imax),    imax)
+    call hdf5_write_1d(file_id, "fields/cs2",      cs2(1:imax),  imax)
+    call hdf5_write_1d(file_id, "fields/Q",        Q(1:imax),    imax)
+    call hdf5_write_1d(file_id, "fields/eps",      eps(1:imax),  imax)
+    call hdf5_write_1d(file_id, "fields/temp",     temp(1:imax), imax)
+    call hdf5_write_1d(file_id, "fields/lum",      lum(1:imax),  imax)
+    call hdf5_write_1d(file_id, "fields/tau",      tau(1:imax),  imax)
+    call hdf5_write_1d(file_id, "fields/delta_time", delta_time(1:imax), imax)
+    call hdf5_write_1d(file_id, "fields/radius",   r(1:imax),    imax)
+    call hdf5_write_1d(file_id, "fields/kappa",    kappa(1:imax),imax)
+    call hdf5_write_1d(file_id, "fields/kappa_table", kappa_table(1:imax), imax)
+    call hdf5_write_1d(file_id, "fields/logR_op",  logR_op(1:imax), imax)
+    call hdf5_write_1d(file_id, "fields/logT",     logT(1:imax), imax)
+    call hdf5_write_1d(file_id, "fields/p_rad",    p_rad(1:imax),imax)
+    call hdf5_write_1d(file_id, "fields/free_electron_frac", &
+                                 free_electron_frac(1:imax), imax)
+    call hdf5_write_1d(file_id, "fields/E_shell",  E_shell(1:imax),  imax)
+    call hdf5_write_1d(file_id, "fields/time_diff",time_diff(1:imax), imax)
+    call hdf5_write_1d(file_id, "fields/time_exp", time_exp(1:imax), imax)
+    call hdf5_write_1d(file_id, "fields/photosphere_tracer", &
+                                 photosphere_tracer(1:imax), imax)
 
-    filename = trim(adjustl(outdir))//"/press.xg"
-    call output_single_mass(p,filename)
+    ! Ion fractions
+    call hdf5_write_1d(file_id, "fields/He_1", &
+                        ion_fractions(He_number,1,1:imax), imax)
+    call hdf5_write_1d(file_id, "fields/He_2", &
+                        ion_fractions(He_number,2,1:imax), imax)
+    call hdf5_write_1d(file_id, "fields/He_3", &
+                        ion_fractions(He_number,3,1:imax), imax)
+    call hdf5_write_1d(file_id, "fields/H_1",  &
+                        ion_fractions(H_number,1,1:imax),  imax)
+    call hdf5_write_1d(file_id, "fields/H_2",  &
+                        ion_fractions(H_number,2,1:imax),  imax)
 
-    filename = trim(adjustl(outdir))//"/cs2.xg"
-    call output_single_mass(cs2,filename)
-
-    filename = trim(adjustl(outdir))//"/Q.xg"
-    call output_single_mass(Q,filename)
-
-    filename = trim(adjustl(outdir))//"/eps.xg"
-    call output_single_mass(eps,filename)
-
-    filename = trim(adjustl(outdir))//"/mass.xg"
-    call output_single_radius(mass,filename)
-
-    filename = trim(adjustl(outdir))//"/temp.xg"
-    call output_single_mass(temp,filename)
-
-    filename = trim(adjustl(outdir))//"/lum.xg"
-    call output_single_mass(lum,filename)
-
-    filename = trim(adjustl(outdir))//"/tau.xg"
-    call output_single_mass(tau,filename)
-
-    filename = trim(adjustl(outdir))//"/delta_time.xg"
-    call output_single_mass(delta_time,filename)
-
-    filename = trim(adjustl(outdir))//"/radius.xg"
-    call output_single_mass(r,filename)
-
-    filename = trim(adjustl(outdir))//"/kappa.xg"
-    call output_single_mass(kappa,filename)
-
-    filename = trim(adjustl(outdir))//"/kappa_table.xg"
-    call output_single_mass(kappa_table,filename)
-
-    filename = trim(adjustl(outdir))//"/logR_op.xg"
-    call output_single_mass(logR_op,filename)
-
-    filename = trim(adjustl(outdir))//"/logT.xg"
-    call output_single_mass(logT,filename)
-
-    filename = trim(adjustl(outdir))//"/p_rad.xg"
-    call output_single_mass(p_rad,filename)
-
-    ! prevent this output if no Ni56 was input
+    ! Optional Ni56 deposit
     if (Ni_mass > 0) then
-       filename = trim(adjustl(outdir))//"/Ni_deposit_function.xg"
-       call output_single_mass(Ni_deposit_function,filename)
+      call hdf5_write_1d(file_id, "fields/Ni_deposit_function", &
+                          Ni_deposit_function(1:imax), imax)
     end if
 
-    filename = trim(adjustl(outdir))//"/He_1.xg"
-    call output_single_mass(ion_fractions(He_number,1,:),filename)
+  !---------------------------------------------------------------------------
+  else if (modeflag == 2) then
 
-    filename = trim(adjustl(outdir))//"/He_2.xg"
-    call output_single_mass(ion_fractions(He_number,2,:),filename)
+    ! ---- scalars (one value appended per call) -----------------------------
+    call hdf5_append_scalar(file_id, "scalars/T_eff",              T_eff)
+    call hdf5_append_scalar(file_id, "scalars/Ni_total_luminosity", Ni_total_luminosity)
+    call hdf5_append_scalar(file_id, "scalars/lum_observed",        lum_observed)
+    call hdf5_append_scalar(file_id, "scalars/lum_photo",           lum_photo)
+    call hdf5_append_scalar(file_id, "scalars/mass_photo",          mass_photo)
+    call hdf5_append_scalar(file_id, "scalars/vel_photo",           vel_photo)
+    call hdf5_append_scalar(file_id, "scalars/rad_photo",           rad_photo)
+    call hdf5_append_scalar(file_id, "scalars/mass_lumshell",       mass_lumshell)
+    call hdf5_append_scalar(file_id, "scalars/time",                time)
 
-    filename = trim(adjustl(outdir))//"/He_3.xg"
-    call output_single_mass(ion_fractions(He_number,3,:),filename)
+    call hdf5_append_int(file_id, "scalars/index_photo",       index_photo)
+    call hdf5_append_int(file_id, "scalars/opacity_corrupted", opacity_corrupted)
+    call hdf5_append_int(file_id, "scalars/index_lumshell",    index_lumshell)
 
-    filename = trim(adjustl(outdir))//"/H_1.xg"
-    call output_single_mass(ion_fractions(H_number,1,:),filename)
+    if (innerBC == "inflow") then
+      call hdf5_append_int(file_id, "scalars/inner_boundary", iBC)
+    end if
 
-    filename = trim(adjustl(outdir))//"/H_2.xg"
-    call output_single_mass(ion_fractions(H_number,2,:),filename)
+  end if
 
-    filename = trim(adjustl(outdir))//"/free_electron_frac.xg"
-    call output_single_mass(free_electron_frac,filename)
-
-    filename = trim(adjustl(outdir))//"/E_shell.xg"
-    call output_single_mass(E_shell,filename)
-
-    filename = trim(adjustl(outdir))//"/time_diff.xg"
-    call output_single_mass(time_diff,filename)
-
-    filename = trim(adjustl(outdir))//"/time_exp.xg"
-    call output_single_mass(time_exp,filename)
-
-    filename = trim(adjustl(outdir))//"/photosphere_tracer.xg"
-    call output_single_mass(photosphere_tracer,filename)
-
-  else if(modeflag.eq.2) then
-
-     filename = trim(adjustl(outdir))//"/T_eff.dat"
-     call output_scalar(T_eff,filename)
-
-     filename = trim(adjustl(outdir))//"/Ni_total_luminosity.dat"
-     call output_scalar(Ni_total_luminosity,filename)
-
-     filename = trim(adjustl(outdir))//"/lum_observed.dat"
-     call output_scalar(lum_observed,filename)
-
-     filename = trim(adjustl(outdir))//"/index_photo.dat"
-     call output_integer(index_photo,filename)
-
-     filename = trim(adjustl(outdir))//"/lum_photo.dat"
-     call output_scalar(lum_photo,filename)
-
-     filename = trim(adjustl(outdir))//"/mass_photo.dat"
-     call output_scalar(mass_photo,filename)
-
-     filename = trim(adjustl(outdir))//"/vel_photo.dat"
-     call output_scalar(vel_photo,filename)
-
-     filename = trim(adjustl(outdir))//"/rad_photo.dat"
-     call output_scalar(rad_photo,filename)
-
-     filename = trim(adjustl(outdir))//"/opacity_corrupted.dat"
-     call output_integer(opacity_corrupted,filename)
-
-     filename = trim(adjustl(outdir))//"/index_lumshell.dat"
-     call output_integer(index_lumshell,filename)
-
-     filename = trim(adjustl(outdir))//"/mass_lumshell.dat"
-     call output_scalar(mass_lumshell,filename)
-
-     if (innerBC == "inflow") then
-        filename = trim(adjustl(outdir))//"/inner_boundary.dat"
-        call output_integer(iBC, filename)
-     end if
-
-  endif
-
+  call h5fclose_f(file_id, hdferr)
+  call h5close_f(hdferr)
 
 end subroutine output_all
 
-! *******************************************************************
 
-subroutine output_single_mass(var,filename)
-
-  use blmod, only: mass,time
-  use parameters
-
+!=============================================================================
+! Write/overwrite a 1-D real*8 dataset (used for field snapshots)
+!=============================================================================
+subroutine hdf5_write_1d(file_id, dsetname, data, n)
+  use hdf5
   implicit none
-  real*8 var(*)
-  character(len=100) filename
-  integer nt
-  integer i
+  integer(HID_T), intent(in) :: file_id
+  character(*),   intent(in) :: dsetname
+  integer,        intent(in) :: n
+  real(8),        intent(in) :: data(n)
+
+  integer(HID_T)   :: dset_id, dspace_id
+  integer(HSIZE_T) :: dims(1)
+  integer          :: hdferr
+  logical          :: exists
+
+  dims(1) = n
+
+  call h5lexists_f(file_id, dsetname, exists, hdferr)
+  if (exists) call h5ldelete_f(file_id, dsetname, hdferr)
+
+  call h5screate_simple_f(1, dims, dspace_id, hdferr)
+  call h5dcreate_f(file_id, dsetname, H5T_NATIVE_DOUBLE, dspace_id, &
+                   dset_id, hdferr)
+  call h5dwrite_f(dset_id, H5T_NATIVE_DOUBLE, data, dims, hdferr)
+  call h5dclose_f(dset_id, hdferr)
+  call h5sclose_f(dspace_id, hdferr)
+
+end subroutine hdf5_write_1d
 
 
-
-  open(unit=666,file=trim(adjustl(filename)),status="unknown", &
-                                            form='formatted',position="append")
-  write(666,"(A,1PE19.10E3)") '"Time = ',time
-
-  do i=1,imax
-     write(666,"(1P20E29.20E3)") mass(i),var(i)
-  enddo
-  write(666,*) " "
-  write(666,*) " "
-  close(666)
-
-
-
-end subroutine output_single_mass
-
-! *******************************************************************
-
-subroutine output_single_radius(var,filename)
-
-  use blmod, only: r,time
-  use parameters
-
+!=============================================================================
+! Write/overwrite a scalar real*8 dataset
+!=============================================================================
+subroutine hdf5_write_scalar_r8(file_id, dsetname, val)
+  use hdf5
   implicit none
-  real*8 var(*)
-  character(*) filename
-  integer nt
-  integer i
+  integer(HID_T), intent(in) :: file_id
+  character(*),   intent(in) :: dsetname
+  real(8),        intent(in) :: val
+
+  integer(HID_T)   :: dset_id, dspace_id
+  integer(HSIZE_T) :: dims(1)
+  integer          :: hdferr
+  logical          :: exists
+
+  dims(1) = 1
+
+  call h5lexists_f(file_id, dsetname, exists, hdferr)
+  if (exists) call h5ldelete_f(file_id, dsetname, hdferr)
+
+  call h5screate_simple_f(1, dims, dspace_id, hdferr)
+  call h5dcreate_f(file_id, dsetname, H5T_NATIVE_DOUBLE, dspace_id, &
+                   dset_id, hdferr)
+  call h5dwrite_f(dset_id, H5T_NATIVE_DOUBLE, val, dims, hdferr)
+  call h5dclose_f(dset_id, hdferr)
+  call h5sclose_f(dspace_id, hdferr)
+
+end subroutine hdf5_write_scalar_r8
 
 
-  open(unit=666,file=trim(adjustl(filename)),status="unknown", &
-                                            form='formatted',position="append")
-  write(666,"(A,1PE19.10E3)") '"Time = ',time
-
-  do i=1,imax
-     write(666,"(1P20E19.10E3)") r(i),var(i)
-  enddo
-  write(666,*) " "
-  write(666,*) " "
-  close(666)
-
-
-
-end subroutine output_single_radius
-
-! *******************************************************************
-
-subroutine output_single_mass_integer(var,filename)
-
-  use blmod, only: mass,time
-  use parameters
-
+!=============================================================================
+! Append one real*8 value to a chunked unlimited-dimension dataset
+!=============================================================================
+subroutine hdf5_append_scalar(file_id, dsetname, val)
+  use hdf5
   implicit none
-  integer var(*)
-  character(*) filename
-  integer nt
-  integer i
+  integer(HID_T), intent(in) :: file_id
+  character(*),   intent(in) :: dsetname
+  real(8),        intent(in) :: val
+
+  integer(HID_T)   :: dset_id, dspace_id, memspace_id, plist_id
+  integer(HSIZE_T) :: cur_dims(1), max_dims(1), new_dims(1), one(1), offset(1)
+  integer          :: hdferr
+  logical          :: exists
+
+  one(1)      = 1
+  max_dims(1) = H5S_UNLIMITED_F
+
+  call h5lexists_f(file_id, dsetname, exists, hdferr)
+
+  if (.not. exists) then
+    ! Create chunked extendable dataset with first value
+    cur_dims(1) = 1
+    call h5screate_simple_f(1, cur_dims, dspace_id, hdferr, max_dims)
+    call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, hdferr)
+    call h5pset_chunk_f(plist_id, 1, one, hdferr)
+    call h5dcreate_f(file_id, dsetname, H5T_NATIVE_DOUBLE, dspace_id, &
+                     dset_id, hdferr, plist_id)
+    call h5dwrite_f(dset_id, H5T_NATIVE_DOUBLE, val, one, hdferr)
+    call h5pclose_f(plist_id, hdferr)
+    call h5sclose_f(dspace_id, hdferr)
+  else
+    ! Extend by one and write into the new slot
+    call h5dopen_f(file_id, dsetname, dset_id, hdferr)
+    call h5dget_space_f(dset_id, dspace_id, hdferr)
+    call h5sget_simple_extent_dims_f(dspace_id, cur_dims, max_dims, hdferr)
+    call h5sclose_f(dspace_id, hdferr)
+
+    new_dims(1) = cur_dims(1) + 1
+    call h5dset_extent_f(dset_id, new_dims, hdferr)
+
+    offset(1) = cur_dims(1)
+    call h5screate_simple_f(1, one, memspace_id, hdferr)
+    call h5dget_space_f(dset_id, dspace_id, hdferr)
+    call h5sselect_hyperslab_f(dspace_id, H5S_SELECT_SET_F, offset, one, hdferr)
+    call h5dwrite_f(dset_id, H5T_NATIVE_DOUBLE, val, one, hdferr, &
+                    memspace_id, dspace_id)
+    call h5sclose_f(memspace_id, hdferr)
+    call h5sclose_f(dspace_id, hdferr)
+  end if
+
+  call h5dclose_f(dset_id, hdferr)
+
+end subroutine hdf5_append_scalar
 
 
-  open(unit=666,file=trim(adjustl(filename)),status="unknown", &
-                                            form='formatted',position="append")
-  write(666,"(A,1PE19.10E3)") '"Time = ',time
-
-  do i=1,imax
-     write(666,"(E19.10E3, I5.4)") mass(i), var(i)
-  enddo
-  write(666,*) " "
-  write(666,*) " "
-  close(666)
-
-
-end subroutine output_single_mass_integer
-! ******************************************************************
-
-subroutine output_central(var,filename)
-
-  use blmod, only: r,mass,time
-  use parameters
-
+!=============================================================================
+! Append one integer value to a chunked unlimited-dimension dataset
+!=============================================================================
+subroutine hdf5_append_int(file_id, dsetname, val)
+  use hdf5
   implicit none
-  real*8 var(*)
-  character(*) filename
-  integer nt
-  integer i
+  integer(HID_T), intent(in) :: file_id
+  character(*),   intent(in) :: dsetname
+  integer,        intent(in) :: val
 
-  open(unit=666,file=trim(adjustl(filename)),status="unknown", &
-                                            form='formatted',position="append")
+  integer(HID_T)   :: dset_id, dspace_id, memspace_id, plist_id
+  integer(HSIZE_T) :: cur_dims(1), max_dims(1), new_dims(1), one(1), offset(1)
+  integer          :: hdferr
+  logical          :: exists
 
-  write(666,"(1P20E19.10E3)") time,var(1)
+  one(1)      = 1
+  max_dims(1) = H5S_UNLIMITED_F
 
-  close(666)
+  call h5lexists_f(file_id, dsetname, exists, hdferr)
 
+  if (.not. exists) then
+    cur_dims(1) = 1
+    call h5screate_simple_f(1, cur_dims, dspace_id, hdferr, max_dims)
+    call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, hdferr)
+    call h5pset_chunk_f(plist_id, 1, one, hdferr)
+    call h5dcreate_f(file_id, dsetname, H5T_NATIVE_INTEGER, dspace_id, &
+                     dset_id, hdferr, plist_id)
+    call h5dwrite_f(dset_id, H5T_NATIVE_INTEGER, val, one, hdferr)
+    call h5pclose_f(plist_id, hdferr)
+    call h5sclose_f(dspace_id, hdferr)
+  else
+    call h5dopen_f(file_id, dsetname, dset_id, hdferr)
+    call h5dget_space_f(dset_id, dspace_id, hdferr)
+    call h5sget_simple_extent_dims_f(dspace_id, cur_dims, max_dims, hdferr)
+    call h5sclose_f(dspace_id, hdferr)
 
-end subroutine output_central
+    new_dims(1) = cur_dims(1) + 1
+    call h5dset_extent_f(dset_id, new_dims, hdferr)
 
-! ******************************************************************
+    offset(1) = cur_dims(1)
+    call h5screate_simple_f(1, one, memspace_id, hdferr)
+    call h5dget_space_f(dset_id, dspace_id, hdferr)
+    call h5sselect_hyperslab_f(dspace_id, H5S_SELECT_SET_F, offset, one, hdferr)
+    call h5dwrite_f(dset_id, H5T_NATIVE_INTEGER, val, one, hdferr, &
+                    memspace_id, dspace_id)
+    call h5sclose_f(memspace_id, hdferr)
+    call h5sclose_f(dspace_id, hdferr)
+  end if
 
-subroutine output_outer(var,filename)
+  call h5dclose_f(dset_id, hdferr)
 
-  use blmod, only: r,mass,time
-  use parameters
-
-  implicit none
-  real*8 var(*)
-  character(*) filename
-  integer nt
-  integer i
-
-  open(unit=666,file=trim(adjustl(filename)),status="unknown", &
-                                        form='formatted',position="append")
-
-  write(666,"(1P20E19.10E3)") time,var(imax)
-
-  close(666)
-
-end subroutine output_outer
-
-
-! *******************************************************************
-subroutine output_scalar(var,filename)
-
-  use blmod, only: time
-
-  implicit none
-  real*8 var
-  character(len=100) filename
-  integer nt
-  integer i
-
-  open(unit=666,file=trim(adjustl(filename)),status="unknown", &
-                                            form='formatted',position="append")
-
-  write(666,"(1P20E19.10E3)") time,var
-
-  close(666)
-
-end subroutine output_scalar
-
-! *******************************************************************
-subroutine output_integer(var,filename)
-
-  use blmod, only: time
-
-  implicit none
-  integer var
-  character(len=100) filename
-  integer nt
-  integer i
-
-  open(unit=666,file=trim(adjustl(filename)),status="unknown", &
-                                            form='formatted',position="append")
-
-  write(666,"(1PE19.10E3, I5.4)") time,var
-
-  close(666)
-
-end subroutine output_integer
+end subroutine hdf5_append_int
 
 
 !******************************************************************************
@@ -349,41 +304,23 @@ subroutine output_screenshot(var,filename,imaximum)
 end subroutine output_screenshot
 
 
-! *******************************************************************
-    subroutine generate_filename(varname,outdir,time,nt,suffix,fname)
+!=============================================================================
+! Create a group if it doesn't already exist
+!=============================================================================
+subroutine hdf5_ensure_group(file_id, groupname)
+  use hdf5
+  implicit none
+  integer(HID_T), intent(in) :: file_id
+  character(*),   intent(in) :: groupname
 
-      implicit none
+  integer(HID_T) :: grp_id
+  integer        :: hdferr
+  logical        :: exists
 
+  call h5lexists_f(file_id, groupname, exists, hdferr)
+  if (.not. exists) then
+    call h5gcreate_f(file_id, groupname, grp_id, hdferr)
+    call h5gclose_f(grp_id, hdferr)
+  end if
 
-      real*8 time
-      integer nt
-      character(*) varname
-      character(len=256) outdir
-      character*(*) suffix
-      character*(*) fname
-      character*(400) aa
-      character(len=100) outtime
-      character(len=20) outnt
-      integer i,ii
-
-      aa=" "
-      fname=" "
-!      write(aa,"(a32,'_',f10.8,'_nt',i6,'.dat')") varname,time,nt
-      write(outnt,"(i10.10)") nt
-!      write(aa,"(a32,'_nt',i6)") varname,nt
-
-      fname = trim(adjustl(outdir))//"/"//trim(adjustl(varname))//"_nt_"//outnt
-      write(outtime,"(f14.7)") time
-!      write(*,*) aa
-
-!      ii=0
-!      do i=1,80
-!         if(aa(i:i).ne.' ') then
-!            ii=ii+1
-!            fname(ii:ii)=aa(i:i)
-!         endif
-!      enddo
-
-      fname = trim(adjustl(fname))//"_time_"//trim(adjustl(outtime))
-
-    end subroutine generate_filename
+end subroutine hdf5_ensure_group
