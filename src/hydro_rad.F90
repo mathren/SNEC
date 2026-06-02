@@ -68,6 +68,26 @@ subroutine hydro_rad
           - dtv * 4.0d0*pi * (cr(i)**2 * Q(i) - cr(i-1)**2 * Q(i-1))/delta_cmass(i-1)
   end do
 
+  !------------------
+  ! i = 31
+  ! if (time>9) then
+  !    print *, "debug", time
+  !    print *, vel(31), ">", vel_p(31), "?", vel(31)>vel_p(31)
+  !    if (vel(31)>vel_p(31)) then
+  !       print *, "ggrav term=", - dtv * ggrav*mass(i) / r(i)**2 *gravity_switch
+  !       print *, "P term = ",  - dtv * 4.0d0*pi*r(i)**2 * (p(i) - p(i-1)) / delta_cmass(i-1)
+  !       print *, "visc=",  - dtv * 4.0d0*pi * (cr(i)**2 * Q(i) - cr(i-1)**2 * Q(i-1))/delta_cmass(i-1)
+  !       print *, "tot=", - dtv * ggrav*mass(i) / r(i)**2 *gravity_switch &
+  !            - dtv * 4.0d0*pi*r(i)**2 * (p(i) - p(i-1)) / delta_cmass(i-1) &
+  !            - dtv * 4.0d0*pi * (cr(i)**2 * Q(i) - cr(i-1)**2 * Q(i-1))/delta_cmass(i-1)
+  !       print *, log10(temp(i)), log10(temp_p(i)), log10(r(i)), log10(r_p(i))
+  !       pause
+  !       print *, "++++++++++++++++"
+  !    end if
+  ! end if
+  !------------------
+
+
 
   !----------------------- update the radial coordinates-------------------------
 

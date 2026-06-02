@@ -21,7 +21,7 @@ initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
 # piston_tstart		= 0.0d0
 # piston_tend		= 1.0d-2
 
-final_energy		= 5.0d50
+final_energy		= 5.0d40
 bomb_tstart		= 0.0d0
 bomb_tend		= 1.0d-2
 bomb_mass_spread	= 0.1d0  # (in solar mass)
