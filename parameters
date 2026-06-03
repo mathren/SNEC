@@ -1,13 +1,12 @@
 #____________LAUNCH_____________
-outdir                  = "./Data"
+
+outdir                  = "/home/mrenzo/Documents/Research/Projects/TARDIS_connector_2025/SNEC/output/large_net/"
 
 #___________PROFILE_____________
 
-profile_name 		= "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/profile_end.short" # "./profiles/15Msol_RSG.short"   #
+profile_name 		= "/home/mrenzo/Documents/Research/Projects/TARDIS_connector_2025/SNEC/input/last_profile.data.short"
 
-comp_profile_name	= "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/profile_end.iso.dat" # "./profiles/15Msol_RSG.iso.dat" #
-
-grid_pattern_name       = "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/Grid_Pattern.dat" # "./profiles/Grid_pattern_15RSG.dat" #
+comp_profile_name	= "/home/mrenzo/Documents/Research/Projects/TARDIS_connector_2025/SNEC/input/last_profile.data.iso.dat"
 #__________EXPLOSION_____________
 
 initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
@@ -15,81 +14,84 @@ initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
 #Options:
 #"Piston_Explosion"
 #"Thermal_Bomb"
-#"Progenitor_binding_energy"
 
-# piston_vel		= 5.0d8
-# piston_tstart		= 0.0d0
-# piston_tend		= 1.0d-2
+piston_vel          = 5.0d9
+piston_tstart       = 0.0d0
+piston_tend         = 1.0d-2
 
-final_energy		= 5.0d40
-bomb_tstart		= 0.0d0
-bomb_tend		= 1.0d-2
-bomb_mass_spread	= 0.1d0  # (in solar mass)
-bomb_start_point	= 1
+final_energy        = 0.0d0 # 0.3d51
+bomb_tstart         = 0.0d0
+bomb_tend           = 0.1d0
+bomb_mass_spread    = 0.1d0 #(in solar mass)
+bomb_start_point    = 1
 
 #_____________GRID_______________
 
-imax			= 2442 # 1000 # 3208 #
+imax         = 1265  # number of mesh points in input model
 
-gridding		= "from_file_by_mass" "uniform_in_mass"  #
+gridding = "from_file_by_mass"
 
 #Options:
 #
 #"from_file_by_mass"
 
-mass_excision		= 1
-mass_excised		= 1.4 #in solar mass, provided mass_excision = 1
+mass_excision = 1
+mass_excised = 1.6 #in solar mass, provided mass_excision = 1
 
 #___________EVOLUTION_____________
 
-radiation		= 1 # 1
-eoskey			= 2 # 1
+radiation = 1
+eoskey = 2
 
 #Options:
 #1 - ideal eos
 #2 - Paczynski
 
-Ni_switch		= 1
-Ni_mass			= 0.0d0 # 0.0d0 # 0.028
-Ni_boundary_mass	= 2.9d0
-Ni_by_hand		= 0
+Ni_switch = 0
+Ni_mass = 0.0d0 # 0.028
+Ni_boundary_mass = 2.9d0
 
-Ni_period		= 1.0d4
+Ni_period = 1.0d4
 
-saha_ncomps		= 3
+saha_ncomps = 3
 
-boxcar_smoothing	= 1
+boxcar_smoothing = 0
 
-opacity_floor_envelope	= 0.01d0
-opacity_floor_core	= 0.01d0
+opacity_floor_envelope = 0.01d0  # stripped progenitor with no H means no envelope
+opacity_floor_core     = 0.01d0  # lower core opacity floor for stripped progenitor
 
 
 #___________TIMING_______________
 
-ntmax			= 10000000000
+ntmax               = 10000000000000
 
-tend			= 30.0d0 # 8640000.0d0
+tend                = 17000000.0d0
 
-max_t_dense_out         = 1.d0 # denser output until this in seconds
+dtout               = 1.7d4
+dtout_scalar        = 1.7d3
+dtout_check         = 1.7d3
 
-dtout			= 0.5d0
-dtout_scalar		= 0.5d0
-dtout_check		= 0.5d0
+ntout               = -1
+ntout_scalar        = -1
+ntout_check         = -1
+>>>>>>> Stashed changes
 
-ntout			= -1
-ntout_scalar		= -1
-ntout_check		= 1000
+ntinfo              = 1000
 
-ntinfo			= 1000
-
-dtmin			= 1.0d-10
-dtmax			= 1.0d2
+dtmin               = 1.0d-10
+dtmax               = 1.0d2
 
 #____________TEST_________________
 
-sedov			= 0
+sedov 		    = 0
+
+
 
 #___________Inner boundary_________
 # Options: "inflow" or empty string
 
 innerBC                = "inflow"
+
+grid_pattern_name = ""
+
+max_t_dense_output = 0.0d0
