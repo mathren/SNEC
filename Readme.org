@@ -1,4 +1,4 @@
-#+title: =SNEC-fb=: SNEC with fallback
+#+title: =SNEC+fb=: SNEC with fallback
 
 Based on =SNEC= version =1.01= available at [[https://sntheory.org/SNEC.html]].
 
@@ -85,9 +85,9 @@ large_grid3 M(r) evolution in time
 [[file:.org_notes_figures/Intermediate_results/2026-02-26_20-14-38_screenshot.png]]
 
 
-* TODO =SNECfb= Objectives
+* TODO =SNEC+fb= Objectives
 - [ ] implement density smoothing self-consistent with boxcar composition smoothing
-
+- [ ] read directly MESA files as option, instead of clunky python scripts.
 * Original =SNEC= resources
 
 - https://img.shields.io/badge/read-paper-blue.svg?style=flat
