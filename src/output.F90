@@ -68,11 +68,8 @@ subroutine output_all(modeflag)
     call hdf5_append_1d(file_id, "fields/H_2",  &
                         ion_fractions(H_number,2,1:imax),  imax)
 
-    ! Optional Ni56 deposit
-    if (Ni_mass > 0) then
-      call hdf5_append_1d(file_id, "fields/Ni_deposit_function", &
+    call hdf5_append_1d(file_id, "fields/Ni_deposit_function", &
                           Ni_deposit_function(1:imax), imax)
-    end if
 
   else if (modeflag == 2) then
     ! ---- scalars (one value appended per call) -----------------------------
