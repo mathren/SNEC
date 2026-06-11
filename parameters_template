@@ -7,7 +7,7 @@ profile_name 		= "INPUT_PROFILE"
 
 comp_profile_name	= "INPUT_COMP_FILE"
 
-grid_pattern_name       = /home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/Grid_Pattern.dat"
+grid_pattern_name       = "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/Grid_Pattern.dat"
 
 #__________EXPLOSION_____________
 
@@ -27,6 +27,7 @@ bomb_tstart		= 0.0d0
 bomb_tend		= 1.0d-2
 bomb_mass_spread	= BOMB_MASS_SPREAD  # (in solar mass)
 bomb_start_point	= 1
+bomb_mode               = 1
 
 #_____________GRID_______________
 

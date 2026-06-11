@@ -175,7 +175,7 @@
 !
 !..... set-up C/O axis points
       xxco=xxc+xxo
-      if(z+xh+xxco-1.e-6 .gt. 1 ) go to 61
+      if(z+xh+xxco-1.e-2 .gt. 1 ) go to 61
       zzz=z+0.001
       xxh=xh
        xxci=xxc
