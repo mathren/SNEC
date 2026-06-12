@@ -56,7 +56,10 @@ def main():
     arr = np.loadtxt(path, skiprows=6)
 
     imass   = col_names.index("mass")
-    iradius = col_names.index("radius")
+    try:
+        iradius = col_names.index("radius")
+    except ValueError:
+        ilogR  = col_names.index("logR")
     ineut   = col_names.index("neut")
     iprot   = col_names.index("h1")
 
@@ -93,7 +96,10 @@ def main():
         for i in range(zones, 0, -1):
             j = i - 1
             line  = "%15.6E" % (arr[j, imass] * msun)
-            line += "%15.6E" % (arr[j, iradius] * rsun)
+            try:
+                line += "%15.6E" % (arr[j, iradius] * rsun)
+            except UnboundLocalError:
+                line += "%15.6E" % (10.0**(arr[j, ilogR]) * rsun)
             line += "%15.6E" % neut_norm[j]
             line += "%15.6E" % prot_norm[j]
             for g in range(N_GROUPS):
