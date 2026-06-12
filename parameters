@@ -8,6 +8,10 @@ profile_name 		= "/home/mrenzo/Documents/Research/Projects/TARDIS_connector_2025
 
 comp_profile_name	= "/home/mrenzo/Documents/Research/Projects/TARDIS_connector_2025/SNEC/input/last_profile.data.iso.dat"
 
+## for SNEC+fb  # "" #  leave empty for default behavior
+grid_pattern_name       = "/home/mrenzo/Documents/Research/Projects/TARDIS_connector_2025/SNEC/input/GridPattern.dat"
+
+
 #__________EXPLOSION_____________
 
 initial_data 		= "Thermal_Bomb"
@@ -31,7 +35,7 @@ bomb_start_point	= 1
 
 imax			= 1265           # number of mesh points in input model
 
-gridding		= "uniform_in_mass" # "from_file_by_mass"
+gridding		= "from_file_by_mass" # "uniform_in_mass" #
 
 #Options:
 #"uniform_in_mass"
@@ -69,6 +73,8 @@ ntmax			= 100000000000
 
 tend			= 8640000.0d0
 
+max_t_dense_out         = 0.0d0 # denser output until this
+
 dtout			= 1.7d4
 dtout_scalar		= 1.7d3
 dtout_check		= 1.7d3
@@ -92,6 +98,3 @@ sedov			= 0
 # Options: "inflow" or empty string
 
 innerBC                = "inflow"
-
-max_t_dense_out         = 100.0d0 # denser output until this
-grid_pattern_name       = ""  #
