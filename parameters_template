@@ -7,7 +7,7 @@ profile_name 		= "INPUT_PROFILE"
 
 comp_profile_name	= "INPUT_COMP_FILE"
 
-grid_pattern_name       = /home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/Grid_Pattern.dat"
+grid_pattern_name       = "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/Grid_Pattern.dat"
 
 #__________EXPLOSION_____________
 

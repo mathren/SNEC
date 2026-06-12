@@ -1,6 +1,6 @@
 #____________LAUNCH_____________
 
-outdir                  = "/home/mrenzo/Documents/Research/Projects/TARDIS_connector_2025/SNEC/output/large_net/"
+outdir                  = "./output/"
 
 #___________PROFILE_____________
 

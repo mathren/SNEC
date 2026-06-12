@@ -15,14 +15,14 @@ subroutine grid
   character(len=256) :: tmp
 
   call get_environment_variable('SNEC_DIR', snec_dir)
-!------------------------------------------------------------------------------
+  !------------------------------------------------------------------------------
 
   if(gridding.eq.'uniform_in_mass') then
 
-      dmass = (mass(imax) - mass(1))/(imax-1)
-      do i=2,imax-1
-         mass(i) = mass(i-1) + dmass
-      enddo
+     dmass = (mass(imax) - mass(1))/(imax-1)
+     do i=2,imax-1
+        mass(i) = mass(i-1) + dmass
+     enddo
 
   else if(gridding.eq.'from_file_by_mass') then
 
@@ -32,38 +32,38 @@ subroutine grid
         tmp = trim(grid_pattern_name)
      end if
 
-        open(666,file=trim(tmp),status='unknown', &
-             form='formatted',action='read')
-        number_lines_GridPattern = 0
-        do
-           read(666,*,end=15)
-           number_lines_GridPattern = number_lines_GridPattern + 1
-        end do
-15      close(666)
+     open(666,file=trim(tmp),status='unknown', &
+          form='formatted',action='read')
+     number_lines_GridPattern = 0
+     do
+        read(666,*,end=15)
+        number_lines_GridPattern = number_lines_GridPattern + 1
+     end do
+15   close(666)
 
-      if(number_lines_GridPattern.ne.imax) then
+     if(number_lines_GridPattern.ne.imax) then
         write(*,*) '******* Number of lines in the file GridPattern.dat'
         write(*,*) '******* does not coincide with the number of grid points.'
         write(*,*) '******* Please, adjust one of the two.'
         stop
-      end if
+     end if
 
-      open(666,file=trim(snec_dir)//trim("tables/GridPattern.dat"),status='unknown', &
-           form='formatted',action='read')
-      do i=1,imax
-         read(666,*) grid_pattern(i)
-      enddo
-      close(666)
+     open(666,file=trim(tmp),status='unknown', &
+          form='formatted',action='read')
+     do i=1,imax
+        read(666,*) grid_pattern(i)
+     enddo
+     close(666)
 
-      do i = 2, imax
-          mass(i) = mass(i-1) &
-              + (grid_pattern(i)-grid_pattern(i-1))*(mass(imax) - mass(1))
-      enddo
+     do i = 2, imax
+        mass(i) = mass(i-1) &
+             + (grid_pattern(i)-grid_pattern(i-1))*(mass(imax) - mass(1))
+     enddo
 
   else
 
-      write(*,*) "the chosen type of gridding is not implemented"
-      stop
+     write(*,*) "the chosen type of gridding is not implemented"
+     stop
 
   end if
 
@@ -73,8 +73,8 @@ subroutine grid
   cmass(imax) = mass(imax) + 0.5d0*(mass(imax)-mass(imax-1))
 
   do i = 1, imax-1
-      delta_mass(i) = mass(i+1) - mass(i)
-      delta_cmass(i) = cmass(i+1) - cmass(i)
+     delta_mass(i) = mass(i+1) - mass(i)
+     delta_cmass(i) = cmass(i+1) - cmass(i)
   enddo
   delta_mass(imax) = delta_mass(imax-1)
   delta_cmass(imax) = delta_cmass(imax-1)
