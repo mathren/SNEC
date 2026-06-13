@@ -20,9 +20,8 @@ can be downloaded from the website, unpacked, and initialized with
 At the time of writing, this provides
 
 #+BEGIN_SRC bash
-  gfortran --version
-  GNU Fortran (GCC) 13.3.0
-  Copyright (C) 2023 Free Software Foundation, Inc.
+  GNU Fortran (GCC) 15.2.0
+  Copyright (C) 2025 Free Software Foundation, Inc.
   This is free software; see the source for copying conditions.  There is NO
   warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #+END_SRC
@@ -38,7 +37,7 @@ to the correct location of =Lapack=. The file shipped in this repo is
 for installation on linux machines, but there is a commented line for
 Mac OS.
 
-* How to run =SNEC=
+* How to run =SNEC+fb=
 
 After editing your =parameters= file according to your needs, and making
 sure the output directory exists,
@@ -66,10 +65,76 @@ If this is /not/ defined, then the original behavior will happen, if it
 is defined, it will be pre-pended to the path of the EOS tables
 allowing to run the executable =snec= from anywhere.
 
-
 * Flowchart
 
 =snec= \rightarrow =timestep= \rightarrow =blstep= \rightarrow =hydro= or =hydro_rad= (where the calculation happens)
+
+* =hdf5= output
+
+=SNEC+fb= uses =hdf5= format for output. Using the python library
+=SNEC_output_parser= in =scripts=:
+
+#+begin_src python
+  from SNEC_output_parser import read_SNEC_hdf5
+  data = read_SNEC_hdf5(root+"output.h5")
+  for key, val in sorted(data.items()):
+      val = np.atleast_1d(val)
+      print(f"{key:<40}  {str(val.shape):<20}  {val.dtype}")
+#+end_src
+
+#+begin_src
+  fields/E_shell                            (1265, 511)           float64
+  fields/H_1                                (1265, 511)           float64
+  fields/H_2                                (1265, 511)           float64
+  fields/He_1                               (1265, 511)           float64
+  fields/He_2                               (1265, 511)           float64
+  fields/He_3                               (1265, 511)           float64
+  fields/Ni_deposit_function                (1265, 511)           float64
+  fields/Q                                  (1265, 511)           float64
+  fields/cs2                                (1265, 511)           float64
+  fields/delta_time                         (1265, 511)           float64
+  fields/eps                                (1265, 511)           float64
+  fields/free_electron_frac                 (1265, 511)           float64
+  fields/kappa                              (1265, 511)           float64
+  fields/kappa_table                        (1265, 511)           float64
+  fields/logR_op                            (1265, 511)           float64
+  fields/logT                               (1265, 511)           float64
+  fields/lum                                (1265, 511)           float64
+  fields/mass                               (1265, 511)           float64
+  fields/p_rad                              (1265, 511)           float64
+  fields/photosphere_tracer                 (1265, 511)           float64
+  fields/press                              (1265, 511)           float64
+  fields/radius                             (1265, 511)           float64
+  fields/rho                                (1265, 511)           float64
+  fields/tau                                (1265, 511)           float64
+  fields/temp                               (1265, 511)           float64
+  fields/time                               (511,)                float64
+  fields/time_diff                          (1265, 511)           float64
+  fields/time_exp                           (1265, 511)           float64
+  fields/vel                                (1265, 511)           float64
+  fields/ye                                 (1265, 511)           float64
+  scalars/Ni_total_luminosity               (511,)                float64
+  scalars/T_eff                             (511,)                float64
+  scalars/index_lumshell                    (511,)                int32
+  scalars/index_photo                       (511,)                int32
+  scalars/inner_boundary                    (511,)                int32
+  scalars/lum_observed                      (511,)                float64
+  scalars/lum_photo                         (511,)                float64
+  scalars/mass_lumshell                     (511,)                float64
+  scalars/mass_photo                        (511,)                float64
+  scalars/opacity_corrupted                 (511,)                int32
+  scalars/rad_photo                         (511,)                float64
+  scalars/time                              (511,)                float64
+  scalars/vel_photo                         (511,)                float64
+#+end_src
+
+You can access variables as:
+
+#+BEGIN_SRC  python
+    times       = data['fields/time']      # (n_times,), seconds
+    mass_grid   = (data['fields/mass']     # (n_zones, n_times), grams
+    radius_grid =  data['fields/radius']   # (n_zones, n_times), cm
+#+END_SRC
 
 * Intermediate results
 
