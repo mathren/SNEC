@@ -7,7 +7,7 @@ profile_name 		= "INPUT_PROFILE"
 
 comp_profile_name	= "INPUT_COMP_FILE"
 
-grid_pattern_name       = "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/Grid_Pattern.dat"
+grid_pattern_name       = "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/GridPattern.data"
 
 #__________EXPLOSION_____________
 
@@ -22,6 +22,7 @@ initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
 # piston_tstart		= 0.0d0
 # piston_tend		= 1.0d-2
 
+bomb_mode		= 1 # add to bomb binding energy
 final_energy		= FINAL_ENERGY
 bomb_tstart		= 0.0d0
 bomb_tend		= 1.0d-2
@@ -50,10 +51,10 @@ eoskey			= 2 # 1
 #1 - ideal eos
 #2 - Paczynski
 
-Ni_switch		= 1
+Ni_by_hand		= 0  # Farmer+23 provide models at onset of collapse
+Ni_switch		= 0
 Ni_mass			= NI_MASS # 0.0d0 # 0.028
 Ni_boundary_mass	= 2.9d0
-Ni_by_hand		= 0
 
 Ni_period		= 1.0d4
 
@@ -68,7 +69,7 @@ opacity_floor_core	= 0.01d0
 
 ntmax			= 10000000000
 
-tend			= 1.01e5
+tend			= 8640000.0d0  # 100 days
 
 max_t_dense_out         = 100.0d0 # denser output until this
 

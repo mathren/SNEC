@@ -148,8 +148,7 @@ module blmod
 
   ! do not check CFL below this
   integer :: iBC = 1
-  real*8:: rBC_initial
-
+  real*8 :: rBC_initial
 end module blmod
 
 !############################# PARAMETERS MODULE ##############################

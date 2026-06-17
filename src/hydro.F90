@@ -40,7 +40,7 @@ subroutine hydro
         vel(2) = piston_vel
   endif
 
-  do i=2,imax
+  do i=iBC+1,imax
     vel(i) = vel_p(i) &
 
      ! gravity
@@ -59,33 +59,58 @@ subroutine hydro
       vel(1) = 0.0d0
   endif
 
+  ! hack inner boundary to be inflow no backreaction
   if (innerBC == "inflow") then
-     vel(1) = min(0.0d0, vel(2))
+     vel(iBC) = min(0.0d0, vel(iBC+1)) !vel(iBC+1)
+     print*, vel(iBC), vel(iBC+1)
+  else
+     vel(iBC) = 0.0d0
   end if
 
 
 !----------------------- update the radial coordinates-------------------------
-  do i=1,imax
+  do i=iBC,imax
    r(i) = r_p(i) + dtime * vel(i)
 
-   if(i.gt.1) then
-       if (r(i).lt.r(i-1)) then
-           write(*,*) 'radius of a gridpoint', i, 'is less than preceding'
-           stop
-       end if
+   if((i.gt.iBC) .and. &
+        (innerBC /= "inflow")) then
+      if (r(i).lt.r(i-1)) then
+         write(*,*) 'radius of a gridpoint', i, 'is less than preceding'
+         stop
+      end if
    end if
   enddo
 
+  ! now we have updated radii and velocities: do we need to move the
+  ! inner boundary index (iBC)? cut everything reaching r smaller thana
+  ! the initial smaller radius, a fixed boundary
+  if (innerBC == "inflow") then
+     i = imax
+
+     do while (i>iBC+1)
+        ! Check if the cell just outside the boundary has fallen inside r(iBC)
+        if (r(i)<=max(r(iBC), rBC_initial)) then
+           print *, "! ----------------------!"
+           print *, "! update inner boundary !"
+           print *, "! iBC: ", iBC, " -> ", i
+           print *, "! ----------------------!"
+           iBC = i
+           exit
+        end if
+        i = i - 1  ! loop inward
+     end do
+  end if
+
 
 !------------------------- update the zone densities --------------------------
-  do i=1,imax-1
+  do i=iBC,imax-1
      rho(i) = delta_mass(i) / (4.0d0*pi * (r(i+1)**3 - r(i)**3)/3.0d0)
   enddo
   rho(imax) = 0.0d0 !passive boundary condition
 
 
 !------------------------- update zone center radius --------------------------
-  do i=1,imax-1
+  do i=iBC,imax-1
      cr(i) = ( ( r(i)**3 + r(i+1)**3 ) / 2.0d0 )**(1.0d0/3.0d0)
   enddo
   cr(imax) = r(imax) + (r(imax) - cr(imax-1))
@@ -108,6 +133,8 @@ subroutine hydro
   !calculate heating term due to bomb
   if(do_bomb .and. time.ge.bomb_tstart .and. time.le.bomb_tend) then
       call bomb_pattern
+  else if (inject_be .and. nt == 0) then
+     call inject_progenitor_binding_energy
   else
       bomb_heating(:) = 0.0d0
   endif
@@ -116,7 +143,28 @@ subroutine hydro
   temp_temp(1:imax) = temp(1:imax)
   delta_temp(1:imax) = temp_temp(1:imax)
   ie=0
+
+  if (iBC>1) then
+     ! flatten everything inside inner boundary
+     ! prevent pressure, temperature and internal
+     ! energy gradients which could cause backreaction
+     vel(1:iBC-1)= 0.0d0
+     !! Reset velocity inside and at the boundary
+     vel(iBC) = min(0.0d0, vel(iBC+1))
+     !! Reset radii at inside and at the boundary
+     r(1:iBC-1) = 1d6     ! r_p(1:iBC-1)
+     r(iBC) = rBC_initial  ! restore inner boundary radius
+     ! N.B.: we ignore change in volume of inner cell,
+     ! since anyways we apply a zero gradient condition
+     ! the energy density, mass density, etc. are copied from the cell above
+     eps(1:iBC) = eps(iBC+1)
+     p(1:iBC) = p(iBC+1)
+     temp(1:iBC) = temp(iBC+1)
+     temp_temp(1:iBC) = temp_temp(iBC+1)
+  end if
   delta_max = 1
+
+
 
   do while(delta_max > EPSTOL)
 
@@ -128,7 +176,7 @@ subroutine hydro
 
     delta_max = 0
 
-    do i=1,imax-1
+    do i=iBC+1,imax-1
 
         function_star = eps_temp(i) - eps(i) + 0.5d0*(p_temp(i) + p(i)) &
             * (1.0d0/rho(i)-1.0d0/rho_p(i)) - bomb_heating(i)*dtime &

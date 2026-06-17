@@ -145,7 +145,7 @@ subroutine read_profile(prof_name)
   enddo
 
   do i=1,imax !velocity lives at the cell edges
-      call map_map(vel(i), mass(i),pvel,   pmass,profile_zones)
+      call map_map(vel(i), mass(i), pvel, pmass,profile_zones)
   enddo
 
   do i=1,imax-1 !temperature and density live at the cell centers
