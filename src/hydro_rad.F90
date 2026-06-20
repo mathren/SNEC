@@ -70,7 +70,8 @@ subroutine hydro_rad
 
   ! hack inner boundary to be inflow no backreaction
   if (innerBC == "inflow") then
-     vel(iBC) = min(0.0d0, vel(iBC+1)) !vel(iBC+1)
+     vel(iBC) = min(0.0, vel(iBC+1))
+     ! vel(iBC) = min(0.0d0, vel(iBC+1)) !vel(iBC+1)
   else
      vel(iBC) = 0.0d0
   end if
@@ -78,41 +79,78 @@ subroutine hydro_rad
   !----------------------- update the radial coordinates-------------------------
   do i=iBC, imax
      r(i) = r_p(i) + dtime * vel(i)
-     if ((i>iBC) .and. (innerBC /= "inflow")) then
-        if ((r(i).lt.r(i-1))) then
-           write(*,*) 'radius of a gridpoint', i, 'is less than preceding'
-           write(*,*) 'boundary at cell', iBC
-           stop
-        end if
-     end if
   end do
 
   ! now we have updated radii and velocities: do we need to move the
   ! inner boundary index (iBC)? cut everything reaching r smaller thana
   ! the initial smaller radius, a fixed boundary
   if (innerBC == "inflow") then
-     i = imax
-     do while (i>iBC+1)
-        ! Check if the cell just outside the boundary has fallen inside r(iBC)
-        if (r(i)<0) then
-           stop "negative radius"
-        end if
-        if (r(i)<=rBC_initial) then
-           print *, "! ----------------------!"
-           print *, "! update inner boundary !"
-           print *, "! iBC:", iBC, "->", i
-           print *, "! ----------------------!"
+     i = iBC
+     do while (i<imax)
+        if (r(i)>= rBC_initial) then
+           ! i is first cell with outer boundary above initial inner boundary
            iBC = i
-           r(i) = rBC_initial
            exit
         end if
-        i = i - 1  ! loop inward
+        i = i+1 ! loop outward
      end do
+     if (i==imax) then
+        write(*,*) "Inner boundary > Outer boundary"
+        stop
+     end if
+     if (iBC>1) then
+        ! flatten everything inside inner boundary
+        ! prevent pressure, temperature and internal
+        ! energy gradients which could cause backreaction
+        vel(1:iBC-1)= 0.0d0
+        !! Reset radii at inside and at the boundary
+        r(1:iBC-1) = 1d6
+        ! N.B.: we ignore change in volume of inner cell,
+        ! since anyways we apply a zero gradient condition
+        ! the energy density, mass density, etc. are copied from the cell above
+        eps(1:iBC-1) = eps(iBC)
+        p(1:iBC-1) = p(iBC)
+        temp(1:iBC-1) = temp(iBC)
+     end if
+
+     ! do while (i>iBC)
+     !    if (r(i)<rBC_initial) then ! fallen below boundary
+     !       iBC = i
+     !       vel(iBC) = min(0.0, vel(iBC+1))
+     !       if (iBC>1) then
+     !          print *, "Flatten inside"
+     !          ! flatten everything inside inner boundary
+     !          ! prevent pressure, temperature and internal
+     !          ! energy gradients which could cause backreaction
+     !          vel(1:iBC-1)= 0.0d0
+     !          !! Reset radii at inside and at the boundary
+     !          r(1:iBC-1) = 1d6     ! r_p(1:iBC-1)
+     !          ! N.B.: we ignore change in volume of inner cell,
+     !          ! since anyways we apply a zero gradient condition
+     !          ! the energy density, mass density, etc. are copied from the cell above
+     !          eps(1:iBC-1) = eps(iBC)
+     !          p(1:iBC-1) = p(iBC)
+     !          temp(1:iBC-1) = temp(iBC)
+     !       end if
+     !       exit
+     !    end if
+     !    i = i - 1  ! loop inward
+     ! end do
+     ! if ((i == iBC) .and. (r(i) <0)) then
+     !    print *, "reset radius"
+     !    r(i) = rBC_initial
+     ! end if
   end if
 
-  ! if (i==iBC+1) then
-  !    print *, "no update iBC", r(1)/rBC_initial, r(i)/rBC_initial, r(iBC), rBC_initial
-  ! end if
+
+  do i=iBC+1, imax
+     if ((r(i).lt.r(i-1))) then
+        write(*,*) 'radius of a gridpoint', i, 'is less than preceding'
+        write(*,*) 'boundary at cell', iBC
+        stop
+     end if
+  end do
+
 
   !------------------------- update the zone densities --------------------------
 
@@ -122,7 +160,6 @@ subroutine hydro_rad
   rho(imax) = 0.0d0 !passive boundary condition
 
   !------------------------- update zone center radius --------------------------
-
   do i=iBC,imax-1
      cr(i) = ( ( r(i)**3 + r(i+1)**3 ) / 2.0d0 )**(1.0d0/3.0d0)
      if (cr(i) /=cr(i)) then
@@ -131,7 +168,6 @@ subroutine hydro_rad
      end if
   end do
   cr(imax) = r(imax) + (r(imax) - cr(imax-1))
-  cr(iBC) = cr_p(iBC)
   !passive boundary condition, used in the expression for the velocity update,
   !but multiplied by the artificial viscosity, which is zero at the last point
 
@@ -178,7 +214,7 @@ subroutine hydro_rad
           eps_temp(:), p_temp(:), lum_temp(:), &
           Aarray(:), Barray(:), Carray(:), Darray(:))
 
-
+     ab(:,:)=0.0d0
      !assemble the matrix in the form used by lapack
      ab(2,2:imax-1) = Aarray(1:imax-2)
      ab(3,1:imax-1) = Barray(1:imax-1)
@@ -205,26 +241,7 @@ subroutine hydro_rad
      !check if the iteration procedure converged
      delta_max = 0.0d0
 
-     if (iBC>1) then
-        ! flatten everything inside inner boundary
-        ! prevent pressure, temperature and internal
-        ! energy gradients which could cause backreaction
-        vel(1:iBC-1)= 0.0d0
-        !! Reset velocity inside and at the boundary
-        vel(iBC) = min(0.0d0, vel(iBC+1))
-        !! Reset radii at inside and at the boundary
-        r(1:iBC-1) = 1d6     ! r_p(1:iBC-1)
-        r(iBC) = rBC_initial  ! restore inner boundary radius
-        ! N.B.: we ignore change in volume of inner cell,
-        ! since anyways we apply a zero gradient condition
-        ! the energy density, mass density, etc. are copied from the cell above
-        eps(1:iBC) = eps(iBC+1)
-        p(1:iBC) = p(iBC+1)
-        temp(1:iBC) = temp(iBC+1)
-        temp_temp(1:iBC) = temp_temp(iBC+1)
-     end if
-
-     do i=iBC+1,imax-1 ! loop avoids iBC
+     do i=iBC,imax-1
         if(abs(b(i)/temp_temp(i)).gt.delta_max) then
            delta_max = abs(b(i)/temp_temp(i))
            location_max = i
