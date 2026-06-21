@@ -88,7 +88,8 @@ subroutine hydro_rad
      i = iBC
      do while (i<imax)
         if (r(i)>= rBC_initial) then
-           ! i is first cell with outer boundary above initial inner boundary
+           ! i is first cell with outer boundary
+           ! above initial inner boundary
            iBC = i
            exit
         end if
@@ -112,38 +113,10 @@ subroutine hydro_rad
         p(1:iBC-1) = p(iBC)
         temp(1:iBC-1) = temp(iBC)
      end if
-
-     ! do while (i>iBC)
-     !    if (r(i)<rBC_initial) then ! fallen below boundary
-     !       iBC = i
-     !       vel(iBC) = min(0.0, vel(iBC+1))
-     !       if (iBC>1) then
-     !          print *, "Flatten inside"
-     !          ! flatten everything inside inner boundary
-     !          ! prevent pressure, temperature and internal
-     !          ! energy gradients which could cause backreaction
-     !          vel(1:iBC-1)= 0.0d0
-     !          !! Reset radii at inside and at the boundary
-     !          r(1:iBC-1) = 1d6     ! r_p(1:iBC-1)
-     !          ! N.B.: we ignore change in volume of inner cell,
-     !          ! since anyways we apply a zero gradient condition
-     !          ! the energy density, mass density, etc. are copied from the cell above
-     !          eps(1:iBC-1) = eps(iBC)
-     !          p(1:iBC-1) = p(iBC)
-     !          temp(1:iBC-1) = temp(iBC)
-     !       end if
-     !       exit
-     !    end if
-     !    i = i - 1  ! loop inward
-     ! end do
-     ! if ((i == iBC) .and. (r(i) <0)) then
-     !    print *, "reset radius"
-     !    r(i) = rBC_initial
-     ! end if
   end if
 
 
-  do i=iBC+1, imax
+  do i=iBC+1, imax ! check radial ordering outside inner boundary
      if ((r(i).lt.r(i-1))) then
         write(*,*) 'radius of a gridpoint', i, 'is less than preceding'
         write(*,*) 'boundary at cell', iBC
@@ -154,7 +127,7 @@ subroutine hydro_rad
 
   !------------------------- update the zone densities --------------------------
 
-  do i=iBC,imax-1 ! above the iBC
+  do i=iBC,imax-1
      rho(i) = delta_mass(i) / (4.0d0*pi * (r(i+1)**3 - r(i)**3)/3.0d0)
   end do
   rho(imax) = 0.0d0 !passive boundary condition
@@ -162,10 +135,6 @@ subroutine hydro_rad
   !------------------------- update zone center radius --------------------------
   do i=iBC,imax-1
      cr(i) = ( ( r(i)**3 + r(i+1)**3 ) / 2.0d0 )**(1.0d0/3.0d0)
-     if (cr(i) /=cr(i)) then
-        print *, "cr(i) is nan", r(i), r(i+1), i, iBC, r(iBC+1)
-        stop
-     end if
   end do
   cr(imax) = r(imax) + (r(imax) - cr(imax-1))
   !passive boundary condition, used in the expression for the velocity update,
@@ -196,6 +165,7 @@ subroutine hydro_rad
   eps_temp(1:imax) = eps(1:imax)
   temp_temp(1:imax) = temp(1:imax)
 
+  ! NR iterations start
   do k=1, ITMAX
 
      keytemp = 1
@@ -214,6 +184,7 @@ subroutine hydro_rad
           eps_temp(:), p_temp(:), lum_temp(:), &
           Aarray(:), Barray(:), Carray(:), Darray(:))
 
+     ! initialize to zero at every
      ab(:,:)=0.0d0
      !assemble the matrix in the form used by lapack
      ab(2,2:imax-1) = Aarray(1:imax-2)

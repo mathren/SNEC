@@ -29,7 +29,6 @@ subroutine output_all(modeflag)
 
   if (modeflag == 1) then
     ! ---- mass-coordinate fields -------------------------------------------
-    call hdf5_append_scalar(file_id, "fields/time", time)
     call hdf5_append_1d(file_id, "fields/mass", mass(1:imax), imax)
     call hdf5_append_1d(file_id, "fields/vel", vel(1:imax), imax)
     call hdf5_append_1d(file_id, "fields/rho", rho(1:imax), imax)
@@ -85,6 +84,7 @@ subroutine output_all(modeflag)
     call hdf5_append_scalar(file_id, "scalars/rad_photo", rad_photo)
     call hdf5_append_scalar(file_id, "scalars/mass_lumshell", mass_lumshell)
     call hdf5_append_scalar(file_id, "scalars/time", time)
+    call hdf5_append_scalar(file_id, "scalars/T_eff", dtime)
     call hdf5_append_int(file_id, "scalars/index_photo", index_photo)
     call hdf5_append_int(file_id, "scalars/opacity_corrupted", opacity_corrupted)
     call hdf5_append_int(file_id, "scalars/index_lumshell", index_lumshell)
