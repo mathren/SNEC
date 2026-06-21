@@ -1,16 +1,17 @@
 program snec
 
   use blmod, only: dtime, dtime_p, time, nt, ntstart, tstart,   &
-     tdump, tdump_scalar, rho, tdump_check
+       tdump, tdump_scalar, rho, tdump_check
   use parameters
   use outinfomod, only: outinfo_count
+  use checkpoint, only: save_checkpoint
   implicit none
 
   logical :: OutputFlag = .false.
   logical :: OutputFlagScalar = .false.
   logical :: OutputFlagCheck = .false.
 
-!------------------------------------------------------------------------------
+  !------------------------------------------------------------------------------
 
   write(*,*)
 
@@ -19,17 +20,20 @@ program snec
   write(*,*) "***********************************"
 
   write(*,*)
-! *****************************************************
-! INITIALIZATION
-! *****************************************************
+  ! *****************************************************
+  ! INITIALIZATION
+  ! *****************************************************
 
   call input_parser
 
-  call problem
-
+  if (restart == .true.) then
+     call problem_restart
+  else
+     call problem
+  end if
   call artificial_viscosity
 
-! output before first timestep
+  ! output before first timestep
   call output_all(0)
   call output_all(1)
   call output_all(2)
@@ -44,9 +48,9 @@ program snec
   nt = ntstart
 
 
-! *****************************************************
-! MAIN LOOP
-! *****************************************************
+  ! *****************************************************
+  ! MAIN LOOP
+  ! *****************************************************
 
 
   IntegrationLoop: do
@@ -126,6 +130,7 @@ program snec
      endif
 
      if (OutputFlagCheck) then
+        call save_checkpoint(restart_file)
         OutputFlagCheck = .false.
      endif
 

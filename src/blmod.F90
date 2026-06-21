@@ -238,6 +238,11 @@ module parameters
 
   character(len=256) :: innerBC = " "  ! default to empty string
 
+  !---------------------- Restart ---------------- ----------------
+
+  logical :: restart = .false.  ! default to false
+  character(len=256) :: restart_file = " "  ! default to empty string
+
 end module parameters
 
 !############################# EOS MODULE #####################################

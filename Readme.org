@@ -76,7 +76,8 @@ allowing to run the executable =snec= from anywhere.
 
 #+begin_src python
   from SNEC_output_parser import read_SNEC_hdf5
-  data = read_SNEC_hdf5(root+"output.h5")
+
+  data = read_SNEC_hdf5("output.h5")
   for key, val in sorted(data.items()):
       val = np.atleast_1d(val)
       print(f"{key:<40}  {str(val.shape):<20}  {val.dtype}")
@@ -131,9 +132,9 @@ allowing to run the executable =snec= from anywhere.
 You can access variables as:
 
 #+BEGIN_SRC  python
-    times       = data['fields/time']      # (n_times,), seconds
-    mass_grid   = (data['fields/mass']     # (n_zones, n_times), grams
-    radius_grid =  data['fields/radius']   # (n_zones, n_times), cm
+    times  = data['fields/time']     # (n_times,), seconds
+    mass   = data['fields/mass']     # (n_zones, n_times), grams
+    radius = data['fields/radius']   # (n_zones, n_times), cm
 #+END_SRC
 
 * Intermediate results
@@ -145,14 +146,14 @@ large_grid3 M(r) evolution in time
 [[file:.org_notes_figures/Intermediate_results/2026-02-26_20-13-41_screenshot.png]]
 
 
-
 #+DOWNLOADED: screenshot @ 2026-02-26 20:14:38
 [[file:.org_notes_figures/Intermediate_results/2026-02-26_20-14-38_screenshot.png]]
 
 
-* TODO =SNEC+fb= Objectives
+* TODO List =SNEC+fb= future objectives
 - [ ] implement density smoothing self-consistent with boxcar composition smoothing
 - [ ] read directly MESA files as option, instead of clunky python scripts.
+
 * Original =SNEC= resources
 
 - https://img.shields.io/badge/read-paper-blue.svg?style=flat

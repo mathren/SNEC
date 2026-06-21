@@ -81,6 +81,11 @@ subroutine input_parser
 
   call get_string_parameter('innerBC',innerBC,opt)
 
+!********************** Inner boundary ****************************************
+  call get_logical_parameter('restart',restart,opt)
+  call get_string_parameter('restart_file',restart_file,opt)
+
+
 !********************** WHEN TO DO THINGS *************************************
 
   call get_integer_parameter('ntmax',ntmax,opt)

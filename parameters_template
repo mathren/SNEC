@@ -1,7 +1,7 @@
-#____________LAUNCH_____________
+#____________OUTPUT LOCATION_____________
 outdir                  = "OUTDIR/Data"
 
-#___________PROFILE_____________
+#___________INPUT FILES_____________
 
 profile_name 		= "INPUT_PROFILE"
 
@@ -9,7 +9,7 @@ comp_profile_name	= "INPUT_COMP_FILE"
 
 grid_pattern_name       = "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/GridPattern.data"
 
-#__________EXPLOSION_____________
+#__________EXPLOSION DRIVING_____________
 
 initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
 
@@ -90,7 +90,12 @@ dtmax			= 1.0d2
 
 sedov			= 0
 
-#___________Inner boundary_________
+#___________INNER BOUNDARY_________
 # Options: "inflow" or empty string
 
 innerBC                = "inflow"
+
+#___________RESTART_________
+
+restart                = 0 # 1 for .true.
+restart_file           = "checkpoint.bin"
