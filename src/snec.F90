@@ -1,10 +1,10 @@
-program snec
+ program snec
 
   use blmod, only: dtime, dtime_p, time, nt, ntstart, tstart,   &
-       tdump, tdump_scalar, rho, tdump_check
+       tdump, tdump_scalar, rho, tdump_check, restart_file
+  use checkpoint, only: save_checkpoint
   use parameters
   use outinfomod, only: outinfo_count
-  use checkpoint, only: save_checkpoint
   implicit none
 
   logical :: OutputFlag = .false.
@@ -26,11 +26,8 @@ program snec
 
   call input_parser
 
-  if (restart == .true.) then
-     call problem_restart
-  else
-     call problem
-  end if
+  call problem
+
   call artificial_viscosity
 
   ! output before first timestep
@@ -98,7 +95,7 @@ program snec
      endif
 
      if ( time.ge.tdump_scalar) then
-        if (time.le.max_t_dense_out) then ! more output in the first 4h
+        if (time.le.max_t_dense_out) then ! more output in the first max_t_dense_out
            tdump_scalar=tdump_scalar+dtout_scalar/200.0
         else
            tdump_scalar =tdump_scalar+dtout
@@ -107,7 +104,7 @@ program snec
      endif
 
      if ( time.ge.tdump_check) then
-        if (time.le.max_t_dense_out) then ! more output in the first 4h
+        if (time.le.max_t_dense_out) then ! more output in the first max_t_dense_out
            tdump_check=tdump_check+dtout_check/200.0
         else
            tdump_check =tdump_check+dtout

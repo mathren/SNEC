@@ -5,6 +5,7 @@ subroutine problem
        do_bomb, inject_BE, total_initial_energy, bomb_total_energy, bomb_spread, &
        rho, kappa, kappa_table, dkappadt, tau, temp, p, delta_mass, &
        lambda, inv_kappa, lum, eos_gamma1, rBC_initial, iBC
+  use checkpoint
   use parameters
   use eosmodule
   use physical_constants
@@ -47,7 +48,15 @@ subroutine problem
 
   !********************* Allocate and initialize variables **********************
 
-  call get_ncomps_from_profile(composition_profile_name,ncomps)
+
+  if (restart .eqv. .true.) then
+     write(*,*)
+     write(*,*) "Restart from", restart_file
+     write(*,*)
+     call get_ncomps_from_checkpoint(restart_file, ncomps)
+  else
+     call get_ncomps_from_profile(composition_profile_name,ncomps)
+  end if
 
   call allocate_vars
 
@@ -55,18 +64,30 @@ subroutine problem
 
   !***************************** Grid setup *************************************
 
-  call get_inner_outer_mass_from_profile(profile_name,mass(1),mass(imax))
+  if (restart .eqv. .true.) then
+     call get_inner_outer_mass_from_checkpoint(restart_file,mass(1),mass(imax))
+     call get_inner_outer_radius_from_checkpoint(profile_name,mass(1),r(1),r(imax))
+     ! TODO read inner boundary radius r[iBC]
+  else
+     call get_inner_outer_mass_from_profile(profile_name,mass(1),mass(imax))
+     call get_inner_outer_radius_from_profile(profile_name,mass(1),r(1),r(imax))
+     rBC_initial = r(1)  ! anything falling under this threshold is excised
+  end if
 
-  if(mass_excision) then
+  if((mass_excision) .and. (restart .eqv. .false.))then
      mass(1) = mass_excised*msun
   endif
 
-  call get_inner_outer_radius_from_profile(profile_name,mass(1),r(1),r(imax))
 
   Rstar=r(imax)
-  rBC_initial = r(1)  ! anything falling under this threshold is excised
 
-  open(unit=666,file=trim(adjustl(trim(adjustl(outdir))//"/info.dat")), &
+  if (restart .eqv. .true.) then
+     filename = adjustl(trim(adjustl(outdir))//"/restart_info.dat")
+  else
+     filename = adjustl(trim(adjustl(outdir))//"/info.dat")
+  end if
+
+  open(unit=666,file=trim(filename), &
        status="unknown",form='formatted',position="append")
   write(666,*) 'Mass of the model = ', mass(imax)/msun, 'solar masses'
   write(666,*) 'Initial radius = ', Rstar/rsun, 'solar radii'
@@ -78,7 +99,11 @@ subroutine problem
   !*************************** Read the profile *********************************
 
   write(*,*) "Profile file: ",trim(profile_name)
-  call read_profile(profile_name)
+  if (restart .eqv. .true.) then
+     call read_checkpoint(restart_file)
+  else
+     call read_profile(profile_name)
+  end if
 
   !set up radius coordinates based on mass and density
   call integrate_radius_initial
@@ -98,57 +123,58 @@ subroutine problem
 
   call conservation_compute_energies
 
-  if (initial_data.eq."Progenitor_binding_energy") then
+  if (restart .eqv. .false.) then
+     if (initial_data.eq."Progenitor_binding_energy") then
 
-     inject_BE = .true.
+        inject_BE = .true.
 
-  else if(initial_data.eq."Piston_Explosion") then
+     else if(initial_data.eq."Piston_Explosion") then
 
-     do_piston = .true.
+        do_piston = .true.
 
-  else if(initial_data.eq."Thermal_Bomb") then
+     else if(initial_data.eq."Thermal_Bomb") then
 
-     do_bomb = .true.
+        do_bomb = .true.
 
-     if(bomb_mode.eq.1) then
-        bomb_total_energy = final_energy - total_initial_energy
-     else if (bomb_mode.eq.2) then
-        bomb_total_energy = final_energy
+        if(bomb_mode.eq.1) then
+           bomb_total_energy = final_energy - total_initial_energy
+        else if (bomb_mode.eq.2) then
+           bomb_total_energy = final_energy
+        else
+           write(6,"(A10,I3,A12)") "bomb_mode ",bomb_mode," not defined!"
+           stop
+        endif
+
+        write(6,"(A60)") "***************************************************************************"
+        write(6,"(A31,I3)") "Operating in Thermal Bomb Mode", bomb_mode
+
+        do i=1, imax
+           if(mass(i).ge.(mass(bomb_start_point)+bomb_mass_spread*msun)) then
+              bomb_spread = i - bomb_start_point
+              open(unit=666, &
+                 file=trim(adjustl(trim(adjustl(outdir))//"/info.dat")), &
+                 status="unknown",form='formatted',position="append")
+              write(666,*) 'Bomb energy is spread over = ', bomb_spread, 'points'
+              write(6,*) 'Bomb energy is spread over = ', bomb_spread, 'points'
+              close(666)
+              exit
+           end if
+        end do
+
+
+        open(unit=666,file=trim(adjustl(trim(adjustl(outdir))//"/info.dat")), &
+           status="unknown",form='formatted',position="append")
+        write(666,*) 'Total energy of the model = ', total_initial_energy, ' ergs'
+        write(666,*) 'Total energy of the bomb = ', bomb_total_energy, ' ergs'
+        write(6,*) 'Total energy of the model = ', total_initial_energy, ' ergs'
+        write(6,*) 'Total energy of the bomb = ', bomb_total_energy, ' ergs'
+        close(666)
+
      else
-        write(6,"(A10,I3,A12)") "bomb_mode ",bomb_mode," not defined!"
-        stop
+        stop "Wrong type of explosion, check the parameter 'initial_data'"
      endif
-
      write(6,"(A60)") "***************************************************************************"
-     write(6,"(A31,I3)") "Operating in Thermal Bomb Mode", bomb_mode
-
-     do i=1, imax
-        if(mass(i).ge.(mass(bomb_start_point)+bomb_mass_spread*msun)) then
-           bomb_spread = i - bomb_start_point
-           open(unit=666, &
-                file=trim(adjustl(trim(adjustl(outdir))//"/info.dat")), &
-                status="unknown",form='formatted',position="append")
-           write(666,*) 'Bomb energy is spread over = ', bomb_spread, 'points'
-           write(6,*) 'Bomb energy is spread over = ', bomb_spread, 'points'
-           close(666)
-           exit
-        end if
-     end do
-
-
-     open(unit=666,file=trim(adjustl(trim(adjustl(outdir))//"/info.dat")), &
-          status="unknown",form='formatted',position="append")
-     write(666,*) 'Total energy of the model = ', total_initial_energy, ' ergs'
-     write(666,*) 'Total energy of the bomb = ', bomb_total_energy, ' ergs'
-     write(6,*) 'Total energy of the model = ', total_initial_energy, ' ergs'
-     write(6,*) 'Total energy of the bomb = ', bomb_total_energy, ' ergs'
-     close(666)
-
-  else
-     stop "Wrong type of explosion, check the parameter 'initial_data'"
-  endif
-  write(6,"(A60)") "***************************************************************************"
-
+  end if
 
   !****************** initialize some vairables *********************************
 

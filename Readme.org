@@ -153,6 +153,22 @@ large_grid3 M(r) evolution in time
 * TODO List =SNEC+fb= future objectives
 - [ ] implement density smoothing self-consistent with boxcar composition smoothing
 - [ ] read directly MESA files as option, instead of clunky python scripts.
+- [ ] checkpoints see corresponding branch
+* Checkpoints implementations
+Original =SNEC= set up the infrastructure but did not implement restarts
+from checkpoints. In =SNEC+fb=, you may need to do long runs with small
+timesteps to resolve the infall. You can save restart files every
+=ntout_check= timesteps or every =dtout_check= seconds form parameters.
+
+To restart, edit
+
+#+BEGIN_SRC
+restart                =  .true. # .false. #
+restart_file           = "checkpoint.bin"
+#+END_SRC
+
+Thermal bomb, piston, and mass excision are applied *only* at the
+beginning, and these parameters are ignored in restarts.
 
 * Original =SNEC= resources
 

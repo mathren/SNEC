@@ -1,7 +1,8 @@
 include ../make.inc
 
 
-SOURCES=problem.F90\
+SOURCES=checkpoint.F90\
+	problem.F90\
 	allocate_vars.F90\
 	eos_switch.F90\
 	eos_content.F90\
@@ -40,18 +41,18 @@ OBJECTS=$(SOURCES:.F90=.o)
 all: blmod.o outinfo.o snec
 
 blmod.o: blmod.F90
-	$(F90) $(F90FLAGS) $(DEFS) $(MODINC) -c blmod.F90	
+	$(F90) $(F90FLAGS) $(DEFS) $(MODINC) -c blmod.F90
 
-snec: $(OBJECTS) 
-	$(F90) $(LDFLAGS) -o ../snec  blmod.o $(OBJECTS) $(EXTRAOBJECTS) $(EXTRALIBS) $(LIBS) 
+snec: $(OBJECTS)
+	$(F90) $(LDFLAGS) -o ../snec  blmod.o $(OBJECTS) $(EXTRAOBJECTS) $(EXTRALIBS) $(LIBS)
 
 $(OBJECTS): %.o: %.F90 $(EXTRADEPS)
 	$(F90) $(F90FLAGS) $(DEFS) $(MODINC) $(EXTRAINCS) -c $< -o $@
 
-snec.o: blmod.o  
+snec.o: blmod.o
 
-input_parser.o: blmod.o 
+input_parser.o: blmod.o
 
 
-clean: 
+clean:
 	$(CLEANSTUFF)

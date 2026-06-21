@@ -243,6 +243,7 @@ module parameters
   logical :: restart = .false.  ! default to false
   character(len=256) :: restart_file = " "  ! default to empty string
 
+
 end module parameters
 
 !############################# EOS MODULE #####################################

@@ -1,15 +1,15 @@
-#____________LAUNCH_____________
+#____________OUTPUT LOCATION_____________
 outdir                  = "./Data_test"
 
-#___________PROFILE_____________
+#___________INPUT FILES_____________
 
-profile_name 		= "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/profile_end.short"
+profile_name 		= "profiles/15Msol_RSG.short"
 
-comp_profile_name	= "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/profile_end.iso.dat"
+comp_profile_name	= "profiles/15Msol_RSG.iso.dat"
 
-grid_pattern_name       = "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/GridPattern.data"
+grid_pattern_name       = "profiles/Grid_pattern_15RSG.dat"
 
-#__________EXPLOSION_____________
+#__________EXPLOSION DRIVING_____________
 
 initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
 
@@ -23,15 +23,15 @@ initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
 # piston_tend		= 1.0d-2
 
 bomb_mode		= 1 # add to bomb binding energy
-final_energy		= 5.0d50 # 5.0d50
+final_energy		= 1.0d51
 bomb_tstart		= 0.0d0
 bomb_tend		= 1.0d-2
-bomb_mass_spread	= 0.1d0  # (in solar mass)
+bomb_mass_spread	= 0.01  # (in solar mass)
 bomb_start_point	= 1
 
 #_____________GRID_______________
 
-imax			= 2442 # 3208 # 2442
+imax			= 3208 # IMAX
 
 gridding		= "from_file_by_mass" # "uniform_in_mass"
 
@@ -53,7 +53,7 @@ eoskey			= 2 # 1
 
 Ni_by_hand		= 0  # Farmer+23 provide models at onset of collapse
 Ni_switch		= 0
-Ni_mass			= 0.0d0 # 0.0d0 # 0.028
+Ni_mass			= 0.028
 Ni_boundary_mass	= 2.9d0
 
 Ni_period		= 1.0d4
@@ -69,17 +69,17 @@ opacity_floor_core	= 0.01d0
 
 ntmax			= 10000000000
 
-tend			=  8640000.0d0  # 100 days 604800.0d0 # 1 week
+tend			= 86400.0d0
 
-max_t_dense_out         = 100.0d0 # denser output until this
+max_t_dense_out         = 10.0d0 # denser output until this
 
-dtout			= 3600.0d0
-dtout_scalar		= 3600.0d0
-dtout_check		= 3600.0d0
+dtout			= 100.0d0
+dtout_scalar		= 100.0d0
+dtout_check		= 1.0d0
 
 ntout			= -1
 ntout_scalar		= -1
-ntout_check		= 1000
+ntout_check		= 4
 
 ntinfo			= 1000
 
@@ -90,7 +90,12 @@ dtmax			= 1.0d2
 
 sedov			= 0
 
-#___________Inner boundary_________
-# Options: "inflow" or empty string ""
+#___________INNER BOUNDARY_________
+# Options: "inflow" or empty string
 
-innerBC                = "inflow"  # "inflow"
+innerBC                = "inflow"
+
+#___________RESTART_________
+
+restart                = 0 # 1 for .true.
+restart_file           = "checkpoint.bin"
