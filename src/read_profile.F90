@@ -197,7 +197,6 @@ end subroutine read_profile
 
 !******************************************************************************
 subroutine map_linterp(x1,x2,y1,y2,x,y)
-
 ! perform linear interpolation
   implicit none
 

@@ -97,4 +97,4 @@ innerBC                = "inflow"
 #___________RESTART_________
 
 restart                = 1
-restart_file           = "checkpoint.bin"
+restart_file           = "checkpoint.bin" # must be in outdir

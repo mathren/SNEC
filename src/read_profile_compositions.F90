@@ -85,7 +85,7 @@ subroutine read_profile_compositions(prof_name)
   end if
   enddo
 
-  if(Ni_switch.eq.1 .and. Ni_number.eq.0 .and. restart .eqv. .false.) then
+  if(Ni_switch.eq.1 .and. Ni_number.eq.0) then
       write(*,*) 'radioactive Ni is absent in the composition profile'
       write(*,*) 'please, add a column for it (see documentation of the code)'
       write(*,*) 'or put Ni_switch = 0'
