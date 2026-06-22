@@ -51,9 +51,9 @@ subroutine problem
 
   if (restart .eqv. .true.) then
      write(*,*)
-     write(*,*) "Restart from", restart_file
+     write(*,*) "Restarting from ", trim(adjustl(outdir))//"/"//trim(adjustl(restart_file))
      write(*,*)
-     call get_ncomps_from_checkpoint(restart_file, ncomps)
+     call get_ncomps_from_checkpoint(ncomps)
   else
      call get_ncomps_from_profile(composition_profile_name,ncomps)
   end if
@@ -65,8 +65,8 @@ subroutine problem
   !***************************** Grid setup *************************************
 
   if (restart .eqv. .true.) then
-     call get_inner_outer_mass_from_checkpoint(restart_file,mass(1),mass(imax))
-     call get_inner_outer_radius_from_checkpoint(profile_name,mass(1),r(1),r(imax))
+     call get_inner_outer_mass_from_checkpoint(mass(1),mass(imax))
+     call get_inner_outer_radius_from_checkpoint(mass(1),r(1),r(imax))
      ! TODO read inner boundary radius r[iBC]
   else
      call get_inner_outer_mass_from_profile(profile_name,mass(1),mass(imax))
@@ -98,10 +98,10 @@ subroutine problem
 
   !*************************** Read the profile *********************************
 
-  write(*,*) "Profile file: ",trim(profile_name)
   if (restart .eqv. .true.) then
-     call read_checkpoint(restart_file)
+     call read_checkpoint() ! which file determined in parameters
   else
+     write(*,*) "Profile file: ",trim(profile_name)
      call read_profile(profile_name)
   end if
 

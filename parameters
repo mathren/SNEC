@@ -67,19 +67,18 @@ opacity_floor_core	= 0.01d0
 
 #___________TIMING_______________
 
-ntmax			= 10000000000
-
+ntmax			= 200
 tend			= 86400.0d0
 
-max_t_dense_out         = 10.0d0 # denser output until this
+max_t_dense_out         = -10.0d0 # denser output until this
 
-dtout			= 100.0d0
-dtout_scalar		= 100.0d0
+dtout			= -100.0d0
+dtout_scalar		= -100.0d0
 dtout_check		= 1.0d0
 
 ntout			= -1
 ntout_scalar		= -1
-ntout_check		= 4
+ntout_check		= 100
 
 ntinfo			= 1000
 
@@ -97,5 +96,5 @@ innerBC                = "inflow"
 
 #___________RESTART_________
 
-restart                = 0 # 1 for .true.
+restart                = 1
 restart_file           = "checkpoint.bin"

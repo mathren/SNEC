@@ -1,7 +1,7 @@
  program snec
 
   use blmod, only: dtime, dtime_p, time, nt, ntstart, tstart,   &
-       tdump, tdump_scalar, rho, tdump_check, restart_file
+       tdump, tdump_scalar, rho, tdump_check
   use checkpoint, only: save_checkpoint
   use parameters
   use outinfomod, only: outinfo_count
@@ -127,12 +127,12 @@
      endif
 
      if (OutputFlagCheck) then
-        call save_checkpoint(restart_file)
+        call save_checkpoint() ! where set in parameters
         OutputFlagCheck = .false.
      endif
 
      if (time.eq.tend) then
-        write(*,*) "Done! :-) tend reached"
+        write(*,*) "Done! :-) tend reached", time
         call output_all(0)
         call output_all(1)
         call output_all(2)
@@ -140,7 +140,7 @@
      endif
 
      if (nt.ge.ntmax) then
-        write(*,*) "Done! :-) ntmax reached"
+        write(*,*) "Done! :-) ntmax reached", nt
         call output_all(0)
         call output_all(1)
         call output_all(2)
