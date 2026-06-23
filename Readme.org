@@ -108,7 +108,6 @@ allowing to run the executable =snec= from anywhere.
   fields/rho                                (1265, 511)           float64
   fields/tau                                (1265, 511)           float64
   fields/temp                               (1265, 511)           float64
-  fields/time                               (511,)                float64
   fields/time_diff                          (1265, 511)           float64
   fields/time_exp                           (1265, 511)           float64
   fields/vel                                (1265, 511)           float64

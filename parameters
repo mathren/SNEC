@@ -51,9 +51,9 @@ eoskey			= 2 # 1
 #1 - ideal eos
 #2 - Paczynski
 
-Ni_by_hand		= 0  # Farmer+23 provide models at onset of collapse
-Ni_switch		= 0
-Ni_mass			= 0.0d0 # 0.0d0 # 0.028
+Ni_by_hand		= 1  # Farmer+23 provide models at onset of collapse
+Ni_switch		= 1
+Ni_mass			= 0.03d0
 Ni_boundary_mass	= 2.9d0
 
 Ni_period		= 1.0d4
@@ -69,9 +69,9 @@ opacity_floor_core	= 0.01d0
 
 ntmax			= 10000000000
 
-tend			=  8640000.0d0  # 100 days 604800.0d0 # 1 week
+tend			=  1728000.0d0 # 20d #8640000.0d0  # 100 days 604800.0d0 # 1 week
 
-max_t_dense_out         = 100.0d0 # denser output until this
+max_t_dense_out         = 1000.0d0 # denser output until this
 
 dtout			= 3600.0d0
 dtout_scalar		= 3600.0d0
