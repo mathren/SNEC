@@ -83,48 +83,47 @@ allowing to run the executable =snec= from anywhere.
 #+end_src
 
 #+begin_src
-  fields/E_shell                            (1265, 511)           float64
-  fields/H_1                                (1265, 511)           float64
-  fields/H_2                                (1265, 511)           float64
-  fields/He_1                               (1265, 511)           float64
-  fields/He_2                               (1265, 511)           float64
-  fields/He_3                               (1265, 511)           float64
-  fields/Ni_deposit_function                (1265, 511)           float64
-  fields/Q                                  (1265, 511)           float64
-  fields/cs2                                (1265, 511)           float64
-  fields/delta_time                         (1265, 511)           float64
-  fields/eps                                (1265, 511)           float64
-  fields/free_electron_frac                 (1265, 511)           float64
-  fields/kappa                              (1265, 511)           float64
-  fields/kappa_table                        (1265, 511)           float64
-  fields/logR_op                            (1265, 511)           float64
-  fields/logT                               (1265, 511)           float64
-  fields/lum                                (1265, 511)           float64
-  fields/mass                               (1265, 511)           float64
-  fields/p_rad                              (1265, 511)           float64
-  fields/photosphere_tracer                 (1265, 511)           float64
-  fields/press                              (1265, 511)           float64
-  fields/radius                             (1265, 511)           float64
-  fields/rho                                (1265, 511)           float64
-  fields/tau                                (1265, 511)           float64
-  fields/temp                               (1265, 511)           float64
-  fields/time_diff                          (1265, 511)           float64
-  fields/time_exp                           (1265, 511)           float64
-  fields/vel                                (1265, 511)           float64
-  fields/ye                                 (1265, 511)           float64
-  scalars/Ni_total_luminosity               (511,)                float64
-  scalars/T_eff                             (511,)                float64
-  scalars/index_lumshell                    (511,)                int32
-  scalars/index_photo                       (511,)                int32
-  scalars/inner_boundary                    (511,)                int32
-  scalars/lum_observed                      (511,)                float64
-  scalars/lum_photo                         (511,)                float64
-  scalars/mass_lumshell                     (511,)                float64
-  scalars/mass_photo                        (511,)                float64
-  scalars/opacity_corrupted                 (511,)                int32
-  scalars/rad_photo                         (511,)                float64
-  scalars/time                              (511,)                float64
-  scalars/vel_photo                         (511,)                float64
+fields/E_shell                            (2442, 2407)          float64
+fields/H_1                                (2442, 2407)          float64
+fields/H_2                                (2442, 2407)          float64
+fields/He_1                               (2442, 2407)          float64
+fields/He_2                               (2442, 2407)          float64
+fields/He_3                               (2442, 2407)          float64
+fields/Q                                  (2442, 2407)          float64
+fields/cs2                                (2442, 2407)          float64
+fields/delta_time                         (2442, 2407)          float64
+fields/eps                                (2442, 2407)          float64
+fields/free_electron_frac                 (2442, 2407)          float64
+fields/kappa                              (2442, 2407)          float64
+fields/kappa_table                        (2442, 2407)          float64
+fields/logR_op                            (2442, 2407)          float64
+fields/logT                               (2442, 2407)          float64
+fields/lum                                (2442, 2407)          float64
+fields/mass                               (2442, 2407)          float64
+fields/p_rad                              (2442, 2407)          float64
+fields/photosphere_tracer                 (2442, 2407)          float64
+fields/press                              (2442, 2407)          float64
+fields/radius                             (2442, 2407)          float64
+fields/rho                                (2442, 2407)          float64
+fields/tau                                (2442, 2407)          float64
+fields/temp                               (2442, 2407)          float64
+fields/time_diff                          (2442, 2407)          float64
+fields/time_exp                           (2442, 2407)          float64
+fields/vel                                (2442, 2407)          float64
+fields/ye                                 (2442, 2407)          float64
+scalars/Ni_total_luminosity               (2407,)               float64
+scalars/T_eff                             (4814,)               float64
+scalars/index_lumshell                    (2407,)               int32
+scalars/index_photo                       (2407,)               int32
+scalars/inner_boundary                    (2407,)               int32
+scalars/lum_observed                      (2407,)               float64
+scalars/lum_photo                         (2407,)               float64
+scalars/mass_lumshell                     (2407,)               float64
+scalars/mass_photo                        (2407,)               float64
+scalars/opacity_corrupted                 (2407,)               int32
+scalars/rad_photo                         (2407,)               float64
+scalars/time                              (2407,)               float64
+scalars/vel_photo                         (2407,)               float64
 #+end_src
 
 You can access variables as:

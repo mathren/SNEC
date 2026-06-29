@@ -1,7 +1,9 @@
 subroutine read_profile_compositions(prof_name)
 
   use blmod, only: comp, comp_details, cmass, H_number, He_number, C_number, &
-                    O_number, Ni_number, mass, ye, abar, metallicity, ncomps
+                    O_number, Ni_number, mass, ye, abar, metallicity, ncomps, &
+                    iBC
+
   use parameters
   use physical_constants
   implicit none
@@ -43,13 +45,13 @@ subroutine read_profile_compositions(prof_name)
   !read in Z's
   read(666,*) comp_details(1:ncomps,2)
 
-  do i=1,profile_zones
+  do i=iBC,profile_zones
      read(666,*) pmass(i),pradius(i),pcomp(i,1:ncomps)
   enddo
   close(666)
 
   !mass fractions live at the cell centers
-  do i=1,imax-1
+  do i=iBC,imax-1
       do l=1,ncomps
         call map_map(comp(i,l), cmass(i), pcomp(:,l), pmass, profile_zones)
      enddo
@@ -71,7 +73,7 @@ subroutine read_profile_compositions(prof_name)
   O_number = 0
   Ni_number = 0
 
-  do l=1,ncomps 
+  do l=1,ncomps
   if(comp_details(l,2).eq.1.0d0 .and. comp_details(l,1).eq.1.0d0) then
       H_number = l  !hydrogen
   else if(comp_details(l,2).eq.2.0d0 .and. comp_details(l,1).eq.4.0d0) then
@@ -95,11 +97,10 @@ subroutine read_profile_compositions(prof_name)
   !seed Ni by hand as a step function before renormalization and boxcar
   if (Ni_by_hand.ne.0) then
     Ni_mass_fraction = Ni_mass/(Ni_boundary_mass-mass(1)/msun)
-
     call map_find_index(imax,mass,Ni_boundary_mass*msun,Ni_boundary_index,ibuffer)
 
     if(Ni_number.ne.0) then
-        do i=1, imax
+        do i=iBC, imax
             if(i.lt.Ni_boundary_index) then
                 comp(i,Ni_number) = Ni_mass_fraction
             else
@@ -110,7 +111,7 @@ subroutine read_profile_compositions(prof_name)
   end if
 
   !normalize composition sum to 1
-  do i=1,imax
+  do i=iBC,imax
       if(Ni_number.eq.0) then
           comp(i,1:ncomps) = comp(i,1:ncomps)/sum(comp(i,1:ncomps))
       else !the fraction of Ni shouldn't change
@@ -131,7 +132,7 @@ subroutine read_profile_compositions(prof_name)
 
 
   !set Y_e and abar
-  do i=1,imax
+  do i=iBC,imax
       ye(i) = sum(comp(i,1:ncomps)* &
           (comp_details(1:ncomps,2)/comp_details(1:ncomps,1)))
       abar(i) = 1.0d0/sum(comp(i,1:ncomps)/comp_details(1:ncomps,1))
@@ -160,7 +161,7 @@ subroutine read_profile_compositions(prof_name)
 
 
   !calculate metallicity as 1 - He_fraction - H_fraction, output initial value
-  do i=1,imax
+  do i=iBC, imax
       if(H_number.ne.0 .and. He_number.ne.0) then
           metallicity(i) = 1 - comp(i,H_number) - comp(i,He_number)
       else if(H_number.ne.0 .and. He_number.eq.0) then

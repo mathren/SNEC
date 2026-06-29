@@ -33,15 +33,16 @@ subroutine nickel_heating
 !------------------------------------------------------------------------------
 !based on the work of Swartz et al., ApJ 446:766 (1995)
 
-  
-  if(Ni_switch.eq.0) then 
+
+  if(Ni_switch.eq.0) then
      !****** heating by Ni is not taken into account *******
 
      Ni_heating(:) = 0.0d0
      Ni_deposit_function(:) = 0.0d0
      Ni_total_luminosity = 0.0d0
 
-  else 
+  else
+
      !*** solve for the local heating due to the radioactive decay of Ni ****
 
      i_Ni = 0
@@ -52,7 +53,7 @@ subroutine nickel_heating
            exit
         endif
      enddo
-     
+
      ! find the limits of integration with respect to the polar angle
      if(i_Ni.eq.0) then
         write(*,*) 'mass fraction of Ni is lower than NIMIN in every grid point'
@@ -86,10 +87,10 @@ subroutine nickel_heating
            delta_r = r_max/npoints_radial_integration
            I_prime = 0
            r_x = r_max
-           
+
            do while(r_x.gt.0)
               r_j = sqrt(r(i)*r(i) + r_x*r_x + 2.0d0*r(i)*r_x*cos(th))
-              
+
               if(r_j.le.r(1)) then !inside the excised region
                  delta_tau_j = 0.0d0
                  comp_Ni_j = 0.0d0
@@ -109,7 +110,7 @@ subroutine nickel_heating
            I_prime_av = I_prime_av + I_prime*sin(th)*delta_th*0.5d0
            th = th - delta_th
         end do
-        
+
         Ni_deposit_function(i) = I_prime_av
      end do
 
@@ -123,7 +124,6 @@ subroutine nickel_heating
      ! total energy per second, deposited to the model by gamma-rays
      Ni_total_luminosity = &
           Ni_energy_rate*sum(Ni_deposit_function(1:imax)*delta_mass(1:imax))
-
   end if
 
 end subroutine nickel_heating
