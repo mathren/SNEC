@@ -25,7 +25,7 @@ subroutine hydro_rad
   real*8 :: p_temp(imax), eps_temp(imax), lum_temp(imax), temp_temp(imax)
   real*8 :: lambda_temp(imax)
 
-  real*8, parameter :: EPSTOL = 1.0d-7
+  real*8, parameter :: EPSTOL = 1.0d-5
   integer, parameter :: ITMAX = 300
 
 
