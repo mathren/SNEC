@@ -24,6 +24,7 @@ __author__ = ["Mathieu Renzo <mrenzo@arizona.edu>"]
 import os
 from MESAreader import get_src_col
 from short_and_iso import prepare_SNEC_input
+import shutils
 # from utilsLib import checkFolder, gitPush
 
 
@@ -70,15 +71,15 @@ if __name__ == "__main__":
 
     # SNEC_ROOT="/home/u20/mrenzo/codes/SNEC/" # cluster_ua
     SNEC_ROOT = "/home/mrenzo/Documents/Research/codes/SNEC-1.01/" # ua_w
-    OUTDIR_ROOT='/home/mrenzo/Runs/SNEC_grid/bomb_spread/15Msun/' # s30VdJNL_0.33/'
+    OUTDIR_ROOT="/home/mrenzo/Runs/LMXRB/SNEC_expl/farmer23/expl_energies/" # s30VdJNL_0.33/'
     # if below is None use SNEC provided model
-    INPUT_MESA_FILE = None # "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/s30VdJNL_0.33_onset_cc.data" # None #
+    INPUT_MESA_FILE = "/home/mrenzo/Runs/LMXRB/CCSN_progenitors/farmer23/SNEC_input/"
     # final_energies need to be strings including a decimal point and d for exponential notation, or SNEC will complain
-    BOMB_MASS_SPREAD = "0.0d0"
-    bomb_spreads = ["0.1d0", "0.25d0", "0.35d0", "1.0d0", "2.0d0",
-                    "2.5d0", "3.0d0", "4.0d0", "5.0d0", "6.0d0", "8.0d0", "10.0d0",
-                    "11.0d0", "12.9d0"]
-
+    BOMB_MASS_SPREAD = "0.1d0"
+    # bomb_spreads = ["0.1d0", "0.25d0", "0.35d0", "1.0d0", "2.0d0",
+    #                 "2.5d0", "3.0d0", "4.0d0", "5.0d0", "6.0d0", "8.0d0", "10.0d0",
+    #                 "11.0d0", "12.9d0"]
+    FINAL_ENERGY = ["0.4d50", "0.5d50", "0.6d50", "0.7d50", "0.8d50", "0.9d50", "1d51"]
     # check if folder exists and user wants to erase it
     if os.path.isdir(OUTDIR_ROOT):
         print("Folder "+OUTDIR_ROOT+" exists!")
@@ -90,10 +91,10 @@ if __name__ == "__main__":
             os.system("rm -rf "+OUTDIR_ROOT)
             print("...removed pre-existing "+OUTDIR_ROOT)
 
-    for BOMB_MASS_SPREAD in bomb_spreads:
-        print("working on "+f"{BOMB_MASS_SPREAD}")
+    for E in FINAL_ENERGY:
+        print("working on "+f"{E}")
 
-        OUTDIR = OUTDIR_ROOT+"/bomb_mass_spread_"+str(BOMB_MASS_SPREAD)+"/"
+        OUTDIR = OUTDIR_ROOT+"/energy_"+str(E)+"/"
 
         # make directory and SNEC output directory
         os.system("mkdir -p "+OUTDIR+"/Data/")
@@ -110,15 +111,15 @@ if __name__ == "__main__":
         setup_one_model(INPUT_SHORT, INPUT_COMP_FILE,
                         parameters_template=SNEC_ROOT+"/parameters_template",
                         OUTDIR=OUTDIR,
-                        BOMB_MASS_SPREAD=BOMB_MASS_SPREAD,
+                        FINAL_ENERGY=E
                         )
 
         # copy SNEC executable -- assumes code is already compiled
         os.system("cp "+SNEC_ROOT+"snec "+OUTDIR)
 
-        # make submission script
-        with open(OUTDIR_ROOT+"run_all.sh", "w") as f:
-            run_all_bash = """#!/bin/bash
+    # make submission script
+    with open(OUTDIR_ROOT+"run_all.sh", "w") as f:
+        run_all_bash = """#!/bin/bash
 
 for dir in */; do
     cd \"$dir\"
@@ -127,13 +128,18 @@ for dir in */; do
 done
 pgrep -a snec
 """
-            # oneliner -- no terminal ouput
-            # "#!/bin/bash\n\nfor dir in */; do\n\tcd \"$dir\"\n\t./snec &\n\tcd ..\ndone"
-            f.write(run_all_bash)
-        # give -x permissions
-        os.chmod(OUTDIR_ROOT+"run_all.sh", 0o755)
+        # oneliner -- no terminal ouput
+        # "#!/bin/bash\n\nfor dir in */; do\n\tcd \"$dir\"\n\t./snec &\n\tcd ..\ndone"
+        f.write(run_all_bash)
+    # give -x permissions
+    os.chmod(OUTDIR_ROOT+"run_all.sh", 0o755)
 
-        print ("Done grid setup in")
-        print("")
-        print(OUTDIR_ROOT)
-        print("")
+    #Backup script
+    shutil.copy(__file__, WHERE_TO_RUN)
+
+
+
+    print ("Done grid setup in")
+    print("")
+    print(OUTDIR_ROOT)
+    print("")
