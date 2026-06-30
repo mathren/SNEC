@@ -314,7 +314,7 @@ subroutine output_screenshot(var,filename,imaximum)
 
   implicit none
   real*8 var(*)
-  character(len=100) filename
+  character(len=512) filename
   integer nt
   integer i
   integer imaximum

@@ -13,7 +13,7 @@ subroutine problem
   real*8 :: buffer(imax)
 
   integer :: i
-  character(len=256) :: filename
+  character(len=1024) :: filename
 
   !for OPAL interpolation routine
   real*4 :: opact,dopact,dopacr,dopactd

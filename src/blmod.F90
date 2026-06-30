@@ -159,19 +159,19 @@ module parameters
 
   !-------------------- launch --------------------------------
 
-  character(len=256) :: outdir
+  character(len=512) :: outdir
 
   !-------------------- profile -------------------------------
 
-  character(len=256) :: profile_name
-  character(len=256) :: composition_profile_name
-  character(len=256) :: grid_pattern_name
+  character(len=512) :: profile_name
+  character(len=512) :: composition_profile_name
+  character(len=512) :: grid_pattern_name
 
-  !------------------- explosion ------------------------------
+  !------------------- Explosion ------------------------------
 
-  character(len=256) :: initial_data
+  character(len=512) :: initial_data
 
-  !piston stuff
+  !Piston stuff
   real*8  :: piston_vel
   real*8  :: piston_tstart
   real*8  :: piston_tend
