@@ -5,8 +5,9 @@ subroutine hydro_rad
   use physical_constants
   implicit none
 
-  integer :: i,k
+  integer :: i,j,k,n
   integer :: keytemp,keyerr
+  integer :: iBC_new
   real*8 :: dtv
 
   ! Variables for inversion of Jacobian
@@ -33,6 +34,8 @@ subroutine hydro_rad
 
   ! follow dt convention of MB93:
   dtv = 0.5d0 * (dtime + dtime_p)
+
+  location_max = iBC
 
   ! copy over data into _p arrays
   rho_p(:) = rho(:)
@@ -68,10 +71,9 @@ subroutine hydro_rad
           - dtv * 4.0d0*pi * (cr(i)**2 * Q(i) - cr(i-1)**2 * Q(i-1))/delta_cmass(i-1)
   end do
 
-  ! hack inner boundary to be inflow no backreaction
+  ! inflow-only (no backreaction) inner boundary
   if (innerBC == "inflow") then
-     vel(iBC) = min(0.0, vel(iBC+1))
-     ! vel(iBC) = min(0.0d0, vel(iBC+1)) !vel(iBC+1)
+     vel(iBC) = min(0.0d0, vel(iBC+1))
   else
      vel(iBC) = 0.0d0
   end if
@@ -82,45 +84,49 @@ subroutine hydro_rad
   end do
 
   ! now we have updated radii and velocities: do we need to move the
-  ! inner boundary index (iBC)? cut everything reaching r smaller thana
-  ! the initial smaller radius, a fixed boundary
+  ! inner boundary index (iBC)? Everything that reached r < rBC_initial is
+  ! excised. Take the OUTERMOST face that fell inside, so that zone
+  ! crossings during fallback are absorbed instead of aborting the run.
   if (innerBC == "inflow") then
-     i = iBC
-     do while (i<imax)
-        if (r(i)>= rBC_initial) then
-           ! i is first cell with outer boundary
-           ! above initial inner boundary
-           iBC = i
-           exit
-        end if
-        i = i+1 ! loop outward
+     iBC_new = iBC
+     do i=iBC, imax-1
+        if (r(i) <= rBC_initial) iBC_new = i
      end do
-     if (i==imax) then
-        write(*,*) "Inner boundary > Outer boundary"
+
+     if (iBC_new.ge.imax-1) then
+        write(*,*) "hydro_rad: inner boundary reached the outer zones, stopping"
         stop
      end if
+
+     iBC = iBC_new
+     ! the excision radius is fixed: pull the new boundary face back onto it
+     r(iBC)   = max(r(iBC), rBC_initial)
+     vel(iBC) = min(0.0d0, vel(iBC+1))
+
      if (iBC>1) then
-        ! flatten everything inside inner boundary
-        ! prevent pressure, temperature and internal
-        ! energy gradients which could cause backreaction
-        vel(1:iBC-1)= 0.0d0
-        !! Reset radii at inside and at the boundary
-        r(1:iBC-1) = 1d6
-        ! N.B.: we ignore change in volume of inner cell,
-        ! since anyways we apply a zero gradient condition
-        ! the energy density, mass density, etc. are copied from the cell above
-        eps(1:iBC-1) = eps(iBC)
-        p(1:iBC-1) = p(iBC)
+        ! flatten everything inside the inner boundary to prevent pressure,
+        ! temperature and internal energy gradients that could push back
+        vel(1:iBC-1) = 0.0d0
+        ! keep the dead radii monotonically ordered and below r(iBC): several
+        ! routines (optical_depth, nickel_heating/map_find_index, analysis)
+        ! assume a monotonic r(1:imax)
+        do i=1, iBC-1
+           r(i) = 0.95d0*r(iBC)*dble(i-1)/dble(iBC-1)
+        end do
+        ! zero-gradient extrapolation into the excised region
+        eps(1:iBC-1)  = eps(iBC)
+        p(1:iBC-1)    = p(iBC)
         temp(1:iBC-1) = temp(iBC)
+        rho(1:iBC-1)  = rho(iBC)
      end if
   end if
-
 
   do i=iBC+1, imax ! check radial ordering outside inner boundary
      if ((r(i).lt.r(i-1))) then
         write(*,*) 'radius of a gridpoint', i, 'is less than preceding'
-        write(*,*) 'boundary at cell', iBC
-        stop
+        write(*,*) 'boundary at cell', iBC, ' - retrying with a smaller dt'
+        scratch_step = .true.
+        return
      end if
   end do
 
@@ -160,13 +166,30 @@ subroutine hydro_rad
      bomb_heating(:) = 0.0d0
   end if
 
+  ! no heating inside the excised region
+  if (iBC>1) then
+     bomb_heating(1:iBC-1) = 0.0d0
+     Ni_heating(1:iBC-1)   = 0.0d0
+  end if
+
   !Initial guess for the quantities at the next time step
   p_temp(1:imax) = p(1:imax)
   eps_temp(1:imax) = eps(1:imax)
   temp_temp(1:imax) = temp(1:imax)
 
+  ! number of unknowns: the active zones iBC ... imax-1
+  n = imax - iBC
+
   ! NR iterations start
   do k=1, ITMAX
+
+     ! re-impose the zero-gradient condition on the excised zones so that the
+     ! ghost state stays slaved to the current iterate of zone iBC
+     if (iBC>1) then
+        temp_temp(1:iBC-1) = temp_temp(iBC)
+        p_temp(1:iBC-1)    = p_temp(iBC)
+        eps_temp(1:iBC-1)  = eps_temp(iBC)
+     end if
 
      keytemp = 1
      call eos(rho(1:imax-1),temp_temp(1:imax-1),ye(1:imax-1), &
@@ -184,26 +207,27 @@ subroutine hydro_rad
           eps_temp(:), p_temp(:), lum_temp(:), &
           Aarray(:), Barray(:), Carray(:), Darray(:))
 
-     ! initialize to zero at every
+     ! initialize to zero at every iteration
      ab(:,:)=0.0d0
-     !assemble the matrix in the form used by lapack
-     ab(2,2:imax-1) = Aarray(1:imax-2)
-     ab(3,1:imax-1) = Barray(1:imax-1)
-     ab(4,1:imax-2) = Carray(2:imax-1)
+     !assemble the matrix in the form used by lapack, for the active
+     !zones only: local index j = i - iBC + 1, j = 1 ... n
+     ab(2,2:n)   = Aarray(iBC:imax-2)
+     ab(3,1:n)   = Barray(iBC:imax-1)
+     ab(4,1:n-1) = Carray(iBC+1:imax-1)
 
-     b(1:imax-1) = Darray(1:imax-1)
+     b(1:n) = Darray(iBC:imax-1)
 
      !invert the matrix
      !if the inversion fails, the whole matrix is written in 'failed_matrix.dat'
      info = 0
-     call dgbsv(imax-1,kl,ku,1,ab,ldab,ipiv,b,imax-1,info)
+     call dgbsv(n,kl,ku,1,ab,ldab,ipiv,b,n,info)
 
      if(info.ne.0) then
         open(unit=666, &
              file=trim(adjustl(trim(adjustl(outdir))//"/failed_matrix.dat")), &
              status="unknown",form='formatted',position="append")
-        do i=1,imax-1
-           write(666,*) ab(2,i), ab(3,i), ab(4,i), Darray(i)
+        do j=1,n
+           write(666,*) ab(2,j), ab(3,j), ab(4,j), Darray(iBC+j-1)
         end do
         close(666)
         stop "problem in the matrix inversion (see Data/failed_matrix.dat)"
@@ -212,9 +236,10 @@ subroutine hydro_rad
      !check if the iteration procedure converged
      delta_max = 0.0d0
 
-     do i=iBC,imax-1
-        if(abs(b(i)/temp_temp(i)).gt.delta_max) then
-           delta_max = abs(b(i)/temp_temp(i))
+     do j=1,n
+        i = iBC + j - 1
+        if(abs(b(j)/temp_temp(i)).gt.delta_max) then
+           delta_max = abs(b(j)/temp_temp(i))
            location_max = i
         end if
      end do
@@ -222,8 +247,9 @@ subroutine hydro_rad
      if((delta_max.le.EPSTOL)) goto 101
 
      !add the increment to the temperature
-     do i=iBC, imax-1
-        temp_temp(i) = temp_temp(i) + b(i)
+     do j=1,n
+        i = iBC + j - 1
+        temp_temp(i) = temp_temp(i) + b(j)
         if(temp_temp(i).lt.0.0d0) then
            goto 100
         end if
@@ -243,6 +269,13 @@ subroutine hydro_rad
   p(iBC:imax-1)   = p_temp(iBC:imax-1)
   temp(iBC:imax-1)  = temp_temp(iBC:imax-1)
 
+  if (iBC>1) then
+     ! zero-gradient extrapolation into the excised region
+     eps(1:iBC-1)  = eps(iBC)
+     p(1:iBC-1)    = p(iBC)
+     temp(1:iBC-1) = temp(iBC)
+  end if
+
   !passive boundary conditions, do not participate in the evolution
   temp(imax) = 0.0d0
   eps(imax) = 0.0d0
@@ -250,8 +283,13 @@ subroutine hydro_rad
   !active boundary condition, used in the velocity update
   p(imax) = 0.0d0
 
-  call opacity(rho(iBC:imax),temp_temp(iBC:imax),kappa(iBC:imax),kappa_table(iBC:imax),dkappadt(iBC:imax))
+  ! NOTE: opacity() and luminosity() declare their dummy arguments with an
+  ! explicit size imax and loop over 1:imax(-1) internally, skipping the
+  ! excised region through the module variable iBC. They must therefore be
+  ! called with WHOLE arrays -- passing rho(iBC:imax) shifts every index by
+  ! iBC-1 and writes past the end of the output arrays.
+  call opacity(rho(:), temp_temp(:), kappa(:), kappa_table(:), dkappadt(:))
 
-  call luminosity(r(iBC:imax),temp(iBC:imax),kappa(iBC:imax),lambda(iBC:imax),inv_kappa(iBC:imax),lum(iBC:imax))
+  call luminosity(r(:), temp(:), kappa(:), lambda(:), inv_kappa(:), lum(:))
 
 end subroutine hydro_rad

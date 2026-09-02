@@ -1,15 +1,16 @@
 subroutine blstep
 
   use blmod, only: rho, temp, ye, abar, eps, p, cs2, vel, r, cr, scratch_step, &
-                    time, dtime, shockpos_stop, nt
+                    time, dtime, shockpos_stop, nt, iBC
   use parameters
   use physical_constants
   implicit none
 
   real*8 :: rho_save(imax),temp_save(imax),vel_save(imax)
   real*8 :: p_save(imax),ye_save(imax),cs2_save(imax), abar_save(imax)
-  real*8 :: dedt_save(imax), r_save(imax), cr_save(imax)
+  real*8 :: r_save(imax), cr_save(imax)
   real*8 :: eps_save(imax)
+  integer :: iBC_save
 
   integer :: iterations
 
@@ -26,6 +27,9 @@ subroutine blstep
   vel_save  = vel
   r_save     = r
   cr_save    = cr
+  ! iBC is advanced inside hydro/hydro_rad and must be rolled back with
+  ! everything else, otherwise a scratched step permanently excises zones
+  iBC_save   = iBC
 
   iterations = 0
 
@@ -34,7 +38,7 @@ subroutine blstep
      iterations = iterations + 1
 
      if(scratch_step) then
-        ! redo step with half the timestep; this is 
+        ! redo step with half the timestep; this is
         ! sometimes necessary if the solver does not converge
         if (iterations.gt. 10) then
            stop "Stopping evolution. Time step repeated 10 times without luck"
@@ -52,16 +56,19 @@ subroutine blstep
         vel = vel_save
         r = r_save
         cr = cr_save
+        iBC = iBC_save
         scratch_step = .false.
      endif
 
-     ! select between pure hydro or 
+     ! select between pure hydro or
      ! radiation+hydro solver
      if(radiation) then
         call hydro_rad
      else
         call hydro
      end if
+
+     if (scratch_step) cycle
 
      if (time.ge.bomb_tend .and. shockpos_stop.eq.0) then
         call shock_capture
@@ -70,7 +77,7 @@ subroutine blstep
      if(.not.sedov) then
         call analysis
      endif
-               
+
      if(time.gt.0.0d0) call conservation_compute_energies
 
   enddo
