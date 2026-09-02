@@ -137,23 +137,6 @@ You can access variables as:
     radius = data['fields/radius']   # (n_zones, n_times), cm
 #+END_SRC
 
-* Intermediate results
-
-=commit c0442068eefd2e591bc56f23555ba5a65eee1f74=
-
-large_grid3 M(r) evolution in time
-#+DOWNLOADED: screenshot @ 2026-02-26 20:13:41
-[[file:.org_notes_figures/Intermediate_results/2026-02-26_20-13-41_screenshot.png]]
-
-
-#+DOWNLOADED: screenshot @ 2026-02-26 20:14:38
-[[file:.org_notes_figures/Intermediate_results/2026-02-26_20-14-38_screenshot.png]]
-
-
-* TODO List =SNEC+fb= future objectives
-- [ ] implement density smoothing self-consistent with boxcar composition smoothing
-- [ ] read directly MESA files as option, instead of clunky python scripts.
-- [ ] checkpoints see corresponding branch
 * Checkpoints implementations
 Original =SNEC= set up the infrastructure but did not implement restarts
 from checkpoints. In =SNEC+fb=, you may need to do long runs with small
@@ -169,6 +152,23 @@ restart_file           = "checkpoint.bin"
 
 Thermal bomb, piston, and mass excision are applied *only* at the
 beginning, and these parameters are ignored in restarts.
+
+* TODO List =SNEC+fb= future objectives
+- [ ] implement density smoothing self-consistent with boxcar composition smoothing
+- [ ] read directly MESA files as option, instead of clunky python scripts.
+- [ ] checkpoints see corresponding branch
+* Intermediate results
+
+=commit c0442068eefd2e591bc56f23555ba5a65eee1f74=
+
+large_grid3 M(r) evolution in time
+#+DOWNLOADED: screenshot @ 2026-02-26 20:13:41
+[[file:.org_notes_figures/Intermediate_results/2026-02-26_20-13-41_screenshot.png]]
+
+
+#+DOWNLOADED: screenshot @ 2026-02-26 20:14:38
+[[file:.org_notes_figures/Intermediate_results/2026-02-26_20-14-38_screenshot.png]]
+
 
 * Original =SNEC= resources
 

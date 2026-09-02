@@ -43,10 +43,10 @@ subroutine analysis
 
   !find the values of some variables at the photosphere
   if(photosphere_fell_on_the_center.eq.0) then
-     call map_map(lum_photo,  0.66d0, lum(imax:1:-1),  tau(imax:1:-1),imax)
-     call map_map(mass_photo, 0.66d0, mass(imax:1:-1), tau(imax:1:-1),imax)
-     call map_map(vel_photo,  0.66d0, vel(imax:1:-1),  tau(imax:1:-1),imax)
-     call map_map(rad_photo,  0.66d0, r(imax:1:-1),    tau(imax:1:-1),imax)
+     call map_map(lum_photo,  0.66d0, lum(imax:iBC:-1),  tau(imax:iBC:-1),imax)
+     call map_map(mass_photo, 0.66d0, mass(imax:iBC:-1), tau(imax:iBC:-1),imax)
+     call map_map(vel_photo,  0.66d0, vel(imax:iBC:-1),  tau(imax:iBC:-1),imax)
+     call map_map(rad_photo,  0.66d0, r(imax:iBC:-1),    tau(imax:iBC:-1),imax)
   else
      lum_photo   = lum(iBC)
      mass_photo  = mass(iBC)

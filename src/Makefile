@@ -31,8 +31,7 @@ SOURCES=checkpoint.F90\
 	arrays.F90\
 	boxcar.F90\
 	shock_capture.F90\
-	snec.F90
-
+	snec.F90\
 
 CLEANSTUFF=rm -rf *.o *.mod
 

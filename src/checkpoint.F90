@@ -423,13 +423,13 @@ contains
       allocate(pmass(profile_zones))
       allocate(pradius(profile_zones))
 
-      read(unit) pmass(iBC:profile_zones)
-      read(unit) pradius(iBC:profile_zones)
+      read(unit) pmass(1:profile_zones)
+      read(unit) pradius(1:profile_zones)
       close(unit)
 
       inner_radius = rBC_initial
       outer_radius = pradius(profile_zones)
-
+      print *, "outer_radius", outer_radius
       deallocate(pradius)
       deallocate(pmass)
 
