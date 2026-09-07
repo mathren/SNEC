@@ -10,3 +10,4 @@ profiles/*
 ./snec # executable
 snec
 parameters
+*.patch

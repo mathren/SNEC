@@ -23,7 +23,7 @@ initial_data 		=  "Thermal_Bomb" # "Piston_Explosion"  #
 # piston_tend		= 1.0d-2
 
 bomb_mode		= 1 # add to bomb binding energy
-final_energy		= 5.0d50 # 5.0d50
+final_energy		= 7.0d50 # 5.0d50
 bomb_tstart		= 0.0d0
 bomb_tend		= 1.0d-2
 bomb_mass_spread	= 0.1d0  # (in solar mass)
@@ -69,7 +69,7 @@ opacity_floor_core	= 0.01d0
 
 ntmax			= 10000000000
 
-tend			=  1728000.0d0 # 20d #8640000.0d0  # 100 days 604800.0d0 # 1 week
+tend			= 1728000.0d0 # 20d #8640000.0d0  # 100 days 604800.0d0 # 1 week
 
 max_t_dense_out         = 1000.0d0 # denser output until this
 
