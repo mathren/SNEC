@@ -1,4 +1,5 @@
 #+title: =SNEC+fb=: SNEC with fallback
+#+author: Mathieu Renzo assisted by: Claude:claude-opus-5 and other free-tier LLMs
 
 Based on =SNEC= version =1.01= available at [[https://sntheory.org/SNEC.html]].
 
@@ -147,8 +148,8 @@ large_grid3 M(r) evolution in time
 #+DOWNLOADED: screenshot @ 2026-02-26 20:14:38
 [[file:.org_notes_figures/Intermediate_results/2026-02-26_20-14-38_screenshot.png]]
 
-
 * TODO =SNEC+fb= Objectives
+- [testing] merge in last patch applied on =ua_w=
 - [ ] implement density smoothing self-consistent with boxcar composition smoothing
 - [ ] read directly MESA files as option, instead of clunky python scripts.
 * Original =SNEC= resources

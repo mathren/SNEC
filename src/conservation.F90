@@ -3,7 +3,7 @@ subroutine conservation_compute_energies
 ! for energy conservation
   
   use blmod, only: nt, delta_mass, cmass, cr, gravity_switch, eps, vel, &
-                    total_initial_energy, time, tdump_scalar
+                    total_initial_energy, time, tdump_scalar, iBC
   use parameters
   use physical_constants
   implicit none
@@ -19,12 +19,18 @@ subroutine conservation_compute_energies
   eint = 0.0d0
   ekin = 0.0d0
 
-  do i=1,imax
+  ! Only the active zones iBC..imax carry physical state: the zones inside the
+  ! moving inner boundary hold a zero-gradient ghost copy of zone iBC on an
+  ! artificial radial grid, so summing over them injects a spurious, drifting
+  ! internal- and gravitational-energy contribution into conservation.dat.
+  ! The mass that fell through the boundary is retained in mass(iBC), i.e. it
+  ! keeps gravitating as a central point mass.
+  do i=iBC,imax
      egrav = egrav - ggrav*delta_mass(i)*cmass(i)/cr(i) *gravity_switch
      eint = eint + eps(i)*delta_mass(i)
   enddo
-  
-  do i=1,imax-1
+
+  do i=iBC,imax-1
      ekin = ekin + 0.5d0*(0.50d0*(vel(i+1)+vel(i)))**2 * delta_mass(i)
   enddo
   ekin = ekin + 0.5d0*(vel(imax))**2 * delta_mass(imax)

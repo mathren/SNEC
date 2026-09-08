@@ -1,6 +1,6 @@
 subroutine opacity(rho_x,temp_x,kappa_x,kappa_table_x,dkappadt_x)
 
-  use blmod, only: logT, logR_op, opacity_floor
+  use blmod, only: logT, logR_op, opacity_floor, iBC
   use parameters
   use physical_constants
   implicit none
@@ -26,7 +26,10 @@ subroutine opacity(rho_x,temp_x,kappa_x,kappa_table_x,dkappadt_x)
   ! the envelope metallicity is assumed to be the nominal metallicity
   ! of the OPAL Type II tables; see blmod.F90
 
-  do i=1, imax - 1
+  ! zones inside the moving inner boundary are excised: their (rho,T) are a
+  ! zero-gradient copy of zone iBC and are not evolved, so skip the table
+  ! lookup there instead of pushing garbage through bicubic_interpolation.
+  do i=iBC, imax - 1
 
      !definitions of R_op and t6 are given in the codata files (opacity tables)
      t6 = temp_x(i)*1.0d-6
@@ -45,7 +48,7 @@ subroutine opacity(rho_x,temp_x,kappa_x,kappa_table_x,dkappadt_x)
 
      else
 
-        if(i.eq.1) then
+        if(i.eq.iBC) then
            kappa_x(i) = opacity_floor(i)
         else
            kappa_x(i) = kappa_x(i-1)
@@ -60,11 +63,17 @@ subroutine opacity(rho_x,temp_x,kappa_x,kappa_table_x,dkappadt_x)
 
   kappa_table_x(1:imax-1) = kappa_x(1:imax-1)
 
-  do i=1, imax-1
+  do i=iBC, imax-1
     if( kappa_x(i) .lt. opacity_floor(i)) then
         kappa_x(i)   =  opacity_floor(i)
     end if
   end do
+
+  if (iBC.gt.1) then
+     kappa_x(1:iBC-1)       = kappa_x(iBC)
+     kappa_table_x(1:iBC-1) = kappa_table_x(iBC)
+     dkappadt_x(1:iBC-1)    = 0.0d0
+  end if
 
   ! Since the temperature temp(imax) is evaluated in the evolution, but
   ! set by the boundary condition, it doesn't make sense to find

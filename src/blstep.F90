@@ -1,7 +1,7 @@
 subroutine blstep
 
   use blmod, only: rho, temp, ye, abar, eps, p, cs2, vel, r, cr, scratch_step, &
-                    time, dtime, shockpos_stop, nt, iBC
+                    time, dtime, dtime_p, shockpos_stop, nt, iBC
   use parameters
   use physical_constants
   implicit none
@@ -46,6 +46,11 @@ subroutine blstep
         write(6,*) "Scratching entire step...", nt
         write(6,"(A25,1P10E15.6)") "time,dt,dt_new: ",time,dtime,dtime/2.0d0
         dtime = dtime / 2.0d0
+        ! hydro/hydro_rad advance the momentum equation with
+        ! dtv = 0.5*(dtime+dtime_p). Leaving dtime_p at its full value means a
+        ! retry barely reduces dtv, so the step can fail 10 times in a row and
+        ! abort. Keep the two consistent.
+        dtime_p = min(dtime_p, dtime)
         rho = rho_save
         temp = temp_save
         ye = ye_save

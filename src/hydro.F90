@@ -6,6 +6,7 @@ subroutine hydro
   implicit none
 
   integer :: i,ie
+  integer :: iBC_new
   integer :: keytemp,keyerr
   real*8 :: dtv
 
@@ -59,10 +60,9 @@ subroutine hydro
       vel(1) = 0.0d0
   endif
 
-  ! hack inner boundary to be inflow no backreaction
+  ! inflow-only (no backreaction) inner boundary
   if (innerBC == "inflow") then
-     vel(iBC) = min(0.0d0, vel(iBC+1)) !vel(iBC+1)
-     print*, vel(iBC), vel(iBC+1)
+     vel(iBC) = min(0.0d0, vel(iBC+1))
   else
      vel(iBC) = 0.0d0
   end if
@@ -84,21 +84,18 @@ subroutine hydro
   ! now we have updated radii and velocities: do we need to move the
   ! inner boundary index (iBC)? cut everything reaching r smaller thana
   ! the initial smaller radius, a fixed boundary
+  ! Same excision rule as hydro_rad: a zone is removed as a whole once its
+  ! inner face has crossed rBC_initial. Keep the two solvers in sync.
   if (innerBC == "inflow") then
-     i = imax
-
-     do while (i>iBC+1)
-        ! Check if the cell just outside the boundary has fallen inside r(iBC)
-        if (r(i)<=max(r(iBC), rBC_initial)) then
-           print *, "! ----------------------!"
-           print *, "! update inner boundary !"
-           print *, "! iBC: ", iBC, " -> ", i
-           print *, "! ----------------------!"
-           iBC = i
-           exit
-        end if
-        i = i - 1  ! loop inward
+     iBC_new = iBC
+     do i=iBC, imax-1
+        if (r(i) < rBC_initial) iBC_new = i+1
      end do
+     if (iBC_new.ge.imax-1) then
+        write(*,*) "hydro: inner boundary reached the outer zones, stopping"
+        stop
+     end if
+     iBC = iBC_new
   end if
 
 
@@ -145,22 +142,21 @@ subroutine hydro
   ie=0
 
   if (iBC>1) then
-     ! flatten everything inside inner boundary
-     ! prevent pressure, temperature and internal
-     ! energy gradients which could cause backreaction
-     vel(1:iBC-1)= 0.0d0
-     !! Reset velocity inside and at the boundary
+     ! flatten everything inside the inner boundary to prevent pressure,
+     ! temperature and internal energy gradients that could push back.
+     ! N.B. the ghost range is 1:iBC-1. The parent version wrote 1:iBC, which
+     ! overwrote the innermost ACTIVE zone iBC with the state of zone iBC+1
+     ! every step, and pinned r(iBC) to rBC_initial at fixed delta_mass(iBC),
+     ! which blows up rho(iBC) and collapses the CFL timestep.
+     vel(1:iBC-1) = 0.0d0
      vel(iBC) = min(0.0d0, vel(iBC+1))
-     !! Reset radii at inside and at the boundary
-     r(1:iBC-1) = 1d6     ! r_p(1:iBC-1)
-     r(iBC) = rBC_initial  ! restore inner boundary radius
-     ! N.B.: we ignore change in volume of inner cell,
-     ! since anyways we apply a zero gradient condition
-     ! the energy density, mass density, etc. are copied from the cell above
-     eps(1:iBC) = eps(iBC+1)
-     p(1:iBC) = p(iBC+1)
-     temp(1:iBC) = temp(iBC+1)
-     temp_temp(1:iBC) = temp_temp(iBC+1)
+     do i=1, iBC-1
+        r(i) = rBC_initial*(0.10d0 + 0.85d0*dble(i-1)/dble(iBC-1))
+     end do
+     eps(1:iBC-1)       = eps(iBC)
+     p(1:iBC-1)         = p(iBC)
+     temp(1:iBC-1)      = temp(iBC)
+     temp_temp(1:iBC-1) = temp_temp(iBC)
   end if
   delta_max = 1
 

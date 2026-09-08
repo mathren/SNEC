@@ -84,13 +84,23 @@ subroutine hydro_rad
   end do
 
   ! now we have updated radii and velocities: do we need to move the
-  ! inner boundary index (iBC)? Everything that reached r < rBC_initial is
-  ! excised. Take the OUTERMOST face that fell inside, so that zone
-  ! crossings during fallback are absorbed instead of aborting the run.
+  ! inner boundary index (iBC)? A Lagrangian zone is excised as a WHOLE as
+  ! soon as its inner face has crossed rBC_initial, i.e. iBC is the first
+  ! face at or above rBC_initial. Scanning the whole range (instead of
+  ! stopping at the first hit) absorbs several crossings in one step.
+  !
+  ! N.B.: do NOT clamp r(iBC) back onto rBC_initial. delta_mass(iBC) is a
+  ! fixed Lagrangian mass, so shrinking the zone volume by hand drives
+  ! rho(iBC) = delta_mass(iBC)/V -> infinity and (r(iBC+1)-r(iBC)) -> 0 as
+  ! the next face approaches rBC_initial. The CFL condition in timestep.F90
+  ! then collapses dt to dtmin just before every zone crossing, which is why
+  ! this branch became much slower than its parent. It is also unphysical:
+  ! the clamp compresses the zone without any corresponding velocity
+  ! divergence, so it does spurious pdV work on the innermost zone.
   if (innerBC == "inflow") then
      iBC_new = iBC
      do i=iBC, imax-1
-        if (r(i) <= rBC_initial) iBC_new = i
+        if (r(i) < rBC_initial) iBC_new = i+1
      end do
 
      if (iBC_new.ge.imax-1) then
@@ -99,25 +109,19 @@ subroutine hydro_rad
      end if
 
      iBC = iBC_new
-     ! the excision radius is fixed: pull the new boundary face back onto it
-     r(iBC)   = max(r(iBC), rBC_initial)
+     ! re-clamp the boundary velocity after the index moved
      vel(iBC) = min(0.0d0, vel(iBC+1))
 
      if (iBC>1) then
         ! flatten everything inside the inner boundary to prevent pressure,
         ! temperature and internal energy gradients that could push back
         vel(1:iBC-1) = 0.0d0
-        ! keep the dead radii monotonically ordered and below r(iBC): several
-        ! routines (optical_depth, nickel_heating/map_find_index, analysis)
-        ! assume a monotonic r(1:imax)
+        ! keep the dead radii monotonic, strictly positive and below r(iBC):
+        ! optical_depth, nickel_heating/map_find_index and analysis assume a
+        ! monotonic r(1:imax), and conservation divides by cr(i)
         do i=1, iBC-1
-           r(i) = 0.95d0*r(iBC)*dble(i-1)/dble(iBC-1)
+           r(i) = rBC_initial*(0.10d0 + 0.85d0*dble(i-1)/dble(iBC-1))
         end do
-        ! zero-gradient extrapolation into the excised region
-        eps(1:iBC-1)  = eps(iBC)
-        p(1:iBC-1)    = p(iBC)
-        temp(1:iBC-1) = temp(iBC)
-        rho(1:iBC-1)  = rho(iBC)
      end if
   end if
 
@@ -145,6 +149,19 @@ subroutine hydro_rad
   cr(imax) = r(imax) + (r(imax) - cr(imax-1))
   !passive boundary condition, used in the expression for the velocity update,
   !but multiplied by the artificial viscosity, which is zero at the last point
+
+  ! zero-gradient ghost state inside the excised region. This has to come
+  ! AFTER the rho/cr update: doing it before (as in the parent commit) copies
+  ! the previous-step rho(iBC) into the ghosts.
+  if (iBC>1) then
+     do i=1, iBC-1
+        cr(i) = ( ( r(i)**3 + r(i+1)**3 ) / 2.0d0 )**(1.0d0/3.0d0)
+     end do
+     rho(1:iBC-1)  = rho(iBC)
+     eps(1:iBC-1)  = eps(iBC)
+     p(1:iBC-1)    = p(iBC)
+     temp(1:iBC-1) = temp(iBC)
+  end if
 
   ! update the artificial viscosity
   call artificial_viscosity
