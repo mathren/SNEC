@@ -309,4 +309,12 @@ subroutine hydro_rad
 
   call luminosity(r(:), temp(:), kappa(:), lambda(:), inv_kappa(:), lum(:))
 
+  if (iBC>1) then
+     ! zero-gradient extrapolation into the excised region
+     tau(1:iBC-1) = 1d99
+     kappa(1:iBC-1) = 1d99
+     lum(1:iBC) = 0
+  end if
+
+
 end subroutine hydro_rad
