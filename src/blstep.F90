@@ -1,7 +1,7 @@
 subroutine blstep
 
   use blmod, only: rho, temp, ye, abar, eps, p, cs2, vel, r, cr, scratch_step, &
-                    time, dtime, dtime_p, shockpos_stop, nt, iBC
+                    time, dtime, dtime_p, shockpos_stop, nt, iBC, time_Ni
   use parameters
   use physical_constants
   implicit none
@@ -11,25 +11,26 @@ subroutine blstep
   real*8 :: r_save(imax), cr_save(imax)
   real*8 :: eps_save(imax)
   integer :: iBC_save
-
+  real*8 :: time_Ni_save
   integer :: iterations
 
 !------------------------------------------------------------------------------
 
   ! save old values in case we have to redo the step
-  rho_save   = rho
-  temp_save  = temp
-  ye_save    = ye
+  rho_save     = rho
+  temp_save    = temp
+  ye_save      = ye
   abar_save    = abar
-  eps_save    = eps
-  p_save     = p
-  cs2_save   = cs2
-  vel_save  = vel
-  r_save     = r
-  cr_save    = cr
+  eps_save     = eps
+  p_save       = p
+  cs2_save     = cs2
+  vel_save     = vel
+  r_save       = r
+  cr_save      = cr
   ! iBC is advanced inside hydro/hydro_rad and must be rolled back with
   ! everything else, otherwise a scratched step permanently excises zones
-  iBC_save   = iBC
+  iBC_save     = iBC
+  time_Ni_save = time_Ni
 
   iterations = 0
 
@@ -62,6 +63,7 @@ subroutine blstep
         r = r_save
         cr = cr_save
         iBC = iBC_save
+        time_Ni = time_Ni_save
         scratch_step = .false.
      endif
 

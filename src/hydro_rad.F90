@@ -57,8 +57,6 @@ subroutine hydro_rad
      end if
   else if(do_bomb) then
      vel(1) = 0.0d0
-  else if(inject_BE) then
-     vel(1) = 0.0d0
   end if
 
   do i=iBC+1, imax
@@ -177,8 +175,6 @@ subroutine hydro_rad
   !calculate heating term due to bomb
   if(do_bomb .and. time.ge.bomb_tstart .and. time.le.bomb_tend) then
      call bomb_pattern
-  else if (inject_be .and. nt == 0) then
-     call inject_progenitor_binding_energy
   else
      bomb_heating(:) = 0.0d0
   end if
@@ -278,7 +274,7 @@ subroutine hydro_rad
 
   write(6,*) "EOS problem", delta_max, location_max, iBC
   scratch_step = .true.
-
+  return
 101 continue
 
 

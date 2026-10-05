@@ -130,9 +130,6 @@ subroutine hydro
   !calculate heating term due to bomb
   if(do_bomb .and. time.ge.bomb_tstart .and. time.le.bomb_tend) then
       call bomb_pattern
-  else if (inject_be .and. nt == 0) then
-     call inject_progenitor_binding_energy
-  else
       bomb_heating(:) = 0.0d0
   endif
 
@@ -172,7 +169,7 @@ subroutine hydro
 
     delta_max = 0
 
-    do i=iBC+1,imax-1
+    do i=iBC,imax-1
 
         function_star = eps_temp(i) - eps(i) + 0.5d0*(p_temp(i) + p(i)) &
             * (1.0d0/rho(i)-1.0d0/rho_p(i)) - bomb_heating(i)*dtime &
@@ -224,6 +221,7 @@ subroutine hydro
      tau(1:iBC-1) = 1d99
      kappa(1:iBC-1) = 1d99
      lum(1:iBC) = 0
+
   end if
 
 end subroutine hydro

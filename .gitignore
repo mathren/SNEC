@@ -11,3 +11,4 @@ profiles/*
 snec
 parameters
 *.patch
+Data_test/*

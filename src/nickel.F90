@@ -1,7 +1,8 @@
 subroutine nickel_heating
 
   use blmod, only: ye, comp, Ni_heating, Ni_total_luminosity, Ni_number, &
-                   r, rho, time, Ni_deposit_function, Ni_energy_rate, delta_mass
+                   r, rho, time, Ni_deposit_function, Ni_energy_rate, delta_mass, &
+                   iBC
   use parameters
   use physical_constants
   implicit none
@@ -46,7 +47,7 @@ subroutine nickel_heating
      !*** solve for the local heating due to the radioactive decay of Ni ****
 
      i_Ni = 0
-     do i=imax, 1, -1
+     do i=imax, iBC, -1
         if(comp(i,Ni_number).gt.nimin) then
            r_Ni = r(i)
            i_Ni = i
@@ -77,7 +78,7 @@ subroutine nickel_heating
 
 
      ! find the deposition function at each grid point
-     do i=1, imax
+     do i=iBC, imax
         th = th_max
         I_prime_av = 0
         delta_th = (th_max-th_min(i))/npoints_angular_integration
@@ -91,7 +92,7 @@ subroutine nickel_heating
            do while(r_x.gt.0)
               r_j = sqrt(r(i)*r(i) + r_x*r_x + 2.0d0*r(i)*r_x*cos(th))
 
-              if(r_j.le.r(1)) then !inside the excised region
+              if(r_j.le.r(iBC)) then !inside the excised region
                  delta_tau_j = 0.0d0
                  comp_Ni_j = 0.0d0
               else if(r_j.ge.r(imax-1)) then
@@ -119,11 +120,11 @@ subroutine nickel_heating
           3.24d10*exp(-time*overtau_Ni) + 7.29d9*exp(-time*overtau_Co)
 
      ! local rate of gamma-ray energy deposition at a given grid point
-     Ni_heating(1:imax) = Ni_energy_rate*Ni_deposit_function(1:imax)
+     Ni_heating(iBC:imax) = Ni_energy_rate*Ni_deposit_function(iBC:imax)
 
      ! total energy per second, deposited to the model by gamma-rays
      Ni_total_luminosity = &
-          Ni_energy_rate*sum(Ni_deposit_function(1:imax)*delta_mass(1:imax))
+          Ni_energy_rate*sum(Ni_deposit_function(iBC:imax)*delta_mass(iBC:imax))
   end if
 
 end subroutine nickel_heating

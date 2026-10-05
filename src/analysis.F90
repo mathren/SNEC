@@ -30,7 +30,7 @@ subroutine analysis
   !fix the moment, when the photosphere reaches the inner boundary, if it does
   ! print *, "tau(iBC)=", tau(iBC), tau(iBC)==tau(1), iBC, tau(iBC).lt.0.66d0, r(iBC)
   if(tau(iBC).lt.0.66d0) then
-     index_photo = 1
+     index_photo = iBC
      if(photosphere_fell_on_the_center.eq.0) then
         photosphere_fell_on_the_center = 1
         open(unit=666, &
@@ -72,13 +72,13 @@ subroutine analysis
 
 !------------------------ Tracing the luminosity shell ------------------------
   index_lumshell = imax
-  do i=iBC, imax - 1
+  do i=1, imax-iBC
      if(tau(imax-i).gt.(clite/vel(imax-i))) then
         index_lumshell = imax - i + 1
         exit
      end if
   end do
-  if (tau(2).le.(clite/vel(2))) then
+  if (tau(2).le.(clite/abs(vel(2)))) then
      index_lumshell = 1
   end if
   mass_lumshell = mass(index_lumshell)
