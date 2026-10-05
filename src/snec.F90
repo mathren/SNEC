@@ -30,7 +30,6 @@ program snec
   call artificial_viscosity
 
 ! output before first timestep
-  call output_all(0)
   call output_all(1)
   call output_all(2)
 
@@ -97,7 +96,7 @@ program snec
         if (time.le.max_t_dense_out) then ! more output in the first 4h
            tdump_scalar=tdump_scalar+dtout_scalar/200.0
         else
-           tdump_scalar =tdump_scalar+dtout
+           tdump_scalar =tdump_scalar+dtout_scalar
         end if
         OutputFlagScalar = .true.
      endif
@@ -106,7 +105,7 @@ program snec
         if (time.le.max_t_dense_out) then ! more output in the first 4h
            tdump_check=tdump_check+dtout_check/200.0
         else
-           tdump_check =tdump_check+dtout
+           tdump_check =tdump_check+dtout_check
         end if
         OutputFlagCheck = .true.
      endif
@@ -115,7 +114,6 @@ program snec
      time = time+dtime
 
      if (OutputFlag) then
-        call output_all(0)
         call output_all(1)
         OutputFlag = .false.
      endif
@@ -129,19 +127,13 @@ program snec
         OutputFlagCheck = .false.
      endif
 
-     if (time.eq.tend) then
+     if (time.ge.tend) then
         write(*,*) "Done! :-) tend reached"
-        call output_all(0)
-        call output_all(1)
-        call output_all(2)
         exit
      endif
 
      if (nt.ge.ntmax) then
         write(*,*) "Done! :-) ntmax reached"
-        call output_all(0)
-        call output_all(1)
-        call output_all(2)
         exit
      endif
 
