@@ -21,8 +21,8 @@ can be downloaded from the website, unpacked, and initialized with
 At the time of writing, this provides
 
 #+BEGIN_SRC bash
-  GNU Fortran (GCC) 15.2.0
-  Copyright (C) 2025 Free Software Foundation, Inc.
+  GNU Fortran (GCC) 13.3.0
+  Copyright (C) 2023 Free Software Foundation, Inc.
   This is free software; see the source for copying conditions.  There is NO
   warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #+END_SRC
@@ -151,7 +151,10 @@ large_grid3 M(r) evolution in time
 * TODO =SNEC+fb= Objectives
 - [testing] merge in last patch applied on =ua_w=
 - [ ] implement density smoothing self-consistent with boxcar composition smoothing
-- [ ] read directly MESA files as option, instead of clunky python scripts.
+- [ ] read directly MESA files as option, instead of clunky python
+  scripts.
+- [ ] expose to users boxcar_width
+
 * Original =SNEC= resources
 
 - https://img.shields.io/badge/read-paper-blue.svg?style=flat

@@ -43,7 +43,7 @@ subroutine eos(rhox, t, y, abar, &
 
  else
     stop "eos choice not implemented, check parameter eoskey"
-    
+
  endif
- 
+
 end subroutine eos
